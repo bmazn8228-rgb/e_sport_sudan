@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:e_sport_sudan/core/theme/app_theme.dart';
 import 'package:e_sport_sudan/features/team/presentation/screens/team_management_screen.dart';
 import 'package:e_sport_sudan/features/roles/presentation/screens/organizer_dashboard.dart';
@@ -25,6 +29,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool _isCardFlipped = false;
   UserModel? _userModel;
   bool _isLoading = true;
+  bool _isImageUploading = false;
 
   @override
   void initState() {
@@ -307,6 +312,56 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  Future<void> _pickAndUploadImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery, imageQuality: 70);
+    
+    if (pickedFile == null) return;
+    
+    setState(() => _isImageUploading = true);
+    
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null || _userModel == null) throw Exception('المستخدم غير مسجل');
+      
+      final file = File(pickedFile.path);
+      final ref = FirebaseStorage.instance.ref().child('profile_images/${user.uid}.jpg');
+      
+      await ref.putFile(file);
+      final downloadUrl = await ref.getDownloadURL();
+      
+      await user.updatePhotoURL(downloadUrl);
+      
+      final updatedUserModel = UserModel(
+        uid: _userModel!.uid,
+        email: _userModel!.email,
+        displayName: _userModel!.displayName,
+        phone: _userModel!.phone,
+        photoUrl: downloadUrl,
+        gameId: _userModel!.gameId,
+        role: _userModel!.role,
+        teamId: _userModel!.teamId,
+        settings: _userModel!.settings,
+      );
+      
+      await FirestoreService().saveUser(updatedUserModel);
+      
+      if (mounted) {
+        setState(() {
+          _userModel = updatedUserModel;
+          _isImageUploading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isImageUploading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('فشل في رفع الصورة، حاول مرة أخرى.'), backgroundColor: Colors.redAccent),
+        );
+      }
+    }
+  }
+
   Widget _buildFrontCard() {
     final user = FirebaseAuth.instance.currentUser;
     final uid = user?.uid ?? '000000';
@@ -343,15 +398,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
             children: [
               Row(
                 children: [
-                  Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: AppTheme.primaryGreen.withValues(alpha: 0.15),
-                      shape: BoxShape.circle,
-                      border: Border.all(color: AppTheme.primaryGreen.withValues(alpha: 0.4)),
+                  GestureDetector(
+                    onTap: _isImageUploading ? null : _pickAndUploadImage,
+                    child: Container(
+                      width: 48,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        color: AppTheme.primaryGreen.withValues(alpha: 0.15),
+                        shape: BoxShape.circle,
+                        border: Border.all(color: AppTheme.primaryGreen.withValues(alpha: 0.4)),
+                        image: (_userModel?.photoUrl != null && _userModel!.photoUrl!.isNotEmpty)
+                            ? DecorationImage(
+                                image: CachedNetworkImageProvider(_userModel!.photoUrl!),
+                                fit: BoxFit.cover,
+                              )
+                            : null,
+                      ),
+                      child: _isImageUploading
+                          ? const Padding(
+                              padding: EdgeInsets.all(14.0),
+                              child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.primaryGreen),
+                            )
+                          : (_userModel?.photoUrl == null || _userModel!.photoUrl!.isEmpty)
+                              ? const Icon(Icons.person_rounded, color: AppTheme.primaryGreen, size: 24)
+                              : null,
                     ),
-                    child: const Icon(Icons.person_rounded, color: AppTheme.primaryGreen, size: 24),
                   ),
                   const SizedBox(width: 12),
                   Column(
