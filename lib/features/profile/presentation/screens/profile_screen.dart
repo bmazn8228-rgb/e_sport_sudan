@@ -169,7 +169,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   const SizedBox(height: 12),
                   _buildPortalTile(
                     title: 'إدارة الفريق والتشكيلة',
-                    subtitle: 'صقور النيل • 5 لاعبين',
+                    subtitle: 'يتوفر قريباً',
                     icon: Icons.groups,
                     color: AppTheme.primaryGreen,
                     onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const TeamManagementScreen())),
@@ -324,9 +324,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
             children: [
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
-                  Text('معرف اللاعب (Player ID)', style: TextStyle(color: Colors.white38, fontSize: 9)),
-                  Text('SD-99214-SDN', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13, letterSpacing: 1.2)),
+                children: [
+                  const Text('معرف اللاعب (Player ID)', style: TextStyle(color: Colors.white38, fontSize: 9)),
+                  Text(
+                    'SD-${FirebaseAuth.instance.currentUser?.uid.substring(0, 6).toUpperCase() ?? "000000"}-SDN',
+                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13, letterSpacing: 1.2),
+                  ),
                 ],
               ),
               Column(
