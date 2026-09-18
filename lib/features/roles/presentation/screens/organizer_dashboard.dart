@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:e_sport_sudan/core/theme/app_theme.dart';
+import 'package:e_sport_sudan/core/services/firestore_service.dart';
 import 'organizer_referees_screen.dart';
 import 'organizer_matches_screen.dart';
 import 'organizer_complaints_screen.dart';
@@ -77,23 +78,30 @@ class OrganizerDashboard extends StatelessWidget {
             const SizedBox(height: 12),
             Row(
               children: [
-                _buildStatTile('الفرق المشاركة', '0', Icons.groups, AppTheme.primaryGreen, () {
+                _buildStreamStatTile('الفرق المشاركة', FirestoreService().getAllTeamsStream(), Icons.groups, AppTheme.primaryGreen, () {
                   Navigator.push(context, MaterialPageRoute(builder: (context) => const OrganizerTeamsScreen()));
                 }),
                 const SizedBox(width: 10),
-                _buildStatTile('المباريات المكتملة', '0', Icons.sports_score, Colors.orange, () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => const OrganizerMatchesScreen()));
-                }),
+                _buildStreamStatTile(
+                  'المباريات المكتملة', 
+                  FirestoreService().getAllMatchesStream(), 
+                  Icons.sports_score, 
+                  Colors.orange, 
+                  () {
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => const OrganizerMatchesScreen()));
+                  },
+                  filter: (m) => m['status'] == 'completed',
+                ),
               ],
             ),
             const SizedBox(height: 10),
             Row(
               children: [
-                _buildStatTile('حكام الساحة النشطين', '0', Icons.sports, Colors.blue, () {
+                _buildStreamStatTile('حكام الساحة النشطين', FirestoreService().getUsersByRoleStream('referee'), Icons.sports, Colors.blue, () {
                   Navigator.push(context, MaterialPageRoute(builder: (context) => const OrganizerRefereesScreen()));
                 }),
                 const SizedBox(width: 10),
-                _buildStatTile('الاعتراضات والشكاوى', '0', Icons.warning_amber, Colors.red, () {
+                _buildStreamStatTile('الاعتراضات والشكاوى', FirestoreService().getComplaintsStream(), Icons.warning_amber, Colors.red, () {
                   Navigator.push(context, MaterialPageRoute(builder: (context) => const OrganizerComplaintsScreen()));
                 }),
               ],
@@ -151,6 +159,23 @@ class OrganizerDashboard extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildStreamStatTile(String label, Stream<List<dynamic>> stream, IconData icon, Color color, VoidCallback onTap, {bool Function(dynamic)? filter}) {
+    return StreamBuilder<List<dynamic>>(
+      stream: stream,
+      builder: (context, snapshot) {
+        String countStr = '0';
+        if (snapshot.hasData) {
+          final list = snapshot.data!;
+          final count = filter != null ? list.where(filter).length : list.length;
+          countStr = count.toString();
+        } else if (snapshot.connectionState == ConnectionState.waiting) {
+          countStr = '...';
+        }
+        return _buildStatTile(label, countStr, icon, color, onTap);
+      },
     );
   }
 

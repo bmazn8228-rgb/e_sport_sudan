@@ -26,6 +26,16 @@ class FirestoreService {
     await _db.collection('users').doc(uid).set({'settings': settings.toMap()}, SetOptions(merge: true));
   }
 
+  Stream<List<Map<String, dynamic>>> getUsersByRoleStream(String role) {
+    return _db.collection('users').where('role', isEqualTo: role).snapshots().map(
+      (snapshot) => snapshot.docs.map((doc) {
+        final data = doc.data();
+        data['id'] = doc.id;
+        return data;
+      }).toList(),
+    );
+  }
+
   // =========================================================================
   // 2. Tournaments (البطولات)
   // =========================================================================
@@ -67,6 +77,16 @@ class FirestoreService {
               data['id'] = doc.id;
               return data;
             }).toList());
+  }
+
+  Stream<List<Map<String, dynamic>>> getAllTeamsStream() {
+    return _db.collection('teams').snapshots().map(
+      (snapshot) => snapshot.docs.map((doc) {
+        final data = doc.data();
+        data['id'] = doc.id;
+        return data;
+      }).toList(),
+    );
   }
 
   // =========================================================================
@@ -216,5 +236,23 @@ class FirestoreService {
   // =========================================================================
   Future<void> seedInitialData() async {
     // Initial data seeding logic removed to avoid dummy data.
+  }
+
+  // =========================================================================
+  // 8. Complaints (الشكاوى والاعتراضات)
+  // =========================================================================
+  Stream<List<Map<String, dynamic>>> getComplaintsStream() {
+    return _db.collection('complaints').orderBy('createdAt', descending: true).snapshots().map(
+      (snapshot) => snapshot.docs.map((doc) {
+        final data = doc.data();
+        data['id'] = doc.id;
+        return data;
+      }).toList(),
+    );
+  }
+
+  Future<void> addComplaint(Map<String, dynamic> data) async {
+    data['createdAt'] = FieldValue.serverTimestamp();
+    await _db.collection('complaints').add(data);
   }
 }
