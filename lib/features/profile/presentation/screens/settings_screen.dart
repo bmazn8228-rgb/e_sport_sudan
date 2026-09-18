@@ -25,24 +25,29 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _loadSettings() async {
-    final user = AuthService().currentUser;
-    if (user != null) {
-      _uid = user.uid;
-      final userModel = await FirestoreService().getUser(user.uid);
-      if (userModel != null) {
-        if (mounted) {
-          setState(() {
-            _settings = userModel.settings;
-            _isLoading = false;
-          });
+    try {
+      final user = AuthService().currentUser;
+      if (user != null) {
+        _uid = user.uid;
+        final userModel = await FirestoreService().getUser(user.uid);
+        if (userModel != null) {
+          if (mounted) {
+            setState(() {
+              _settings = userModel.settings;
+              _isLoading = false;
+            });
+          }
+          // Sync topics initially on load just to be sure
+          NotificationService().syncTopicSubscriptions(_settings);
+          return;
         }
-        // Sync topics initially on load just to be sure
-        NotificationService().syncTopicSubscriptions(_settings);
-        return;
       }
-    }
-    if (mounted) {
-      setState(() => _isLoading = false);
+    } catch (e) {
+      debugPrint('Error loading settings: $e');
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
