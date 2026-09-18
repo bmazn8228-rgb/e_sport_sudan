@@ -11,6 +11,7 @@ class SuperAdminDashboard extends StatefulWidget {
   State<SuperAdminDashboard> createState() => _SuperAdminDashboardState();
 }
 
+class _SuperAdminDashboardState extends State<SuperAdminDashboard> {
   // This will be replaced with a Firestore stream in the future
   final List<Map<String, dynamic>> _pendingVerifications = [];
 

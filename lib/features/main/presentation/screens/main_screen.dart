@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'dart:ui';
+import 'package:flutter/services.dart';
 import 'package:e_sport_sudan/core/theme/app_theme.dart';
-import 'package:e_sport_sudan/features/auth/presentation/screens/login_screen.dart';
-import 'package:e_sport_sudan/features/admin/presentation/screens/tournament_admin_dashboard_screen.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:e_sport_sudan/core/services/firestore_service.dart';
@@ -55,23 +55,100 @@ class _MainScreenState extends State<MainScreen> {
     ];
 
     return Scaffold(
+      extendBody: true,
       body: screens[_currentIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (index) => setState(() => _currentIndex = index),
-        backgroundColor: AppTheme.backgroundDark,
-        selectedItemColor: AppTheme.primaryGreen,
-        unselectedItemColor: Colors.white54,
-        type: BottomNavigationBarType.fixed,
-        selectedFontSize: 12,
-        unselectedFontSize: 11,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.videogame_asset), label: 'الرئيسية'),
-          BottomNavigationBarItem(icon: Icon(Icons.emoji_events), label: 'البطولات'),
-          BottomNavigationBarItem(icon: Icon(Icons.sports_kabaddi), label: 'المباريات'),
-          BottomNavigationBarItem(icon: Icon(Icons.leaderboard), label: 'التصنيف'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'حسابي'),
-        ],
+      bottomNavigationBar: _buildFloatingGlassNavBar(),
+    );
+  }
+
+  Widget _buildFloatingGlassNavBar() {
+    final navItems = [
+      {'icon': Icons.sports_esports_rounded, 'label': 'الرئيسية'},
+      {'icon': Icons.emoji_events_rounded, 'label': 'البطولات'},
+      {'icon': Icons.live_tv_rounded, 'label': 'المباريات'},
+      {'icon': Icons.leaderboard_rounded, 'label': 'التصنيف'},
+      {'icon': Icons.person_rounded, 'label': 'حسابي'},
+    ];
+
+    return Container(
+      margin: const EdgeInsets.only(left: 16, right: 16, bottom: 20),
+      height: 68,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(34),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+          child: Container(
+            decoration: BoxDecoration(
+              color: const Color(0xE6121722),
+              borderRadius: BorderRadius.circular(34),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.12),
+                width: 1.2,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.35),
+                  blurRadius: 20,
+                  offset: const Offset(0, 10),
+                ),
+              ],
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: List.generate(navItems.length, (index) {
+                final isSelected = _currentIndex == index;
+                final item = navItems[index];
+
+                return GestureDetector(
+                  onTap: () {
+                    HapticFeedback.lightImpact();
+                    setState(() => _currentIndex = index);
+                  },
+                  behavior: HitTestBehavior.opaque,
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 250),
+                    curve: Curves.easeOutCubic,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: isSelected ? 14 : 10,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: isSelected
+                          ? AppTheme.primaryGreen.withValues(alpha: 0.15)
+                          : Colors.transparent,
+                      borderRadius: BorderRadius.circular(20),
+                      border: isSelected
+                          ? Border.all(
+                              color: AppTheme.primaryGreen.withValues(alpha: 0.35),
+                              width: 1,
+                            )
+                          : null,
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          item['icon'] as IconData,
+                          color: isSelected ? AppTheme.primaryGreen : Colors.white54,
+                          size: 22,
+                        ),
+                        const SizedBox(height: 3),
+                        Text(
+                          item['label'] as String,
+                          style: TextStyle(
+                            color: isSelected ? AppTheme.primaryGreen : Colors.white54,
+                            fontSize: 10,
+                            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }),
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -92,7 +169,7 @@ class HomeScreen extends StatelessWidget {
           children: [
             CircleAvatar(
               radius: 18,
-              backgroundColor: AppTheme.primaryGreen.withOpacity(0.2),
+              backgroundColor: AppTheme.primaryGreen.withValues(alpha: 0.2),
               child: const Icon(Icons.person, color: AppTheme.primaryGreen),
             ),
             const SizedBox(width: 12),
@@ -110,7 +187,7 @@ class HomeScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 color: AppTheme.cardDark,
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: AppTheme.primaryGreen.withOpacity(0.4)),
+                border: Border.all(color: AppTheme.primaryGreen.withValues(alpha: 0.4)),
               ),
               child: Row(
                 children: [
@@ -131,19 +208,35 @@ class HomeScreen extends StatelessWidget {
         ),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        physics: const BouncingScrollPhysics(),
+        padding: const EdgeInsets.only(left: 16, right: 16, top: 12, bottom: 120),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Search Bar
-            TextField(
-              decoration: InputDecoration(
-                hintText: 'ابحث عن بطولة، فريق، لاعب أو لعبة...',
-                prefixIcon: const Icon(Icons.search),
-                suffixIcon: const Icon(Icons.tune),
-                filled: true,
-                fillColor: AppTheme.cardDark,
-                contentPadding: const EdgeInsets.symmetric(vertical: 0),
+            // iOS Style Search Bar
+            Container(
+              decoration: BoxDecoration(
+                color: AppTheme.cardDark,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+              ),
+              child: TextField(
+                decoration: InputDecoration(
+                  hintText: 'ابحث عن بطولة، فريق، لاعب أو لعبة...',
+                  hintStyle: const TextStyle(color: Colors.white38, fontSize: 13),
+                  prefixIcon: const Icon(Icons.search, color: Colors.white60),
+                  suffixIcon: Container(
+                    margin: const EdgeInsets.all(8),
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: Colors.white10,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(Icons.tune, color: AppTheme.primaryGreen, size: 18),
+                  ),
+                  border: InputBorder.none,
+                  contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                ),
               ),
             ),
             const SizedBox(height: 20),
@@ -171,20 +264,27 @@ class HomeScreen extends StatelessWidget {
                 return Column(
                   children: [
                     Container(
-                      height: 200,
+                      height: 220,
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(24),
                         gradient: const LinearGradient(
                           colors: [Color(0xFF0D2818), Color(0xFF040F08)],
                           begin: Alignment.topRight,
                           end: Alignment.bottomLeft,
                         ),
-                        border: Border.all(color: AppTheme.primaryGreen.withOpacity(0.5)),
+                        border: Border.all(color: AppTheme.primaryGreen.withValues(alpha: 0.4), width: 1.2),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppTheme.primaryGreen.withValues(alpha: 0.18),
+                            blurRadius: 24,
+                            offset: const Offset(0, 8),
+                          ),
+                        ],
                         image: (posterUrl != null && posterUrl.isNotEmpty) 
                           ? DecorationImage(
                               image: CachedNetworkImageProvider(posterUrl),
                               fit: BoxFit.cover,
-                              colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.4), BlendMode.darken),
+                              colorFilter: ColorFilter.mode(Colors.black.withValues(alpha: 0.45), BlendMode.darken),
                             )
                           : null,
                       ),
@@ -194,7 +294,7 @@ class HomeScreen extends StatelessWidget {
                             top: 14,
                             right: 14,
                             child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
                               decoration: BoxDecoration(
                                 color: AppTheme.primaryGreen,
                                 borderRadius: BorderRadius.circular(20),
@@ -206,7 +306,7 @@ class HomeScreen extends StatelessWidget {
                             top: 14,
                             left: 14,
                             child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
                               decoration: BoxDecoration(
                                 color: Colors.orange,
                                 borderRadius: BorderRadius.circular(20),
@@ -215,28 +315,41 @@ class HomeScreen extends StatelessWidget {
                             ),
                           ),
                           Positioned(
-                            bottom: 20,
+                            bottom: 18,
                             right: 16,
+                            left: 16,
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
                                 if (logoUrl != null && logoUrl.isNotEmpty)
                                   Padding(
                                     padding: const EdgeInsets.only(left: 12),
-                                    child: CachedNetworkImage(
-                                      imageUrl: logoUrl,
-                                      height: 50,
-                                      width: 50,
-                                      fit: BoxFit.contain,
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(12),
+                                      child: CachedNetworkImage(
+                                        imageUrl: logoUrl,
+                                        height: 52,
+                                        width: 52,
+                                        fit: BoxFit.contain,
+                                      ),
                                     ),
                                   ),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Chip(label: Text(game, style: const TextStyle(fontSize: 10)), visualDensity: VisualDensity.compact),
-                                    const SizedBox(height: 4),
-                                    Text(title, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-                                  ],
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white12,
+                                          borderRadius: BorderRadius.circular(6),
+                                        ),
+                                        child: Text(game, style: const TextStyle(fontSize: 10, color: Colors.white70)),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold), maxLines: 1, overflow: TextOverflow.ellipsis),
+                                    ],
+                                  ),
                                 ),
                               ],
                             ),
@@ -244,21 +357,30 @@ class HomeScreen extends StatelessWidget {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 14),
+                    const SizedBox(height: 12),
                     if (!isGuest)
-                      ElevatedButton.icon(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => TournamentRegistrationScreen(tournamentData: featured),
-                            ),
-                          );
-                        },
-                        icon: const Icon(Icons.flag),
-                        label: const Text('عرض البطولة والتسجيل'),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                            HapticFeedback.lightImpact();
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => TournamentRegistrationScreen(tournamentData: featured),
+                              ),
+                            );
+                          },
+                          icon: const Icon(Icons.flag_rounded),
+                          label: const Text('عرض تفاصيل البطولة والتسجيل', style: TextStyle(fontWeight: FontWeight.bold)),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppTheme.primaryGreen,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          ),
+                        ),
                       ),
-                    const SizedBox(height: 28),
+                    const SizedBox(height: 24),
                   ],
                 );
               },
@@ -359,15 +481,25 @@ class HomeScreen extends StatelessWidget {
 
   Widget _buildActionItem(BuildContext context, String label, IconData icon, Color color, VoidCallback onTap) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: () {
+        HapticFeedback.lightImpact();
+        onTap();
+      },
       child: Column(
         children: [
           Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: AppTheme.cardDark,
-              shape: BoxShape.circle,
-              border: Border.all(color: color.withOpacity(0.3)),
+              color: color.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: color.withValues(alpha: 0.35), width: 1.2),
+              boxShadow: [
+                BoxShadow(
+                  color: color.withValues(alpha: 0.15),
+                  blurRadius: 14,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
             child: Icon(icon, color: color, size: 24),
           ),
@@ -381,14 +513,48 @@ class HomeScreen extends StatelessWidget {
   Widget _buildUpcomingMatchCard() {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppTheme.cardDark,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppTheme.primaryGreen.withOpacity(0.3)),
+        color: AppTheme.cardDark.withValues(alpha: 0.9),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.2),
+            blurRadius: 14,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
-      child: const Center(
-        child: Text('يتوفر قريباً', style: TextStyle(color: Colors.white54, fontSize: 14)),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: AppTheme.primaryGreen.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AppTheme.primaryGreen.withValues(alpha: 0.25)),
+            ),
+            child: const Icon(Icons.schedule_rounded, color: AppTheme.primaryGreen, size: 24),
+          ),
+          const SizedBox(width: 16),
+          const Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'لا توجد مباريات مجدولة اليوم',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                ),
+                SizedBox(height: 3),
+                Text(
+                  'ستظهر مباريات فريقك القادمة فور إعلان جدول التصفيات.',
+                  style: TextStyle(color: Colors.white38, fontSize: 11),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -401,8 +567,9 @@ class HomeScreen extends StatelessWidget {
           return Container(
             height: 120,
             decoration: BoxDecoration(
-              color: AppTheme.cardDark,
-              borderRadius: BorderRadius.circular(16),
+              color: AppTheme.cardDark.withValues(alpha: 0.9),
+              borderRadius: BorderRadius.circular(22),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
             ),
             child: const Center(child: CircularProgressIndicator(color: AppTheme.primaryGreen)),
           );
@@ -414,19 +581,39 @@ class HomeScreen extends StatelessWidget {
         if (!isLive) {
           return Container(
             width: double.infinity,
-            padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+            padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
             decoration: BoxDecoration(
-              color: AppTheme.cardDark,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.white10),
+              color: AppTheme.cardDark.withValues(alpha: 0.9),
+              borderRadius: BorderRadius.circular(22),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
             ),
-            child: const Column(
+            child: Row(
               children: [
-                Icon(Icons.tv_off, color: Colors.white38, size: 36),
-                SizedBox(height: 8),
-                Text('لا يوجد بث مباشر نشط حالياً', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
-                SizedBox(height: 4),
-                Text('سيظهر البث هنا فور قيام إدارة البطولة بنقل المباريات', style: TextStyle(color: Colors.white54, fontSize: 11)),
+                Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.05),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: const Icon(Icons.tv_off_rounded, color: Colors.white38, size: 24),
+                ),
+                const SizedBox(width: 16),
+                const Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'لا يوجد بث مباشر نشط حالياً',
+                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                      ),
+                      SizedBox(height: 3),
+                      Text(
+                        'سيظهر البث هنا فور قيام إدارة البطولة بنقل مجريات المباريات.',
+                        style: TextStyle(color: Colors.white38, fontSize: 11),
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
           );
@@ -436,19 +623,25 @@ class HomeScreen extends StatelessWidget {
 
         return Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(18),
           decoration: BoxDecoration(
-            color: AppTheme.cardDark,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.red.withOpacity(0.6)),
-            gradient: LinearGradient(
+            gradient: const LinearGradient(
               colors: [
-                Colors.red.withOpacity(0.15),
-                AppTheme.cardDark,
+                Color(0xFF261217),
+                Color(0xFF131822),
               ],
-              begin: Alignment.topRight,
-              end: Alignment.bottomLeft,
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
+            borderRadius: BorderRadius.circular(22),
+            border: Border.all(color: Colors.redAccent.withValues(alpha: 0.45), width: 1.2),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.redAccent.withValues(alpha: 0.15),
+                blurRadius: 18,
+                offset: const Offset(0, 6),
+              ),
+            ],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -457,38 +650,60 @@ class HomeScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     decoration: BoxDecoration(
-                      color: Colors.red,
+                      color: Colors.redAccent,
                       borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.redAccent.withValues(alpha: 0.4),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
                     ),
                     child: const Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.circle, color: Colors.white, size: 8),
-                        SizedBox(width: 4),
+                        Icon(Icons.circle, color: Colors.white, size: 7),
+                        SizedBox(width: 5),
                         Text('مباشر الآن', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
                       ],
                     ),
                   ),
-                  const Text('YouTube Live 🔴', style: TextStyle(color: Colors.white70, fontSize: 11)),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.play_circle_fill_rounded, color: Colors.redAccent, size: 14),
+                        SizedBox(width: 4),
+                        Text('YouTube Live', style: TextStyle(color: Colors.white70, fontSize: 11, fontWeight: FontWeight.w600)),
+                      ],
+                    ),
+                  ),
                 ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 14),
               Text(
                 title,
                 style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
-              const SizedBox(height: 6),
+              const SizedBox(height: 4),
               const Text(
-                'البث المباشر الرسمي المعتمد من اتحاد الرياضات الإلكترونية',
+                'البث المباشر الرسمي المعتمد من الاتحاد السوداني للرياضات الإلكترونية',
                 style: TextStyle(color: Colors.white60, fontSize: 12),
               ),
-              const SizedBox(height: 14),
+              const SizedBox(height: 16),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(
                   onPressed: () {
+                    HapticFeedback.lightImpact();
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -496,11 +711,12 @@ class HomeScreen extends StatelessWidget {
                       ),
                     );
                   },
-                  icon: const Icon(Icons.play_circle_fill, color: Colors.black),
+                  icon: const Icon(Icons.play_arrow_rounded, color: Colors.black, size: 20),
                   label: const Text('مشاهدة البث والدردشة الحية الآن', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppTheme.primaryGreen,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   ),
                 ),
               ),
@@ -514,37 +730,52 @@ class HomeScreen extends StatelessWidget {
   Widget _buildTopLeaderboard() {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppTheme.cardDark,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.amber.withOpacity(0.3)),
+        color: AppTheme.cardDark.withValues(alpha: 0.9),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
       ),
-      child: const Center(
-        child: Text('يتوفر قريباً', style: TextStyle(color: Colors.white54, fontSize: 14)),
-      ),
-    );
-  }
-
-  Widget _buildLeaderboardCard(String rank, String name, String points, Color rankColor) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: AppTheme.cardDark,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: rankColor.withOpacity(0.5)),
-      ),
-      child: Column(
+      child: Row(
         children: [
-          CircleAvatar(
-            backgroundColor: rankColor.withOpacity(0.2),
-            radius: 16,
-            child: Text(rank, style: TextStyle(color: rankColor, fontWeight: FontWeight.bold, fontSize: 12)),
+          Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: Colors.amber.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: Colors.amber.withValues(alpha: 0.3)),
+            ),
+            child: const Icon(Icons.leaderboard_rounded, color: Colors.amber, size: 24),
           ),
-          const SizedBox(height: 8),
-          Text(name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11), textAlign: TextAlign.center, overflow: TextOverflow.ellipsis),
-          const SizedBox(height: 4),
-          Text('$points MMR', style: const TextStyle(color: AppTheme.primaryGreen, fontSize: 10, fontWeight: FontWeight.bold)),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'المتصدرون في الموسم الأول',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                ),
+                const SizedBox(height: 3),
+                const Text(
+                  'شاهد أداء نخبة اللاعبين والفرق في السودان.',
+                  style: TextStyle(color: Colors.white38, fontSize: 11),
+                ),
+              ],
+            ),
+          ),
+          OutlinedButton(
+            onPressed: () {
+              HapticFeedback.lightImpact();
+              if (onNavigateTab != null) onNavigateTab!(3);
+            },
+            style: OutlinedButton.styleFrom(
+              side: BorderSide(color: AppTheme.primaryGreen.withValues(alpha: 0.4)),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            ),
+            child: const Text('عرض', style: TextStyle(color: AppTheme.primaryGreen, fontSize: 12, fontWeight: FontWeight.bold)),
+          ),
         ],
       ),
     );
@@ -553,55 +784,42 @@ class HomeScreen extends StatelessWidget {
   Widget _buildNewsSection() {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppTheme.cardDark,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.blue.withOpacity(0.3)),
+        color: AppTheme.cardDark.withValues(alpha: 0.9),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
       ),
-      child: const Center(
-        child: Text('يتوفر قريباً', style: TextStyle(color: Colors.white54, fontSize: 14)),
-      ),
-    );
-  }
-
-  Widget _buildNewsCard(String title, String category, Color categoryColor) {
-    return Container(
-      width: 240,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppTheme.cardDark,
-        borderRadius: BorderRadius.circular(16),
-        image: DecorationImage(
-          image: const NetworkImage('https://via.placeholder.com/240x140/1E293B/FFFFFF?text=News'),
-          fit: BoxFit.cover,
-          colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.6), BlendMode.darken),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.end,
+      child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-            decoration: BoxDecoration(color: categoryColor, borderRadius: BorderRadius.circular(4)),
-            child: Text(category, style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold)),
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: Colors.blueAccent.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: Colors.blueAccent.withValues(alpha: 0.3)),
+            ),
+            child: const Icon(Icons.newspaper_rounded, color: Colors.blueAccent, size: 24),
           ),
-          const SizedBox(height: 8),
-          Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.white), maxLines: 2, overflow: TextOverflow.ellipsis),
+          const SizedBox(width: 16),
+          const Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'أخبار وبلاغات الاتحاد',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                ),
+                SizedBox(height: 3),
+                Text(
+                  'إعلانات فتح باب التسجيل وتحديثات القوانين التحكيمية.',
+                  style: TextStyle(color: Colors.white38, fontSize: 11),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
-    );
-  }
-
-  Widget _buildTeamColumn(String nameAr, String nameEn, IconData icon) {
-    return Column(
-      children: [
-        CircleAvatar(radius: 22, backgroundColor: Colors.white12, child: Icon(icon, color: Colors.white, size: 20)),
-        const SizedBox(height: 6),
-        Text(nameAr, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-        Text(nameEn, style: const TextStyle(fontSize: 10, color: Colors.white54)),
-      ],
     );
   }
 }
