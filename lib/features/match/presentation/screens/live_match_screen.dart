@@ -129,24 +129,78 @@ class _LiveMatchScreenState extends State<LiveMatchScreen> {
         stream: FirestoreService().getLiveMatchStream(widget.matchId),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator(color: AppTheme.primaryGreen));
           }
           if (snapshot.hasError || !snapshot.hasData || !snapshot.data!.exists) {
-            return const Center(child: Text('يتوفر قريباً', style: TextStyle(color: Colors.white54, fontSize: 18)));
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    Icon(Icons.tv_off, color: Colors.white38, size: 64),
+                    SizedBox(height: 16),
+                    Text('لا يوجد بث مباشر نشط حالياً', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                    SizedBox(height: 8),
+                    Text('سيبدأ البث فور قيام إدارة البطولة بنقل المباريات', style: TextStyle(color: Colors.white54, fontSize: 13), textAlign: TextAlign.center),
+                  ],
+                ),
+              ),
+            );
           }
 
           final matchData = snapshot.data!.data()!;
-          _initializeOrUpdateYoutubePlayer(matchData['youtubeVideoId'] ?? '');
+          final isLive = matchData['isLive'] == true;
+          final videoId = (matchData['youtubeVideoId'] ?? '').toString().trim();
+          
+          if (videoId.isNotEmpty && isLive) {
+            _initializeOrUpdateYoutubePlayer(videoId);
+          }
+
+          final streamTitle = matchData['title'] ?? 'E-Sport Sudan';
 
           return Column(
             children: [
+              // Video Player Header Info
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                color: Colors.black45,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        streamTitle,
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: isLive ? Colors.red : Colors.grey,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.circle, color: Colors.white, size: 8),
+                          const SizedBox(width: 4),
+                          Text(isLive ? 'مباشر الآن' : 'البث متوقف', style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
               // Video Player
               Container(
                 height: 220,
                 color: Colors.black,
                 child: Stack(
                   children: [
-                    if (_controller != null)
+                    if (_controller != null && isLive && videoId.isNotEmpty)
                       YoutubePlayer(
                         controller: _controller!,
                         showVideoProgressIndicator: true,
@@ -157,16 +211,26 @@ class _LiveMatchScreenState extends State<LiveMatchScreen> {
                         ),
                       )
                     else
-                      const Center(child: Text('البث لم يبدأ بعد', style: TextStyle(color: Colors.white))),
-                    Positioned(
-                      top: 16,
-                      right: 16,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        color: Colors.red,
-                        child: const Text('YouTube Live', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                      Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: const [
+                            Icon(Icons.live_tv, color: Colors.white38, size: 48),
+                            SizedBox(height: 8),
+                            Text('البث المباشر متوقف حالياً أو لم يبدأ بعد', style: TextStyle(color: Colors.white70, fontSize: 14)),
+                          ],
+                        ),
                       ),
-                    ),
+                    if (isLive && videoId.isNotEmpty)
+                      Positioned(
+                        top: 16,
+                        right: 16,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          color: Colors.red,
+                          child: const Text('YouTube Live', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                        ),
+                      ),
                   ],
                 ),
               ),

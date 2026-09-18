@@ -3,6 +3,7 @@ import 'package:e_sport_sudan/core/theme/app_theme.dart';
 import 'package:e_sport_sudan/features/auth/presentation/screens/login_screen.dart';
 import 'package:e_sport_sudan/features/admin/presentation/screens/tournament_admin_dashboard_screen.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:e_sport_sudan/core/services/firestore_service.dart';
 import 'package:e_sport_sudan/features/match/presentation/screens/live_match_screen.dart';
 import 'package:e_sport_sudan/features/tournament/presentation/screens/tournaments_screen.dart';
@@ -393,17 +394,120 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _buildLiveMatchCard(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: AppTheme.cardDark,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.red.withOpacity(0.3)),
-      ),
-      child: const Center(
-        child: Text('يتوفر قريباً', style: TextStyle(color: Colors.white54, fontSize: 14)),
-      ),
+    return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+      stream: FirestoreService().getGlobalLiveStream(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Container(
+            height: 120,
+            decoration: BoxDecoration(
+              color: AppTheme.cardDark,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: const Center(child: CircularProgressIndicator(color: AppTheme.primaryGreen)),
+          );
+        }
+
+        final data = snapshot.data?.data();
+        final isLive = (data != null && data['isLive'] == true && (data['youtubeVideoId'] ?? '').toString().isNotEmpty);
+
+        if (!isLive) {
+          return Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+            decoration: BoxDecoration(
+              color: AppTheme.cardDark,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: Colors.white10),
+            ),
+            child: const Column(
+              children: [
+                Icon(Icons.tv_off, color: Colors.white38, size: 36),
+                SizedBox(height: 8),
+                Text('لا يوجد بث مباشر نشط حالياً', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
+                SizedBox(height: 4),
+                Text('سيظهر البث هنا فور قيام إدارة البطولة بنقل المباريات', style: TextStyle(color: Colors.white54, fontSize: 11)),
+              ],
+            ),
+          );
+        }
+
+        final title = data['title'] ?? 'مباراة مباشرة';
+
+        return Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: AppTheme.cardDark,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.red.withOpacity(0.6)),
+            gradient: LinearGradient(
+              colors: [
+                Colors.red.withOpacity(0.15),
+                AppTheme.cardDark,
+              ],
+              begin: Alignment.topRight,
+              end: Alignment.bottomLeft,
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.circle, color: Colors.white, size: 8),
+                        SizedBox(width: 4),
+                        Text('مباشر الآن', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
+                      ],
+                    ),
+                  ),
+                  const Text('YouTube Live 🔴', style: TextStyle(color: Colors.white70, fontSize: 11)),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Text(
+                title,
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 6),
+              const Text(
+                'البث المباشر الرسمي المعتمد من اتحاد الرياضات الإلكترونية',
+                style: TextStyle(color: Colors.white60, fontSize: 12),
+              ),
+              const SizedBox(height: 14),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const LiveMatchScreen(matchId: 'sample_live_match'),
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.play_circle_fill, color: Colors.black),
+                  label: const Text('مشاهدة البث والدردشة الحية الآن', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.primaryGreen,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 

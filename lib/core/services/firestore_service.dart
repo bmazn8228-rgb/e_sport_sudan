@@ -177,6 +177,46 @@ class FirestoreService {
     });
   }
 
+  Future<void> updateLiveStream({
+    required String youtubeVideoId,
+    required String title,
+    required bool isLive,
+  }) async {
+    final data = {
+      'id': 'sample_live_match',
+      'youtubeVideoId': youtubeVideoId,
+      'title': title,
+      'isLive': isLive,
+      'status': isLive ? 'live' : 'offline',
+      'teamA': 'بث مباشر',
+      'teamB': 'E-Sport Sudan',
+      'scoreA': 0,
+      'scoreB': 0,
+      'time': isLive ? 'مباشر الآن' : 'متوقف',
+      'updatedAt': FieldValue.serverTimestamp(),
+    };
+    await _db.collection('matches').doc('sample_live_match').set(data, SetOptions(merge: true));
+    await _db.collection('settings').doc('live_stream').set(data, SetOptions(merge: true));
+  }
+
+  Future<void> stopLiveStream() async {
+    await _db.collection('matches').doc('sample_live_match').set({
+      'isLive': false,
+      'status': 'offline',
+      'youtubeVideoId': '',
+      'updatedAt': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
+    await _db.collection('settings').doc('live_stream').set({
+      'isLive': false,
+      'youtubeVideoId': '',
+      'updatedAt': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
+  }
+
+  Stream<DocumentSnapshot<Map<String, dynamic>>> getGlobalLiveStream() {
+    return _db.collection('matches').doc('sample_live_match').snapshots();
+  }
+
   Stream<DocumentSnapshot<Map<String, dynamic>>> getLiveMatchStream(String matchId) {
     return _db.collection('matches').doc(matchId).snapshots();
   }

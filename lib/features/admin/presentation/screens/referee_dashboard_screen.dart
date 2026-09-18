@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:e_sport_sudan/core/theme/app_theme.dart';
 import 'package:e_sport_sudan/core/services/firestore_service.dart';
 import 'package:e_sport_sudan/core/services/auth_service.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'package:e_sport_sudan/features/auth/presentation/screens/login_screen.dart';
 
 class RefereeDashboardScreen extends StatelessWidget {
@@ -130,18 +131,27 @@ class _MatchControlRoomState extends State<MatchControlRoom> {
   }
 
   Future<void> _updateStreamUrl() async {
+    final rawInput = _youtubeController.text.trim();
+    if (rawInput.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('يرجى إدخال رابط أو معرّف فيديو YouTube ⚠️'), backgroundColor: Colors.red),
+      );
+      return;
+    }
+    final videoId = YoutubePlayer.convertUrlToId(rawInput) ?? rawInput;
+
     setState(() => _isLoading = true);
     try {
       await FirestoreService().updateMatchStreamUrl(
         widget.matchId,
-        _youtubeController.text.trim(),
+        videoId,
       );
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('تم تحديث الرابط بنجاح', style: TextStyle(color: Colors.black)), backgroundColor: AppTheme.primaryGreen));
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('تم تحديث رابط البث المباشر بنجاح ✅', style: TextStyle(color: Colors.black)), backgroundColor: AppTheme.primaryGreen));
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('فشل تحديث الرابط', style: TextStyle(color: Colors.white)), backgroundColor: Colors.red));
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('فشل تحديث رابط البث ❌', style: TextStyle(color: Colors.white)), backgroundColor: Colors.red));
       }
     }
     setState(() => _isLoading = false);
