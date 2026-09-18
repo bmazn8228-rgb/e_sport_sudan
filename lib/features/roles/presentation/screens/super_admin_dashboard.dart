@@ -11,12 +11,8 @@ class SuperAdminDashboard extends StatefulWidget {
   State<SuperAdminDashboard> createState() => _SuperAdminDashboardState();
 }
 
-class _SuperAdminDashboardState extends State<SuperAdminDashboard> {
-  final List<Map<String, dynamic>> _pendingVerifications = [
-    {'name': 'عمر عبد الله الشيخ', 'requestedRole': 'حكم معتمد', 'state': 'بورتسودان', 'experience': 'تحكيم 4 بطولات محلية'},
-    {'name': 'شركة سودان قيمينق', 'requestedRole': 'منظم بطولات', 'state': 'الخرطوم', 'experience': 'سجل تجاري وترخيص ساري'},
-    {'name': 'فريق صقور النيل', 'requestedRole': 'توثيق هوية الفريق', 'state': 'الخرطوم', 'experience': '5 لاعبين ببطاقات قومية'},
-  ];
+  // This will be replaced with a Firestore stream in the future
+  final List<Map<String, dynamic>> _pendingVerifications = [];
 
   @override
   Widget build(BuildContext context) {
@@ -100,17 +96,17 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard> {
             const SizedBox(height: 12),
             Row(
               children: [
-                _buildMetricBox('اللاعبين المسجلين', '12,450', Icons.person, AppTheme.primaryGreen),
+                _buildMetricBox('اللاعبين المسجلين', '0', Icons.person, AppTheme.primaryGreen),
                 const SizedBox(width: 10),
-                _buildMetricBox('الفرق المعتمدة', '128 فريق', Icons.shield, Colors.blue),
+                _buildMetricBox('الفرق المعتمدة', '0 فريق', Icons.shield, Colors.blue),
               ],
             ),
             const SizedBox(height: 10),
             Row(
               children: [
-                _buildMetricBox('البطولات القومية', '8 بطولات', Icons.emoji_events, Colors.orange),
+                _buildMetricBox('البطولات القومية', '0 بطولات', Icons.emoji_events, Colors.orange),
                 const SizedBox(width: 10),
-                _buildMetricBox('رسوم التسجيل', '2.8M ج.س', Icons.account_balance_wallet, Colors.amber),
+                _buildMetricBox('رسوم التسجيل', '0 ج.س', Icons.account_balance_wallet, Colors.amber),
               ],
             ),
             const SizedBox(height: 24),
@@ -119,7 +115,7 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('طلبات الاعتماد وتوثيق الرخص (3)', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                const Text('طلبات الاعتماد وتوثيق الرخص', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                 Text(
                   'تحديث فوري',
                   style: TextStyle(fontSize: 11, color: AppTheme.primaryGreen.withOpacity(0.8)),
@@ -128,7 +124,15 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard> {
             ),
             const SizedBox(height: 12),
 
-            ..._pendingVerifications.map((req) => _buildVerificationTile(context, req)),
+            if (_pendingVerifications.isEmpty)
+              const Padding(
+                padding: EdgeInsets.all(20.0),
+                child: Center(
+                  child: Text('لا توجد طلبات اعتماد معلقة حالياً', style: TextStyle(color: Colors.white54)),
+                ),
+              )
+            else
+              ..._pendingVerifications.map((req) => _buildVerificationTile(context, req)),
           ],
         ),
       ),

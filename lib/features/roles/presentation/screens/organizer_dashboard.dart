@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:e_sport_sudan/core/theme/app_theme.dart';
+import 'organizer_referees_screen.dart';
+import 'organizer_matches_screen.dart';
+import 'organizer_complaints_screen.dart';
+import 'organizer_teams_screen.dart';
 
 class OrganizerDashboard extends StatelessWidget {
   const OrganizerDashboard({Key? key}) : super(key: key);
@@ -73,17 +77,25 @@ class OrganizerDashboard extends StatelessWidget {
             const SizedBox(height: 12),
             Row(
               children: [
-                _buildStatTile('الفرق المشاركة', '48 / 64', Icons.groups, AppTheme.primaryGreen),
+                _buildStatTile('الفرق المشاركة', '0', Icons.groups, AppTheme.primaryGreen, () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => const OrganizerTeamsScreen()));
+                }),
                 const SizedBox(width: 10),
-                _buildStatTile('المباريات المكتملة', '18 / 32', Icons.sports_score, Colors.orange),
+                _buildStatTile('المباريات المكتملة', '0', Icons.sports_score, Colors.orange, () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => const OrganizerMatchesScreen()));
+                }),
               ],
             ),
             const SizedBox(height: 10),
             Row(
               children: [
-                _buildStatTile('حكام الساحة النشطين', '6 حكام', Icons.sports, Colors.blue),
+                _buildStatTile('حكام الساحة النشطين', '0', Icons.sports, Colors.blue, () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => const OrganizerRefereesScreen()));
+                }),
                 const SizedBox(width: 10),
-                _buildStatTile('الاعتراضات والشكاوى', '1 معلقة', Icons.warning_amber, Colors.red),
+                _buildStatTile('الاعتراضات والشكاوى', '0', Icons.warning_amber, Colors.red, () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => const OrganizerComplaintsScreen()));
+                }),
               ],
             ),
             const SizedBox(height: 24),
@@ -142,27 +154,31 @@ class OrganizerDashboard extends StatelessWidget {
     );
   }
 
-  Widget _buildStatTile(String label, String value, IconData icon, Color color) {
+  Widget _buildStatTile(String label, String value, IconData icon, Color color, VoidCallback onTap) {
     return Expanded(
-      child: Container(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: AppTheme.cardDark,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(label, style: const TextStyle(fontSize: 11, color: Colors.white54)),
-                Icon(icon, size: 18, color: color),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Text(value, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: color)),
-          ],
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: AppTheme.cardDark,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(child: Text(label, style: const TextStyle(fontSize: 11, color: Colors.white54))),
+                  Icon(icon, size: 18, color: color),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text(value, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: color)),
+            ],
+          ),
         ),
       ),
     );

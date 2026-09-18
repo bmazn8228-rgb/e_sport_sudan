@@ -46,29 +46,11 @@ class _RefereeDashboardState extends State<RefereeDashboard> {
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: Colors.red.withOpacity(0.4)),
               ),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text('المباراة الموكلة للتحكيم #M1', style: TextStyle(color: Colors.white54, fontSize: 12)),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                        decoration: BoxDecoration(color: Colors.red, borderRadius: BorderRadius.circular(4)),
-                        child: const Text('مباشر LIVE', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      _buildTeamScore('صقور النيل', _scoreA, (v) => setState(() => _scoreA = v)),
-                      const Text('VS', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white54)),
-                      _buildTeamScore('فرسان المقرن', _scoreB, (v) => setState(() => _scoreB = v)),
-                    ],
-                  ),
-                ],
+              child: const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(20.0),
+                  child: Text('لا توجد مباراة موكلة لك حالياً', style: TextStyle(color: Colors.white54)),
+                ),
               ),
             ),
             const SizedBox(height: 20),

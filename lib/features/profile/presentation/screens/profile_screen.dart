@@ -10,6 +10,8 @@ import 'package:e_sport_sudan/features/admin/presentation/screens/admin_dashboar
 import 'package:e_sport_sudan/features/profile/presentation/screens/settings_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:e_sport_sudan/core/services/auth_service.dart';
+import 'package:e_sport_sudan/core/services/firestore_service.dart';
+import 'package:e_sport_sudan/core/models/user_model.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -21,9 +23,42 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   String? _profileImageFileName;
   bool _isCardFlipped = false;
+  UserModel? _userModel;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUser();
+  }
+
+  Future<void> _loadUser() async {
+    try {
+      final user = AuthService().currentUser;
+      if (user != null) {
+        final userModel = await FirestoreService().getUser(user.uid);
+        if (mounted) {
+          setState(() {
+            _userModel = userModel;
+            _isLoading = false;
+          });
+        }
+      } else {
+        if (mounted) {
+          setState(() => _isLoading = false);
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    final role = _userModel?.role ?? UserRole.player;
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -120,8 +155,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
             const SizedBox(height: 20),
-
-            // Administrative Control Portals (حسب الصلاحيات)
+            // Player Services (e.g., Team Management)
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -131,7 +165,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('بوابات إدارة النظام والصلاحيات', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                  const Text('الخدمات التنافسية', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                   const SizedBox(height: 12),
                   _buildPortalTile(
                     title: 'إدارة الفريق والتشكيلة',
@@ -140,42 +174,66 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     color: AppTheme.primaryGreen,
                     onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const TeamManagementScreen())),
                   ),
-                  const Divider(color: Colors.white10),
-                  _buildPortalTile(
-                    title: 'لوحة تحكم منظم البطولة',
-                    subtitle: 'إدارة المجموعات والقرعة التلقائية',
-                    icon: Icons.admin_panel_settings,
-                    color: Colors.orange,
-                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const OrganizerDashboard())),
-                  ),
-                  const Divider(color: Colors.white10),
-                  _buildPortalTile(
-                    title: 'لوحة تحكم الحكم المعتمد',
-                    subtitle: 'إدخال النتائج وتوثيق النزاهة',
-                    icon: Icons.sports,
-                    color: Colors.blue,
-                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const RefereeDashboard())),
-                  ),
-                  const Divider(color: Colors.white10),
-                  _buildPortalTile(
-                    title: 'لوحة المشرف العام (Super Admin)',
-                    subtitle: 'السيادة الوطنية واعتماد الرخص والحكام',
-                    icon: Icons.security,
-                    color: Colors.amber,
-                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const SuperAdminDashboard())),
-                  ),
-                  const Divider(color: Colors.white10),
-                  _buildPortalTile(
-                    title: 'إدارة الصلاحيات وقاعدة البيانات السحابية ☁️',
-                    subtitle: 'فحص صلاحيات الأدوار وتهيئة جداول Firebase بنقرة واحدة',
-                    icon: Icons.cloud_sync,
-                    color: Colors.cyanAccent,
-                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const AdminDashboardScreen())),
-                  ),
                 ],
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
+
+            // Administrative Control Portals (حسب الصلاحيات)
+            if (role != UserRole.player && role != UserRole.financeAdmin)
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: AppTheme.cardDark,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('بوابات إدارة النظام والصلاحيات', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                    const SizedBox(height: 12),
+                    if (role == UserRole.superAdmin || role == UserRole.tournamentAdmin) ...[
+                      _buildPortalTile(
+                        title: 'لوحة تحكم منظم البطولة',
+                        subtitle: 'إدارة المجموعات والقرعة التلقائية',
+                        icon: Icons.admin_panel_settings,
+                        color: Colors.orange,
+                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const OrganizerDashboard())),
+                      ),
+                      const Divider(color: Colors.white10),
+                    ],
+                    if (role == UserRole.superAdmin || role == UserRole.referee) ...[
+                      _buildPortalTile(
+                        title: 'لوحة تحكم الحكم المعتمد',
+                        subtitle: 'إدخال النتائج وتوثيق النزاهة',
+                        icon: Icons.sports,
+                        color: Colors.blue,
+                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const RefereeDashboard())),
+                      ),
+                      const Divider(color: Colors.white10),
+                    ],
+                    if (role == UserRole.superAdmin) ...[
+                      _buildPortalTile(
+                        title: 'لوحة المشرف العام (Super Admin)',
+                        subtitle: 'السيادة الوطنية واعتماد الرخص والحكام',
+                        icon: Icons.security,
+                        color: Colors.amber,
+                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const SuperAdminDashboard())),
+                      ),
+                      const Divider(color: Colors.white10),
+                      _buildPortalTile(
+                        title: 'إدارة الصلاحيات وقاعدة البيانات السحابية ☁️',
+                        subtitle: 'فحص صلاحيات الأدوار وتهيئة جداول Firebase بنقرة واحدة',
+                        icon: Icons.cloud_sync,
+                        color: Colors.cyanAccent,
+                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const AdminDashboardScreen())),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            if (role != UserRole.player && role != UserRole.financeAdmin)
+              const SizedBox(height: 24),
             // Logout Button (Direct access)
             OutlinedButton.icon(
               onPressed: () async {
