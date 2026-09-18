@@ -617,7 +617,7 @@ class _TournamentRegistrationScreenState extends State<TournamentRegistrationScr
               ),
               const SizedBox(height: 16),
               Text(
-                widget.tournamentTitle,
+                widget.tournamentData['title'] ?? 'بدون عنوان',
                 style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),

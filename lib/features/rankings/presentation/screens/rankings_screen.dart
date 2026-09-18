@@ -147,7 +147,7 @@ class _RankingsScreenState extends State<RankingsScreen> {
         final list = snapshot.data ?? [];
 
         if (list.isEmpty) {
-          return const Center(child: Text('لا توجد بيانات متاحة حالياً', style: TextStyle(color: Colors.white54)));
+          return const Center(child: Text('يتوفر قريباً', style: TextStyle(color: Colors.white54, fontSize: 16)));
         }
 
         return SingleChildScrollView(
@@ -190,8 +190,8 @@ class _RankingsScreenState extends State<RankingsScreen> {
         if (stats == null || stats.isEmpty) {
           return const Center(
             child: Text(
-              'لا توجد إحصائيات متوفرة لهذه اللعبة حتى الآن',
-              style: TextStyle(color: Colors.white54),
+              'يتوفر قريباً',
+              style: TextStyle(color: Colors.white54, fontSize: 16),
             ),
           );
         }
@@ -399,5 +399,4 @@ class _RankingsScreenState extends State<RankingsScreen> {
       ),
     );
   }
-}
 }

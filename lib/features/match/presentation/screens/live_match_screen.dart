@@ -121,7 +121,7 @@ class _LiveMatchScreenState extends State<LiveMatchScreen> {
             return const Center(child: CircularProgressIndicator());
           }
           if (snapshot.hasError || !snapshot.hasData || !snapshot.data!.exists) {
-            return const Center(child: Text('حدث خطأ أو أن المباراة غير متوفرة.'));
+            return const Center(child: Text('يتوفر قريباً', style: TextStyle(color: Colors.white54, fontSize: 18)));
           }
 
           final matchData = snapshot.data!.data()!;

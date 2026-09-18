@@ -99,7 +99,7 @@ class _TournamentsScreenState extends State<TournamentsScreen> {
                         Icon(Icons.emoji_events_outlined, size: 64, color: Colors.white54),
                         const SizedBox(height: 16),
                         const Text(
-                          'لا توجد بطولات حالياً',
+                          'يتوفر قريباً',
                           style: TextStyle(fontSize: 18, color: Colors.white54),
                         ),
                         const SizedBox(height: 8),

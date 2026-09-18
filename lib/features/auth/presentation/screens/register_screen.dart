@@ -82,31 +82,71 @@ class _RegisterScreenState extends State<RegisterScreen> {
       if (mounted) {
         setState(() => _isLoading = false);
         if (user != null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              backgroundColor: AppTheme.primaryGreen,
-              content: Text(
-                'تم تسجيل الحساب وإصدار البطاقة الرقمية بنجاح! مرحباً بك في الساحة.',
-                style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-              ),
-            ),
-          );
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => const RootScreen()),
-            (route) => false,
-          );
+          // فايربيز يقوم بتسجيل الدخول تلقائياً بعد إنشاء الحساب
+          // نقوم بتسجيل الخروج لتوجيه المستخدم لصفحة تسجيل الدخول
+          await AuthService().signOut();
+
+          if (mounted) {
+            await showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  backgroundColor: AppTheme.cardDark,
+                  title: const Row(
+                    children: [
+                      Icon(Icons.check_circle, color: AppTheme.primaryGreen),
+                      SizedBox(width: 8),
+                      Text('نجاح التسجيل', style: TextStyle(color: Colors.white)),
+                    ],
+                  ),
+                  content: const Text(
+                    'تم إنشاء الحساب بنجاح! يرجى تسجيل الدخول باستخدام بياناتك الجديدة.',
+                    style: TextStyle(color: Colors.white70),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text('انتقال لتسجيل الدخول', style: TextStyle(color: AppTheme.primaryGreen, fontWeight: FontWeight.bold)),
+                    ),
+                  ],
+                );
+              },
+            );
+          }
+
+          if (mounted) {
+            Navigator.pop(context); // العودة لصفحة تسجيل الدخول
+          }
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('فشل التسجيل. حاول مرة أخرى.')),
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              backgroundColor: AppTheme.cardDark,
+              title: const Text('فشل التسجيل', style: TextStyle(color: Colors.red)),
+              content: const Text('حدث خطأ ولم يتم إنشاء الحساب. يرجى المحاولة مرة أخرى.', style: TextStyle(color: Colors.white)),
+              actions: [
+                TextButton(onPressed: () => Navigator.pop(context), child: const Text('حسناً', style: TextStyle(color: AppTheme.primaryGreen))),
+              ],
+            ),
           );
         }
       }
     } catch (e) {
       if (mounted) {
         setState(() => _isLoading = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('حدث خطأ: ${e.toString()}')),
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            backgroundColor: AppTheme.cardDark,
+            title: const Text('فشل التسجيل', style: TextStyle(color: Colors.red)),
+            content: const Text('تأكد من أن البريد الإلكتروني غير مستخدم مسبقاً وأن كلمة المرور قوية.', style: TextStyle(color: Colors.white)),
+            actions: [
+              TextButton(onPressed: () => Navigator.pop(context), child: const Text('حسناً', style: TextStyle(color: AppTheme.primaryGreen))),
+            ],
+          ),
         );
       }
     }

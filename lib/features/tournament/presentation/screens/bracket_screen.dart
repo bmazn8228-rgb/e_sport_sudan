@@ -20,48 +20,7 @@ class _BracketScreenState extends State<BracketScreen> {
     'النهائي 🏆',
   ];
 
-  final List<Map<String, dynamic>> _quarterFinals = [
-    {
-      'id': 'M1',
-      'teamA': 'صقور النيل',
-      'teamB': 'فرسان المقرن',
-      'scoreA': 2,
-      'scoreB': 1,
-      'winner': 'teamA',
-      'status': 'انتهت',
-      'time': 'أمس',
-    },
-    {
-      'id': 'M2',
-      'teamA': 'أسود توتي',
-      'teamB': 'نسور كوستي',
-      'scoreA': 3,
-      'scoreB': 0,
-      'winner': 'teamA',
-      'status': 'انتهت',
-      'time': 'أمس',
-    },
-    {
-      'id': 'M3',
-      'teamA': 'أبطال مدني',
-      'teamB': 'ذئاب بورتسودان',
-      'scoreA': 1,
-      'scoreB': 1,
-      'winner': null,
-      'status': 'جارية الآن',
-      'time': 'شوط إضافي',
-    },
-    {
-      'id': 'M4',
-      'teamA': 'ريد نايل إي سبورت',
-      'teamB': 'فايكنج الخرطوم',
-      'scoreA': 0,
-      'scoreB': 0,
-      'winner': null,
-      'status': 'قادمة',
-      'time': 'اليوم 8:00 م',
-    },
-  ];
+  final List<Map<String, dynamic>> _quarterFinals = [];
 
   @override
   Widget build(BuildContext context) {
@@ -110,14 +69,12 @@ class _BracketScreenState extends State<BracketScreen> {
           ),
 
           // Matches List / Tree
-          Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: _quarterFinals.length,
-              itemBuilder: (context, index) {
-                final match = _quarterFinals[index];
-                return _buildMatchCard(match);
-              },
+          const Expanded(
+            child: Center(
+              child: Text(
+                'يتوفر قريباً',
+                style: TextStyle(color: Colors.white54, fontSize: 16),
+              ),
             ),
           ),
         ],

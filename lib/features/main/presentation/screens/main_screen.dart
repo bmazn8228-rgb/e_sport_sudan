@@ -13,6 +13,7 @@ import 'package:e_sport_sudan/features/profile/presentation/screens/profile_scre
 import 'package:e_sport_sudan/features/wallet/presentation/screens/wallet_screen.dart';
 import 'package:e_sport_sudan/features/team/presentation/screens/team_management_screen.dart';
 import 'package:e_sport_sudan/core/services/notification_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class MainScreen extends StatefulWidget {
   final bool isGuest;
@@ -94,12 +95,12 @@ class HomeScreen extends StatelessWidget {
               child: const Icon(Icons.person, color: AppTheme.primaryGreen),
             ),
             const SizedBox(width: 12),
-            const Expanded(
+            Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('مساء الخير 👋 يا كابتن أحمد', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
-                  Text('جاهز لمنافسات اليوم في الدوري القومي؟', style: TextStyle(fontSize: 11, color: Colors.white70)),
+                  Text('مرحباً بك 👋 ${FirebaseAuth.instance.currentUser?.displayName ?? 'يا كابتن'}', style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                  const Text('جاهز لمنافسات اليوم في الدوري القومي؟', style: TextStyle(fontSize: 11, color: Colors.white70)),
                 ],
               ),
             ),
@@ -249,7 +250,7 @@ class HomeScreen extends StatelessWidget {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => TournamentRegistrationScreen(tournamentTitle: title),
+                              builder: (context) => TournamentRegistrationScreen(tournamentData: featured),
                             ),
                           );
                         },
@@ -378,113 +379,46 @@ class HomeScreen extends StatelessWidget {
 
   Widget _buildUpcomingMatchCard() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      width: double.infinity,
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: AppTheme.cardDark,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppTheme.primaryGreen.withOpacity(0.3)),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: AppTheme.primaryGreen.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Icon(Icons.sports_esports, color: AppTheme.primaryGreen),
-              ),
-              const SizedBox(width: 12),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
-                  Text('صقور النيل vs الذئاب', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                  Text('نصف نهائي ببجي موبايل', style: TextStyle(color: Colors.white54, fontSize: 11)),
-                ],
-              ),
-            ],
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: const [
-              Text('اليوم 8:00 م', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppTheme.primaryGreen)),
-              Text('تبدأ بعد 3 ساعات', style: TextStyle(color: Colors.white54, fontSize: 10)),
-            ],
-          ),
-        ],
+      child: const Center(
+        child: Text('يتوفر قريباً', style: TextStyle(color: Colors.white54, fontSize: 14)),
       ),
     );
   }
 
   Widget _buildLiveMatchCard(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      width: double.infinity,
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: AppTheme.cardDark,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.red.withOpacity(0.3)),
       ),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Row(
-                children: [
-                  Icon(Icons.remove_red_eye, color: Colors.white54, size: 14),
-                  SizedBox(width: 4),
-                  Text('1.4K مشاهد', style: TextStyle(color: Colors.white54, fontSize: 11)),
-                ],
-              ),
-              const Text('دقيقة 78\'', style: TextStyle(color: Colors.white54, fontSize: 11)),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                decoration: BoxDecoration(color: Colors.red, borderRadius: BorderRadius.circular(4)),
-                child: const Text('مباشر LIVE', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildTeamColumn('صقور النيل', 'Nile Falcons', Icons.sports_kabaddi),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(8)),
-                child: const Text('2 : 1', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.orange)),
-              ),
-              _buildTeamColumn('فرسان المقرن', 'Mogran Knights', Icons.security),
-            ],
-          ),
-          const SizedBox(height: 16),
-          TextButton.icon(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const LiveMatchScreen(matchId: 'sample_live_match')),
-              );
-            },
-            icon: const Icon(Icons.play_arrow, color: AppTheme.primaryGreen),
-            label: const Text('دخول البث المباشر والتصويت', style: TextStyle(color: AppTheme.primaryGreen)),
-          )
-        ],
+      child: const Center(
+        child: Text('يتوفر قريباً', style: TextStyle(color: Colors.white54, fontSize: 14)),
       ),
     );
   }
 
   Widget _buildTopLeaderboard() {
-    return Row(
-      children: [
-        Expanded(child: _buildLeaderboardCard('2', 'أبطال مدني', '1,350', Colors.grey[400]!)),
-        const SizedBox(width: 8),
-        Expanded(child: _buildLeaderboardCard('1', 'صقور النيل', '1,420', Colors.amber)),
-        const SizedBox(width: 8),
-        Expanded(child: _buildLeaderboardCard('3', 'ذئاب بورتسودان', '1,280', Colors.brown[300]!)),
-      ],
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: AppTheme.cardDark,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.amber.withOpacity(0.3)),
+      ),
+      child: const Center(
+        child: Text('يتوفر قريباً', style: TextStyle(color: Colors.white54, fontSize: 14)),
+      ),
     );
   }
 
@@ -513,15 +447,16 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _buildNewsSection() {
-    return SizedBox(
-      height: 140,
-      child: ListView(
-        scrollDirection: Axis.horizontal,
-        children: [
-          _buildNewsCard('تحديث فالورانت الجديد يعيد تشكيل خارطة الميتا!', 'تحليل تكتيكي', Colors.purple),
-          const SizedBox(width: 12),
-          _buildNewsCard('مقابلة حصرية مع بطل السودان للعبة EA FC 25', 'لقاءات حصرية', Colors.orange),
-        ],
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: AppTheme.cardDark,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.blue.withOpacity(0.3)),
+      ),
+      child: const Center(
+        child: Text('يتوفر قريباً', style: TextStyle(color: Colors.white54, fontSize: 14)),
       ),
     );
   }

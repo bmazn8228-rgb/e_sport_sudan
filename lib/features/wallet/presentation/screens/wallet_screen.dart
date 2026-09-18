@@ -15,22 +15,7 @@ class _WalletScreenState extends State<WalletScreen> {
   String? _receiptFileName;
 
 
-  final List<Map<String, dynamic>> _transactions = [
-    {
-      'title': 'شحن رصيد (بنكك)',
-      'date': '15 سبتمبر 2025',
-      'amount': '+20,000 ج.س',
-      'isPositive': true,
-      'icon': Icons.account_balance_wallet,
-    },
-    {
-      'title': 'رسوم تسجيل بطولة السودان الكبرى',
-      'date': '16 سبتمبر 2025',
-      'amount': '-10,000 ج.س',
-      'isPositive': false,
-      'icon': Icons.emoji_events,
-    },
-  ];
+  final List<Map<String, dynamic>> _transactions = [];
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +56,7 @@ class _WalletScreenState extends State<WalletScreen> {
                   const Text('الرصيد المتاح', style: TextStyle(color: Colors.white70, fontSize: 14)),
                   const SizedBox(height: 8),
                   const Text(
-                    '10,000 ج.س',
+                    '0 ج.س',
                     style: TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 24),
@@ -227,7 +212,12 @@ class _WalletScreenState extends State<WalletScreen> {
             const SizedBox(height: 16),
             
             // Transactions List
-            ..._transactions.map((tx) => _buildTransactionTile(tx)).toList(),
+            const Center(
+              child: Text(
+                'يتوفر قريباً',
+                style: TextStyle(color: Colors.white54, fontSize: 16),
+              ),
+            ),
           ],
         ),
       ),

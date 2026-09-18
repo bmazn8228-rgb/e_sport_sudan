@@ -8,6 +8,7 @@ import 'package:e_sport_sudan/features/auth/presentation/screens/login_screen.da
 import 'package:e_sport_sudan/features/wallet/presentation/screens/wallet_screen.dart';
 import 'package:e_sport_sudan/features/admin/presentation/screens/admin_dashboard_screen.dart';
 import 'package:e_sport_sudan/features/profile/presentation/screens/settings_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -209,9 +210,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   const SizedBox(width: 12),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
-                      Text('مهند طارق (Falcon)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                      Text('صقور النيل • الخرطوم', style: TextStyle(color: Colors.white54, fontSize: 11)),
+                    children: [
+                      Text(FirebaseAuth.instance.currentUser?.displayName ?? 'لاعب', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                      const Text('فريق غير محدد', style: TextStyle(color: Colors.white54, fontSize: 11)),
                     ],
                   ),
                 ],
@@ -239,7 +240,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: const [
                   Text('التقييم الوطني', style: TextStyle(color: Colors.white38, fontSize: 9)),
-                  Text('1,420 نقطة', style: TextStyle(color: AppTheme.primaryGreen, fontWeight: FontWeight.bold, fontSize: 13)),
+                  Text('يتوفر قريباً', style: TextStyle(color: AppTheme.primaryGreen, fontWeight: FontWeight.bold, fontSize: 13)),
                 ],
               ),
             ],
@@ -247,7 +248,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: const [
-              Text('المستوى: محترف (Pro)', style: TextStyle(color: Colors.amber, fontSize: 10, fontWeight: FontWeight.bold)),
+              Text('المستوى: يتوفر قريباً', style: TextStyle(color: Colors.amber, fontSize: 10, fontWeight: FontWeight.bold)),
               Text('انقر للقلب 🔄 QR', style: TextStyle(color: Colors.white38, fontSize: 10)),
             ],
           ),
@@ -315,30 +316,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _buildStatsRow() {
     return Container(
-      padding: const EdgeInsets.all(16),
+      width: double.infinity,
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: AppTheme.cardDark,
         borderRadius: BorderRadius.circular(16),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _buildStatColumn('البطولات', '12', Icons.emoji_events, Colors.amber),
-          _buildStatColumn('الفوز', '68%', Icons.trending_up, AppTheme.primaryGreen),
-          _buildStatColumn('الأرباح', '45K', Icons.monetization_on, Colors.blue),
-        ],
+      child: const Center(
+        child: Text('الإحصائيات: يتوفر قريباً', style: TextStyle(color: Colors.white54, fontSize: 14)),
       ),
-    );
-  }
-
-  Widget _buildStatColumn(String label, String value, IconData icon, Color color) {
-    return Column(
-      children: [
-        Icon(icon, color: color, size: 28),
-        const SizedBox(height: 8),
-        Text(value, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-        Text(label, style: const TextStyle(color: Colors.white54, fontSize: 12)),
-      ],
     );
   }
 
@@ -348,43 +334,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
       children: [
         const Text('خزانة الإنجازات (Badges)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
         const SizedBox(height: 12),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: [
-              _buildBadge(Icons.workspace_premium, 'بطل السودان 2025', Colors.amber),
-              const SizedBox(width: 12),
-              _buildBadge(Icons.my_location, 'قناص خطير', Colors.redAccent),
-              const SizedBox(width: 12),
-              _buildBadge(Icons.event_seat, 'لاعب أوفلاين', Colors.blue),
-              const SizedBox(width: 12),
-              _buildBadge(Icons.star, 'مؤسس مبكر', AppTheme.primaryGreen),
-            ],
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: AppTheme.cardDark,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: const Center(
+            child: Text('يتوفر قريباً', style: TextStyle(color: Colors.white54, fontSize: 14)),
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildBadge(IconData icon, String label, Color color) {
-    return Container(
-      width: 100,
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: AppTheme.cardDark,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.3)),
-      ),
-      child: Column(
-        children: [
-          CircleAvatar(
-            backgroundColor: color.withOpacity(0.2),
-            child: Icon(icon, color: color),
-          ),
-          const SizedBox(height: 8),
-          Text(label, textAlign: TextAlign.center, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
-        ],
-      ),
     );
   }
 
@@ -396,42 +357,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: const [
             Text('سجل المباريات (Match History)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-            Text('عرض الكل', style: TextStyle(color: AppTheme.primaryGreen, fontSize: 12)),
           ],
         ),
         const SizedBox(height: 12),
         Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
             color: AppTheme.cardDark,
             borderRadius: BorderRadius.circular(16),
           ),
-          child: Column(
-            children: [
-              _buildMatchHistoryItem(true, 'صقور النيل vs أبطال مدني', '2 - 1', 'اليوم'),
-              const Divider(color: Colors.white10, height: 1),
-              _buildMatchHistoryItem(false, 'صقور النيل vs ذئاب بورتسودان', '0 - 2', 'أمس'),
-              const Divider(color: Colors.white10, height: 1),
-              _buildMatchHistoryItem(true, 'صقور النيل vs أسود توتي', '1 - 0', 'منذ 3 أيام'),
-            ],
+          child: const Center(
+            child: Text('يتوفر قريباً', style: TextStyle(color: Colors.white54, fontSize: 14)),
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildMatchHistoryItem(bool isWin, String teams, String score, String date) {
-    return ListTile(
-      leading: Container(
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: isWin ? AppTheme.primaryGreen.withOpacity(0.2) : Colors.red.withOpacity(0.2),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Text(isWin ? 'W' : 'L', style: TextStyle(color: isWin ? AppTheme.primaryGreen : Colors.red, fontWeight: FontWeight.bold)),
-      ),
-      title: Text(teams, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
-      subtitle: Text(date, style: const TextStyle(color: Colors.white54, fontSize: 11)),
-      trailing: Text(score, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
     );
   }
 
