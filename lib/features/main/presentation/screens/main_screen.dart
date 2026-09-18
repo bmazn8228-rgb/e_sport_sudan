@@ -119,7 +119,9 @@ class _MainScreenState extends State<MainScreen> {
                       borderRadius: BorderRadius.circular(20),
                       border: isSelected
                           ? Border.all(
-                              color: AppTheme.primaryGreen.withValues(alpha: 0.35),
+                              color: AppTheme.primaryGreen.withValues(
+                                alpha: 0.35,
+                              ),
                               width: 1,
                             )
                           : null,
@@ -129,16 +131,22 @@ class _MainScreenState extends State<MainScreen> {
                       children: [
                         Icon(
                           item['icon'] as IconData,
-                          color: isSelected ? AppTheme.primaryGreen : Colors.white54,
+                          color: isSelected
+                              ? AppTheme.primaryGreen
+                              : Colors.white54,
                           size: 22,
                         ),
                         const SizedBox(height: 3),
                         Text(
                           item['label'] as String,
                           style: TextStyle(
-                            color: isSelected ? AppTheme.primaryGreen : Colors.white54,
+                            color: isSelected
+                                ? AppTheme.primaryGreen
+                                : Colors.white54,
                             fontSize: 10,
-                            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                            fontWeight: isSelected
+                                ? FontWeight.bold
+                                : FontWeight.normal,
                           ),
                         ),
                       ],
@@ -157,7 +165,8 @@ class _MainScreenState extends State<MainScreen> {
 class HomeScreen extends StatelessWidget {
   final bool isGuest;
   final Function(int)? onNavigateTab;
-  const HomeScreen({Key? key, this.isGuest = false, this.onNavigateTab}) : super(key: key);
+  const HomeScreen({Key? key, this.isGuest = false, this.onNavigateTab})
+    : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -167,41 +176,61 @@ class HomeScreen extends StatelessWidget {
         elevation: 0,
         title: Row(
           children: [
-            CircleAvatar(
-              radius: 18,
-              backgroundColor: AppTheme.primaryGreen.withValues(alpha: 0.2),
-              child: const Icon(Icons.person, color: AppTheme.primaryGreen),
+            Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: AppTheme.primaryGreen.withValues(alpha: 0.4),
+                ),
+                image: const DecorationImage(
+                  image: AssetImage('assets/images/app_logo.jpg'),
+                  fit: BoxFit.cover,
+                ),
+              ),
             ),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('مرحباً بك 👋 ${FirebaseAuth.instance.currentUser?.displayName ?? 'يا كابتن'}', style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
-                  const Text('جاهز لمنافسات اليوم في الدوري القومي؟', style: TextStyle(fontSize: 11, color: Colors.white70)),
+                  Text(
+                    'مرحباً، ${FirebaseAuth.instance.currentUser?.displayName ?? 'يا كابتن'} 👋',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: -0.5,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    'جاهز لمنافسات اليوم؟',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.white.withValues(alpha: 0.6),
+                    ),
+                  ),
                 ],
               ),
             ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-              decoration: BoxDecoration(
-                color: AppTheme.cardDark,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: AppTheme.primaryGreen.withValues(alpha: 0.4)),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 7,
-                    height: 7,
-                    decoration: const BoxDecoration(
-                      color: AppTheme.primaryGreen,
-                      shape: BoxShape.circle,
-                    ),
+            // Notification Bell (iOS Style)
+            GestureDetector(
+              onTap: () => HapticFeedback.lightImpact(),
+              child: Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.05),
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.1),
                   ),
-                  const SizedBox(width: 6),
-                  const Text('4G • متزامن', style: TextStyle(fontSize: 11)),
-                ],
+                ),
+                child: const Icon(
+                  Icons.notifications_none_rounded,
+                  color: Colors.white,
+                  size: 22,
+                ),
               ),
             ),
           ],
@@ -209,33 +238,53 @@ class HomeScreen extends StatelessWidget {
       ),
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
-        padding: const EdgeInsets.only(left: 16, right: 16, top: 12, bottom: 120),
+        padding: const EdgeInsets.only(
+          left: 16,
+          right: 16,
+          top: 12,
+          bottom: 120,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // iOS Style Search Bar
             Container(
               decoration: BoxDecoration(
-                color: AppTheme.cardDark,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+                color: Colors.white.withValues(alpha: 0.06),
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
               ),
               child: TextField(
+                style: const TextStyle(color: Colors.white, fontSize: 14),
                 decoration: InputDecoration(
-                  hintText: 'ابحث عن بطولة، فريق، لاعب أو لعبة...',
-                  hintStyle: const TextStyle(color: Colors.white38, fontSize: 13),
-                  prefixIcon: const Icon(Icons.search, color: Colors.white60),
+                  hintText: 'ابحث عن بطولة، فريق، لاعب...',
+                  hintStyle: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.4),
+                    fontSize: 14,
+                  ),
+                  prefixIcon: Icon(
+                    Icons.search_rounded,
+                    color: Colors.white.withValues(alpha: 0.5),
+                    size: 22,
+                  ),
                   suffixIcon: Container(
-                    margin: const EdgeInsets.all(8),
+                    margin: const EdgeInsets.all(6),
                     padding: const EdgeInsets.all(6),
                     decoration: BoxDecoration(
-                      color: Colors.white10,
-                      borderRadius: BorderRadius.circular(10),
+                      color: AppTheme.primaryGreen.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Icon(Icons.tune, color: AppTheme.primaryGreen, size: 18),
+                    child: const Icon(
+                      Icons.tune_rounded,
+                      color: AppTheme.primaryGreen,
+                      size: 18,
+                    ),
                   ),
                   border: InputBorder.none,
-                  contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                  contentPadding: const EdgeInsets.symmetric(
+                    vertical: 14,
+                    horizontal: 16,
+                  ),
                 ),
               ),
             ),
@@ -246,9 +295,13 @@ class HomeScreen extends StatelessWidget {
               stream: FirestoreService().getTournamentsStream(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator(color: AppTheme.primaryGreen));
+                  return const Center(
+                    child: CircularProgressIndicator(
+                      color: AppTheme.primaryGreen,
+                    ),
+                  );
                 }
-                
+
                 final tournaments = snapshot.data ?? [];
                 if (tournaments.isEmpty) {
                   return const SizedBox();
@@ -272,21 +325,29 @@ class HomeScreen extends StatelessWidget {
                           begin: Alignment.topRight,
                           end: Alignment.bottomLeft,
                         ),
-                        border: Border.all(color: AppTheme.primaryGreen.withValues(alpha: 0.4), width: 1.2),
+                        border: Border.all(
+                          color: AppTheme.primaryGreen.withValues(alpha: 0.4),
+                          width: 1.2,
+                        ),
                         boxShadow: [
                           BoxShadow(
-                            color: AppTheme.primaryGreen.withValues(alpha: 0.18),
+                            color: AppTheme.primaryGreen.withValues(
+                              alpha: 0.18,
+                            ),
                             blurRadius: 24,
                             offset: const Offset(0, 8),
                           ),
                         ],
-                        image: (posterUrl != null && posterUrl.isNotEmpty) 
-                          ? DecorationImage(
-                              image: CachedNetworkImageProvider(posterUrl),
-                              fit: BoxFit.cover,
-                              colorFilter: ColorFilter.mode(Colors.black.withValues(alpha: 0.45), BlendMode.darken),
-                            )
-                          : null,
+                        image: (posterUrl != null && posterUrl.isNotEmpty)
+                            ? DecorationImage(
+                                image: CachedNetworkImageProvider(posterUrl),
+                                fit: BoxFit.cover,
+                                colorFilter: ColorFilter.mode(
+                                  Colors.black.withValues(alpha: 0.45),
+                                  BlendMode.darken,
+                                ),
+                              )
+                            : null,
                       ),
                       child: Stack(
                         children: [
@@ -294,24 +355,44 @@ class HomeScreen extends StatelessWidget {
                             top: 14,
                             right: 14,
                             child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 5,
+                              ),
                               decoration: BoxDecoration(
                                 color: AppTheme.primaryGreen,
                                 borderRadius: BorderRadius.circular(20),
                               ),
-                              child: const Text('أحدث بطولة', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 11)),
+                              child: const Text(
+                                'أحدث بطولة',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 11,
+                                ),
+                              ),
                             ),
                           ),
                           Positioned(
                             top: 14,
                             left: 14,
                             child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 5,
+                              ),
                               decoration: BoxDecoration(
                                 color: Colors.orange,
                                 borderRadius: BorderRadius.circular(20),
                               ),
-                              child: Text('🏆 $prize', style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 11)),
+                              child: Text(
+                                '🏆 $prize',
+                                style: const TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 11,
+                                ),
+                              ),
                             ),
                           ),
                           Positioned(
@@ -336,18 +417,38 @@ class HomeScreen extends StatelessWidget {
                                   ),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                          vertical: 2,
+                                        ),
                                         decoration: BoxDecoration(
                                           color: Colors.white12,
-                                          borderRadius: BorderRadius.circular(6),
+                                          borderRadius: BorderRadius.circular(
+                                            6,
+                                          ),
                                         ),
-                                        child: Text(game, style: const TextStyle(fontSize: 10, color: Colors.white70)),
+                                        child: Text(
+                                          game,
+                                          style: const TextStyle(
+                                            fontSize: 10,
+                                            color: Colors.white70,
+                                          ),
+                                        ),
                                       ),
                                       const SizedBox(height: 4),
-                                      Text(title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold), maxLines: 1, overflow: TextOverflow.ellipsis),
+                                      Text(
+                                        title,
+                                        style: const TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -367,16 +468,24 @@ class HomeScreen extends StatelessWidget {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => TournamentRegistrationScreen(tournamentData: featured),
+                                builder: (context) =>
+                                    TournamentRegistrationScreen(
+                                      tournamentData: featured,
+                                    ),
                               ),
                             );
                           },
                           icon: const Icon(Icons.flag_rounded),
-                          label: const Text('عرض تفاصيل البطولة والتسجيل', style: TextStyle(fontWeight: FontWeight.bold)),
+                          label: const Text(
+                            'عرض تفاصيل البطولة والتسجيل',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppTheme.primaryGreen,
                             padding: const EdgeInsets.symmetric(vertical: 14),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
                           ),
                         ),
                       ),
@@ -392,7 +501,11 @@ class HomeScreen extends StatelessWidget {
             const SizedBox(height: 24),
 
             // My Upcoming Matches
-            _buildSectionHeader('مبارياتي القادمة', Icons.timer, AppTheme.primaryGreen),
+            _buildSectionHeader(
+              'مبارياتي القادمة',
+              Icons.timer,
+              AppTheme.primaryGreen,
+            ),
             const SizedBox(height: 12),
             _buildUpcomingMatchCard(),
             const SizedBox(height: 24),
@@ -401,17 +514,29 @@ class HomeScreen extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _buildSectionHeader('مباريات حية ومباشرة', Icons.circle, Colors.red),
+                _buildSectionHeader(
+                  'مباريات حية ومباشرة',
+                  Icons.circle,
+                  Colors.red,
+                ),
                 TextButton(
                   onPressed: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const BracketScreen(tournamentTitle: 'بطولة السودان الكبرى 2025'),
+                        builder: (context) => const BracketScreen(
+                          tournamentTitle: 'بطولة السودان الكبرى 2025',
+                        ),
                       ),
                     );
                   },
-                  child: const Text('شجرة المباريات', style: TextStyle(color: AppTheme.primaryGreen, fontSize: 13)),
+                  child: const Text(
+                    'شجرة المباريات',
+                    style: TextStyle(
+                      color: AppTheme.primaryGreen,
+                      fontSize: 13,
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -425,12 +550,22 @@ class HomeScreen extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _buildSectionHeader('صدارة الترتيب الوطني', Icons.leaderboard, Colors.amber),
+                _buildSectionHeader(
+                  'صدارة الترتيب الوطني',
+                  Icons.leaderboard,
+                  Colors.amber,
+                ),
                 TextButton(
                   onPressed: () {
                     // Navigate to Rankings Tab
                   },
-                  child: const Text('عرض الكل', style: TextStyle(color: AppTheme.primaryGreen, fontSize: 13)),
+                  child: const Text(
+                    'عرض الكل',
+                    style: TextStyle(
+                      color: AppTheme.primaryGreen,
+                      fontSize: 13,
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -439,7 +574,11 @@ class HomeScreen extends StatelessWidget {
             const SizedBox(height: 24),
 
             // Recent News
-            _buildSectionHeader('آخر الأخبار والمقالات', Icons.article, Colors.blue),
+            _buildSectionHeader(
+              'آخر الأخبار والمقالات',
+              Icons.article,
+              Colors.blue,
+            ),
             const SizedBox(height: 12),
             _buildNewsSection(),
             const SizedBox(height: 20),
@@ -454,7 +593,10 @@ class HomeScreen extends StatelessWidget {
       children: [
         Icon(icon, color: color, size: 14),
         const SizedBox(width: 8),
-        Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        Text(
+          title,
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
       ],
     );
   }
@@ -463,23 +605,61 @@ class HomeScreen extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
-        _buildActionItem(context, 'البطولات', Icons.emoji_events, Colors.amber, () {
-          if (onNavigateTab != null) onNavigateTab!(1);
-        }),
-        _buildActionItem(context, 'فريق جديد', Icons.group_add, AppTheme.primaryGreen, () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => const TeamManagementScreen()));
-        }),
-        _buildActionItem(context, 'التصنيف', Icons.bar_chart, Colors.purpleAccent, () {
-          if (onNavigateTab != null) onNavigateTab!(3);
-        }),
-        _buildActionItem(context, 'المحفظة', Icons.account_balance_wallet, Colors.blue, () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => const WalletScreen()));
-        }),
+        _buildActionItem(
+          context,
+          'البطولات',
+          Icons.emoji_events,
+          Colors.amber,
+          () {
+            if (onNavigateTab != null) onNavigateTab!(1);
+          },
+        ),
+        _buildActionItem(
+          context,
+          'فريق جديد',
+          Icons.group_add,
+          AppTheme.primaryGreen,
+          () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const TeamManagementScreen(),
+              ),
+            );
+          },
+        ),
+        _buildActionItem(
+          context,
+          'التصنيف',
+          Icons.bar_chart,
+          Colors.purpleAccent,
+          () {
+            if (onNavigateTab != null) onNavigateTab!(3);
+          },
+        ),
+        _buildActionItem(
+          context,
+          'المحفظة',
+          Icons.account_balance_wallet,
+          Colors.blue,
+          () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const WalletScreen()),
+            );
+          },
+        ),
       ],
     );
   }
 
-  Widget _buildActionItem(BuildContext context, String label, IconData icon, Color color, VoidCallback onTap) {
+  Widget _buildActionItem(
+    BuildContext context,
+    String label,
+    IconData icon,
+    Color color,
+    VoidCallback onTap,
+  ) {
     return GestureDetector(
       onTap: () {
         HapticFeedback.lightImpact();
@@ -492,7 +672,10 @@ class HomeScreen extends StatelessWidget {
             decoration: BoxDecoration(
               color: color.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(18),
-              border: Border.all(color: color.withValues(alpha: 0.35), width: 1.2),
+              border: Border.all(
+                color: color.withValues(alpha: 0.35),
+                width: 1.2,
+              ),
               boxShadow: [
                 BoxShadow(
                   color: color.withValues(alpha: 0.15),
@@ -504,7 +687,10 @@ class HomeScreen extends StatelessWidget {
             child: Icon(icon, color: color, size: 24),
           ),
           const SizedBox(height: 8),
-          Text(label, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+          Text(
+            label,
+            style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+          ),
         ],
       ),
     );
@@ -533,9 +719,15 @@ class HomeScreen extends StatelessWidget {
             decoration: BoxDecoration(
               color: AppTheme.primaryGreen.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppTheme.primaryGreen.withValues(alpha: 0.25)),
+              border: Border.all(
+                color: AppTheme.primaryGreen.withValues(alpha: 0.25),
+              ),
             ),
-            child: const Icon(Icons.schedule_rounded, color: AppTheme.primaryGreen, size: 24),
+            child: const Icon(
+              Icons.schedule_rounded,
+              color: AppTheme.primaryGreen,
+              size: 24,
+            ),
           ),
           const SizedBox(width: 16),
           const Expanded(
@@ -571,12 +763,17 @@ class HomeScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(22),
               border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
             ),
-            child: const Center(child: CircularProgressIndicator(color: AppTheme.primaryGreen)),
+            child: const Center(
+              child: CircularProgressIndicator(color: AppTheme.primaryGreen),
+            ),
           );
         }
 
         final data = snapshot.data?.data();
-        final isLive = (data != null && data['isLive'] == true && (data['youtubeVideoId'] ?? '').toString().isNotEmpty);
+        final isLive =
+            (data != null &&
+            data['isLive'] == true &&
+            (data['youtubeVideoId'] ?? '').toString().isNotEmpty);
 
         if (!isLive) {
           return Container(
@@ -595,7 +792,11 @@ class HomeScreen extends StatelessWidget {
                     color: Colors.white.withValues(alpha: 0.05),
                     borderRadius: BorderRadius.circular(16),
                   ),
-                  child: const Icon(Icons.tv_off_rounded, color: Colors.white38, size: 24),
+                  child: const Icon(
+                    Icons.tv_off_rounded,
+                    color: Colors.white38,
+                    size: 24,
+                  ),
                 ),
                 const SizedBox(width: 16),
                 const Expanded(
@@ -604,7 +805,11 @@ class HomeScreen extends StatelessWidget {
                     children: [
                       Text(
                         'لا يوجد بث مباشر نشط حالياً',
-                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
                       ),
                       SizedBox(height: 3),
                       Text(
@@ -626,15 +831,15 @@ class HomeScreen extends StatelessWidget {
           padding: const EdgeInsets.all(18),
           decoration: BoxDecoration(
             gradient: const LinearGradient(
-              colors: [
-                Color(0xFF261217),
-                Color(0xFF131822),
-              ],
+              colors: [Color(0xFF261217), Color(0xFF131822)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
             borderRadius: BorderRadius.circular(22),
-            border: Border.all(color: Colors.redAccent.withValues(alpha: 0.45), width: 1.2),
+            border: Border.all(
+              color: Colors.redAccent.withValues(alpha: 0.45),
+              width: 1.2,
+            ),
             boxShadow: [
               BoxShadow(
                 color: Colors.redAccent.withValues(alpha: 0.15),
@@ -650,7 +855,10 @@ class HomeScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 5,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.redAccent,
                       borderRadius: BorderRadius.circular(20),
@@ -667,12 +875,22 @@ class HomeScreen extends StatelessWidget {
                       children: [
                         Icon(Icons.circle, color: Colors.white, size: 7),
                         SizedBox(width: 5),
-                        Text('مباشر الآن', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
+                        Text(
+                          'مباشر الآن',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ],
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 3,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.08),
                       borderRadius: BorderRadius.circular(8),
@@ -680,9 +898,20 @@ class HomeScreen extends StatelessWidget {
                     child: const Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.play_circle_fill_rounded, color: Colors.redAccent, size: 14),
+                        Icon(
+                          Icons.play_circle_fill_rounded,
+                          color: Colors.redAccent,
+                          size: 14,
+                        ),
                         SizedBox(width: 4),
-                        Text('YouTube Live', style: TextStyle(color: Colors.white70, fontSize: 11, fontWeight: FontWeight.w600)),
+                        Text(
+                          'YouTube Live',
+                          style: TextStyle(
+                            color: Colors.white70,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -691,7 +920,10 @@ class HomeScreen extends StatelessWidget {
               const SizedBox(height: 14),
               Text(
                 title,
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 4),
               const Text(
@@ -707,16 +939,29 @@ class HomeScreen extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const LiveMatchScreen(matchId: 'sample_live_match'),
+                        builder: (context) =>
+                            const LiveMatchScreen(matchId: 'sample_live_match'),
                       ),
                     );
                   },
-                  icon: const Icon(Icons.play_arrow_rounded, color: Colors.black, size: 20),
-                  label: const Text('مشاهدة البث والدردشة الحية الآن', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+                  icon: const Icon(
+                    Icons.play_arrow_rounded,
+                    color: Colors.black,
+                    size: 20,
+                  ),
+                  label: const Text(
+                    'مشاهدة البث والدردشة الحية الآن',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppTheme.primaryGreen,
                     padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
                   ),
                 ),
               ),
@@ -745,7 +990,11 @@ class HomeScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: Colors.amber.withValues(alpha: 0.3)),
             ),
-            child: const Icon(Icons.leaderboard_rounded, color: Colors.amber, size: 24),
+            child: const Icon(
+              Icons.leaderboard_rounded,
+              color: Colors.amber,
+              size: 24,
+            ),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -770,11 +1019,22 @@ class HomeScreen extends StatelessWidget {
               if (onNavigateTab != null) onNavigateTab!(3);
             },
             style: OutlinedButton.styleFrom(
-              side: BorderSide(color: AppTheme.primaryGreen.withValues(alpha: 0.4)),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              side: BorderSide(
+                color: AppTheme.primaryGreen.withValues(alpha: 0.4),
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             ),
-            child: const Text('عرض', style: TextStyle(color: AppTheme.primaryGreen, fontSize: 12, fontWeight: FontWeight.bold)),
+            child: const Text(
+              'عرض',
+              style: TextStyle(
+                color: AppTheme.primaryGreen,
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
         ],
       ),
@@ -797,9 +1057,15 @@ class HomeScreen extends StatelessWidget {
             decoration: BoxDecoration(
               color: Colors.blueAccent.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.blueAccent.withValues(alpha: 0.3)),
+              border: Border.all(
+                color: Colors.blueAccent.withValues(alpha: 0.3),
+              ),
             ),
-            child: const Icon(Icons.newspaper_rounded, color: Colors.blueAccent, size: 24),
+            child: const Icon(
+              Icons.newspaper_rounded,
+              color: Colors.blueAccent,
+              size: 24,
+            ),
           ),
           const SizedBox(width: 16),
           const Expanded(
