@@ -9,6 +9,7 @@ import 'package:e_sport_sudan/features/wallet/presentation/screens/wallet_screen
 import 'package:e_sport_sudan/features/admin/presentation/screens/admin_dashboard_screen.dart';
 import 'package:e_sport_sudan/features/profile/presentation/screens/settings_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:e_sport_sudan/core/services/auth_service.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -159,6 +160,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const AdminDashboardScreen())),
                   ),
                 ],
+              ),
+            ),
+            const SizedBox(height: 24),
+            // Logout Button (Direct access)
+            OutlinedButton.icon(
+              onPressed: () async {
+                await AuthService().signOut();
+                if (mounted) {
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (context) => const LoginScreen()),
+                    (route) => false,
+                  );
+                }
+              },
+              icon: const Icon(Icons.logout, color: Colors.red),
+              label: const Text('تسجيل الخروج', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+              style: OutlinedButton.styleFrom(
+                side: const BorderSide(color: Colors.red),
+                minimumSize: const Size(double.infinity, 50),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
             ),
             const SizedBox(height: 24),
