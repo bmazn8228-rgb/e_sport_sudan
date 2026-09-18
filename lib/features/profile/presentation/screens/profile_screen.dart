@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:e_sport_sudan/core/theme/app_theme.dart';
+import 'package:e_sport_sudan/core/widgets/animated_lottie_icon.dart';
 import 'package:e_sport_sudan/features/team/presentation/screens/team_management_screen.dart';
 import 'package:e_sport_sudan/features/roles/presentation/screens/organizer_dashboard.dart';
 import 'package:e_sport_sudan/features/roles/presentation/screens/referee_dashboard.dart';
@@ -183,7 +184,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   _buildPortalTile(
                     title: 'محفظة اللاعب (المحفظة الإلكترونية)',
                     subtitle: 'إدارة الرصيد، الشحن عبر بنكك، وسحب الجوائز',
-                    icon: Icons.account_balance_wallet_rounded,
+                    lottieAsset: 'assets/lottie/wallet.json',
                     color: AppTheme.primaryGreen,
                     onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const WalletScreen())),
                   ),
@@ -206,7 +207,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   _buildPortalTile(
                     title: 'إدارة الفريق والتشكيلة',
                     subtitle: 'يتوفر قريباً',
-                    icon: Icons.groups_rounded,
+                    lottieAsset: 'assets/lottie/gamepad.json',
                     color: Colors.cyanAccent,
                     onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const TeamManagementScreen())),
                   ),
@@ -595,7 +596,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           child: Column(
             children: [
-              Icon(Icons.military_tech_outlined, size: 38, color: Colors.white.withValues(alpha: 0.25)),
+              const AnimatedLottieIcon(lottieAsset: 'assets/lottie/trophy.json', width: 60, height: 60),
               const SizedBox(height: 8),
               const Text('يتوفر قريباً', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.white70)),
               const SizedBox(height: 4),
@@ -623,7 +624,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           child: Column(
             children: [
-              Icon(Icons.history_rounded, size: 38, color: Colors.white.withValues(alpha: 0.25)),
+              const AnimatedLottieIcon(lottieAsset: 'assets/lottie/gamepad.json', width: 60, height: 60),
               const SizedBox(height: 8),
               const Text('يتوفر قريباً', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.white70)),
               const SizedBox(height: 4),
@@ -638,7 +639,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _buildPortalTile({
     required String title,
     required String subtitle,
-    required IconData icon,
+    IconData? icon,
+    String? lottieAsset,
     required Color color,
     required VoidCallback onTap,
   }) {
@@ -653,13 +655,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(10),
+              padding: EdgeInsets.all(lottieAsset != null ? 4 : 10),
               decoration: BoxDecoration(
                 color: color.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(color: color.withValues(alpha: 0.25)),
               ),
-              child: Icon(icon, color: color, size: 20),
+              child: lottieAsset != null
+                  ? AnimatedLottieIcon(lottieAsset: lottieAsset, width: 32, height: 32)
+                  : Icon(icon, color: color, size: 20),
             ),
             const SizedBox(width: 14),
             Expanded(
