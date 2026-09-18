@@ -59,6 +59,10 @@ class FirestoreService {
     await _db.collection('tournaments').doc(tournamentId).update({'status': newStatus});
   }
 
+  Future<void> deleteTournament(String tournamentId) async {
+    await _db.collection('tournaments').doc(tournamentId).delete();
+  }
+
   // =========================================================================
   // 3. Teams (الفرق)
   // =========================================================================
@@ -87,6 +91,10 @@ class FirestoreService {
         return data;
       }).toList(),
     );
+  }
+
+  Future<void> deleteTeam(String teamId) async {
+    await _db.collection('teams').doc(teamId).delete();
   }
 
   // =========================================================================
@@ -254,5 +262,9 @@ class FirestoreService {
   Future<void> addComplaint(Map<String, dynamic> data) async {
     data['createdAt'] = FieldValue.serverTimestamp();
     await _db.collection('complaints').add(data);
+  }
+
+  Future<void> deleteComplaint(String complaintId) async {
+    await _db.collection('complaints').doc(complaintId).delete();
   }
 }

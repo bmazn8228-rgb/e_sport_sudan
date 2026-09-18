@@ -111,28 +111,40 @@ class _MatchControlRoomState extends State<MatchControlRoom> {
 
   Future<void> _updateScore() async {
     setState(() => _isLoading = true);
-    await FirestoreService().updateMatchScore(
-      widget.matchId,
-      _scoreA,
-      _scoreB,
-      _timeController.text.trim(),
-    );
-    setState(() => _isLoading = false);
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('تم تحديث النتيجة')));
+    try {
+      await FirestoreService().updateMatchScore(
+        widget.matchId,
+        _scoreA,
+        _scoreB,
+        _timeController.text.trim(),
+      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('تم تحديث النتيجة بنجاح', style: TextStyle(color: Colors.black)), backgroundColor: AppTheme.primaryGreen));
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('فشل تحديث النتيجة', style: TextStyle(color: Colors.white)), backgroundColor: Colors.red));
+      }
     }
+    setState(() => _isLoading = false);
   }
 
   Future<void> _updateStreamUrl() async {
     setState(() => _isLoading = true);
-    await FirestoreService().updateMatchStreamUrl(
-      widget.matchId,
-      _youtubeController.text.trim(),
-    );
-    setState(() => _isLoading = false);
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('تم تحديث الرابط')));
+    try {
+      await FirestoreService().updateMatchStreamUrl(
+        widget.matchId,
+        _youtubeController.text.trim(),
+      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('تم تحديث الرابط بنجاح', style: TextStyle(color: Colors.black)), backgroundColor: AppTheme.primaryGreen));
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('فشل تحديث الرابط', style: TextStyle(color: Colors.white)), backgroundColor: Colors.red));
+      }
     }
+    setState(() => _isLoading = false);
   }
 
   @override

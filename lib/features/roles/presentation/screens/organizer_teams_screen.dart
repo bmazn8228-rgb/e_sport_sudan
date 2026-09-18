@@ -39,11 +39,61 @@ class OrganizerTeamsScreen extends StatelessWidget {
                   ),
                   title: Text(team['name'] ?? 'فريق مجهول', style: const TextStyle(fontWeight: FontWeight.bold)),
                   subtitle: Text('اللعبة: ${team['game'] ?? 'غير محدد'} | النقاط: ${team['points'] ?? 0}', style: const TextStyle(color: Colors.white54)),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
+                    tooltip: 'حذف الفريق',
+                    onPressed: () => _confirmDeleteTeam(context, team['id'], team['name'] ?? 'الفريق'),
+                  ),
                 ),
               );
             },
           );
         },
+      ),
+    );
+  }
+
+  void _confirmDeleteTeam(BuildContext context, String? id, String name) {
+    if (id == null) return;
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppTheme.cardDark,
+        title: const Text('تأكيد الحذف', style: TextStyle(color: Colors.white)),
+        content: Text('هل أنت متأكد من رغبتك في حذف فريق "$name"؟', style: const TextStyle(color: Colors.white70)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('إلغاء', style: TextStyle(color: Colors.white54)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () async {
+              Navigator.pop(ctx);
+              try {
+                await FirestoreService().deleteTeam(id);
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('تم حذف الفريق بنجاح ✅', style: TextStyle(color: Colors.black)),
+                      backgroundColor: AppTheme.primaryGreen,
+                    ),
+                  );
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('فشل في حذف الفريق ❌', style: TextStyle(color: Colors.white)),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              }
+            },
+            child: const Text('حذف'),
+          ),
+        ],
       ),
     );
   }

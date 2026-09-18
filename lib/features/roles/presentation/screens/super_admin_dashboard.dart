@@ -237,7 +237,10 @@ class SuperAdminDashboard extends StatefulWidget {
                 child: ElevatedButton(
                   onPressed: () {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('تم اعتماد وترقية: ${req['name']} بنجاح ✅')),
+                      SnackBar(
+                        content: Text('تم اعتماد وترقية: ${req['name']} بنجاح ✅', style: const TextStyle(color: Colors.black)),
+                        backgroundColor: AppTheme.primaryGreen,
+                      ),
                     );
                   },
                   style: ElevatedButton.styleFrom(
@@ -249,7 +252,14 @@ class SuperAdminDashboard extends StatefulWidget {
               ),
               const SizedBox(width: 8),
               OutlinedButton(
-                onPressed: () {},
+                onPressed: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('تم رفض طلب (${req['name']}) وحذفه ❌', style: const TextStyle(color: Colors.white)),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                },
                 style: OutlinedButton.styleFrom(
                   visualDensity: VisualDensity.compact,
                   side: const BorderSide(color: Colors.red),

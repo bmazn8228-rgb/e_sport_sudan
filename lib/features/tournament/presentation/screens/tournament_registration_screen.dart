@@ -345,17 +345,31 @@ class _TournamentRegistrationScreenState extends State<TournamentRegistrationScr
             const SizedBox(width: 12),
             ElevatedButton(
               onPressed: () {
-                if (_playerIdController.text.isEmpty) return;
+                if (_playerIdController.text.trim().isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('يرجى إدخال معرف اللاعب أولاً ⚠️'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                  return;
+                }
                 final requiredPlayers = widget.tournamentData['playersPerTeam'] ?? 1;
                 if (_teamMembers.length >= requiredPlayers) {
-                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('تم الوصول للحد الأقصى وهو $requiredPlayers لاعبين')));
-                   return;
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('فشل الإضافة: تم الوصول للحد الأقصى وهو $requiredPlayers لاعبين ❌'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                  return;
                 }
                 
                 // Simulate fetching player by ID
+                final newId = _playerIdController.text.trim();
                 setState(() {
                   _teamMembers.add({
-                    'id': _playerIdController.text,
+                    'id': newId,
                     'name': 'لاعب جديد ${_teamMembers.length}',
                     'ign': 'PlayerIGN_${_teamMembers.length}',
                     'role': 'Assault',
@@ -364,7 +378,12 @@ class _TournamentRegistrationScreenState extends State<TournamentRegistrationScr
                   _playerIdController.clear();
                 });
                 
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('تم إضافة اللاعب بنجاح ✔️')));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('تم إضافة اللاعب بنجاح ✅', style: TextStyle(color: Colors.black)),
+                    backgroundColor: AppTheme.primaryGreen,
+                  ),
+                );
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.primaryGreen,
@@ -739,9 +758,16 @@ class _TournamentRegistrationScreenState extends State<TournamentRegistrationScr
             IconButton(
               icon: const Icon(Icons.close, color: Colors.red, size: 18),
               onPressed: () {
+                final removedPlayer = _teamMembers[index]['ign'] ?? _teamMembers[index]['name'];
                 setState(() {
                   _teamMembers.removeAt(index);
                 });
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('تم حذف اللاعب ($removedPlayer) من الفريق بنجاح ✅', style: const TextStyle(color: Colors.black)),
+                    backgroundColor: AppTheme.primaryGreen,
+                  ),
+                );
               },
               constraints: const BoxConstraints(),
               padding: EdgeInsets.zero,

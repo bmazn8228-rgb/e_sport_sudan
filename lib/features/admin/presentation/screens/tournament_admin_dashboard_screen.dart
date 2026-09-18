@@ -212,13 +212,27 @@ class _TournamentAdminDashboardScreenState extends State<TournamentAdminDashboar
                       'logoUrl': logoUrl ?? '',
                     };
 
-                    await _firestoreService.createTournament(tournamentData);
-                    
-                    if (context.mounted) {
-                      Navigator.pop(context);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('تمت إضافة البطولة بنجاح')),
-                      );
+                    try {
+                      await _firestoreService.createTournament(tournamentData);
+                      if (context.mounted) {
+                        Navigator.pop(context);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('تمت إضافة البطولة بنجاح ✅', style: TextStyle(color: Colors.black)),
+                            backgroundColor: AppTheme.primaryGreen,
+                          ),
+                        );
+                      }
+                    } catch (e) {
+                      if (context.mounted) {
+                        setState(() => isUploading = false);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('فشل في إضافة البطولة ❌', style: TextStyle(color: Colors.white)),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
                     }
                   },
                   style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryGreen),
@@ -234,7 +248,7 @@ class _TournamentAdminDashboardScreenState extends State<TournamentAdminDashboar
     showModalBottomSheet(
       context: context,
       backgroundColor: AppTheme.cardDark,
-      builder: (context) => Padding(
+      builder: (ctx) => Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -245,29 +259,88 @@ class _TournamentAdminDashboardScreenState extends State<TournamentAdminDashboar
             ListTile(
               leading: const Icon(Icons.event_available, color: AppTheme.primaryGreen),
               title: const Text('التسجيل مفتوح (Upcoming)'),
-              onTap: () {
-                _firestoreService.updateTournamentStatus(tournamentId, 'upcoming');
-                Navigator.pop(context);
-              },
+              onTap: () => _applyStatusChange(ctx, tournamentId, 'upcoming'),
             ),
             ListTile(
               leading: const Icon(Icons.play_circle_filled, color: Colors.red),
               title: const Text('جارية الآن (Live)'),
-              onTap: () {
-                _firestoreService.updateTournamentStatus(tournamentId, 'live');
-                Navigator.pop(context);
-              },
+              onTap: () => _applyStatusChange(ctx, tournamentId, 'live'),
             ),
             ListTile(
               leading: const Icon(Icons.check_circle, color: Colors.grey),
               title: const Text('مكتملة (Finished)'),
-              onTap: () {
-                _firestoreService.updateTournamentStatus(tournamentId, 'finished');
-                Navigator.pop(context);
-              },
+              onTap: () => _applyStatusChange(ctx, tournamentId, 'finished'),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Future<void> _applyStatusChange(BuildContext bottomSheetContext, String tournamentId, String newStatus) async {
+    Navigator.pop(bottomSheetContext);
+    try {
+      await _firestoreService.updateTournamentStatus(tournamentId, newStatus);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('تم تحديث حالة البطولة بنجاح ✅', style: TextStyle(color: Colors.black)),
+            backgroundColor: AppTheme.primaryGreen,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('فشل في تحديث حالة البطولة ❌', style: TextStyle(color: Colors.white)),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  void _confirmDeleteTournament(String tournamentId, String title) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppTheme.cardDark,
+        title: const Text('تأكيد حذف البطولة', style: TextStyle(color: Colors.white)),
+        content: Text('هل أنت متأكد من رغبتك في حذف بطولة "$title"؟ سيتم حذف جميع بياناتها نهائياً.', style: const TextStyle(color: Colors.white70)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('إلغاء', style: TextStyle(color: Colors.white54)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () async {
+              Navigator.pop(ctx);
+              try {
+                await _firestoreService.deleteTournament(tournamentId);
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('تم حذف البطولة بنجاح ✅', style: TextStyle(color: Colors.black)),
+                      backgroundColor: AppTheme.primaryGreen,
+                    ),
+                  );
+                }
+              } catch (e) {
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('فشل في حذف البطولة ❌', style: TextStyle(color: Colors.white)),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              }
+            },
+            child: const Text('حذف'),
+          ),
+        ],
       ),
     );
   }
@@ -352,14 +425,22 @@ class _TournamentAdminDashboardScreenState extends State<TournamentAdminDashboar
                       Text('الجوائز: ${t['prizePool']} | الرسوم: ${t['entryFee']}', style: const TextStyle(color: Colors.white70)),
                       Text('الفرق: ${t['registeredTeamsCount']} / ${t['maxTeams']} (اللاعبين لكل فريق: ${t['playersPerTeam'] ?? 1})', style: const TextStyle(color: Colors.white70)),
                       const SizedBox(height: 12),
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: TextButton.icon(
-                          onPressed: () => _updateStatus(t['id'], status),
-                          icon: const Icon(Icons.edit, size: 18),
-                          label: const Text('تغيير الحالة'),
-                          style: TextButton.styleFrom(foregroundColor: Colors.orange),
-                        ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          TextButton.icon(
+                            onPressed: () => _confirmDeleteTournament(t['id'], t['title'] ?? 'البطولة'),
+                            icon: const Icon(Icons.delete_outline, size: 18, color: Colors.redAccent),
+                            label: const Text('حذف', style: TextStyle(color: Colors.redAccent)),
+                          ),
+                          const SizedBox(width: 8),
+                          TextButton.icon(
+                            onPressed: () => _updateStatus(t['id'], status),
+                            icon: const Icon(Icons.edit, size: 18),
+                            label: const Text('تغيير الحالة'),
+                            style: TextButton.styleFrom(foregroundColor: Colors.orange),
+                          ),
+                        ],
                       )
                     ],
                   ),

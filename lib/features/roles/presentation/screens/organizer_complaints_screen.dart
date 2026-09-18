@@ -44,11 +44,61 @@ class OrganizerComplaintsScreen extends StatelessWidget {
                   ),
                   title: Text(complaint['title'] ?? 'بدون عنوان', style: const TextStyle(fontWeight: FontWeight.bold)),
                   subtitle: Text(complaint['description'] ?? 'لا يوجد تفاصيل', style: const TextStyle(color: Colors.white54)),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
+                    tooltip: 'حذف الشكوى',
+                    onPressed: () => _confirmDeleteComplaint(context, complaint['id'], complaint['title'] ?? 'الشكوى'),
+                  ),
                 ),
               );
             },
           );
         },
+      ),
+    );
+  }
+
+  void _confirmDeleteComplaint(BuildContext context, String? id, String title) {
+    if (id == null) return;
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppTheme.cardDark,
+        title: const Text('تأكيد الحذف', style: TextStyle(color: Colors.white)),
+        content: Text('هل أنت متأكد من رغبتك في حذف "$title"؟', style: const TextStyle(color: Colors.white70)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('إلغاء', style: TextStyle(color: Colors.white54)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () async {
+              Navigator.pop(ctx);
+              try {
+                await FirestoreService().deleteComplaint(id);
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('تم حذف الشكوى بنجاح ✅', style: TextStyle(color: Colors.black)),
+                      backgroundColor: AppTheme.primaryGreen,
+                    ),
+                  );
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('فشل في حذف الشكوى ❌', style: TextStyle(color: Colors.white)),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              }
+            },
+            child: const Text('حذف'),
+          ),
+        ],
       ),
     );
   }
@@ -85,12 +135,21 @@ class OrganizerComplaintsScreen extends StatelessWidget {
             ElevatedButton(
               onPressed: () async {
                 if (titleController.text.isNotEmpty && descController.text.isNotEmpty) {
-                  await FirestoreService().addComplaint({
-                    'title': titleController.text,
-                    'description': descController.text,
-                    'status': 'pending',
-                  });
-                  if (context.mounted) Navigator.pop(context);
+                  try {
+                    await FirestoreService().addComplaint({
+                      'title': titleController.text,
+                      'description': descController.text,
+                      'status': 'pending',
+                    });
+                    if (context.mounted) {
+                      Navigator.pop(context);
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('تم إضافة الشكوى بنجاح', style: TextStyle(color: Colors.black)), backgroundColor: AppTheme.primaryGreen));
+                    }
+                  } catch (e) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('فشل في إضافة الشكوى', style: TextStyle(color: Colors.white)), backgroundColor: Colors.red));
+                    }
+                  }
                 }
               },
               style: ElevatedButton.styleFrom(backgroundColor: Colors.red),

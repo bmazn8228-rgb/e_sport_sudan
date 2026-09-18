@@ -179,15 +179,21 @@ class _WalletScreenState extends State<WalletScreen> {
                     const SizedBox(height: 24),
                     ElevatedButton(
                       onPressed: () {
-                        if (_transactionIdController.text.isEmpty || _receiptFileName == null) {
+                        if (_transactionIdController.text.trim().isEmpty || _receiptFileName == null) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('الرجاء إدخال رقم المعاملة وإرفاق الإشعار')),
+                            const SnackBar(
+                              content: Text('الرجاء إدخال رقم المعاملة وإرفاق صورة الإشعار أولاً ⚠️'),
+                              backgroundColor: Colors.red,
+                            ),
                           );
                           return;
                         }
                         // Submit logic
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('تم إرسال طلب شحن الرصيد للمراجعة بنجاح ✔️')),
+                          const SnackBar(
+                            content: Text('تم إرسال طلب شحن الرصيد للمراجعة بنجاح ✅', style: TextStyle(color: Colors.black)),
+                            backgroundColor: AppTheme.primaryGreen,
+                          ),
                         );
                         setState(() {
                           _isAddingFunds = false;

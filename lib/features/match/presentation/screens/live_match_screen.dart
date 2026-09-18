@@ -57,20 +57,31 @@ class _LiveMatchScreenState extends State<LiveMatchScreen> {
 
     _chatController.clear();
 
-    await FirestoreService().sendChatMessage(
-      matchId: widget.matchId,
-      senderId: user.uid,
-      senderName: user.displayName ?? 'لاعب',
-      message: message,
-    );
-
-    // Scroll to bottom
-    if (_scrollController.hasClients) {
-      _scrollController.animateTo(
-        _scrollController.position.maxScrollExtent + 100,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOut,
+    try {
+      await FirestoreService().sendChatMessage(
+        matchId: widget.matchId,
+        senderId: user.uid,
+        senderName: user.displayName ?? 'لاعب',
+        message: message,
       );
+
+      // Scroll to bottom
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent + 100,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('فشل في إرسال الرسالة ❌', style: TextStyle(color: Colors.white)),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 
