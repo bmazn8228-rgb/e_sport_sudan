@@ -7,10 +7,10 @@ class PaymentFailureScreen extends StatelessWidget {
   final double availableBalance;
 
   const PaymentFailureScreen({
-    Key? key,
+    super.key,
     required this.requiredAmount,
     required this.availableBalance,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -73,7 +73,7 @@ class PaymentFailureScreen extends StatelessWidget {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.primaryGreen,
+                    backgroundColor: AppTheme.primaryBlue,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                   ),
                   child: const Text('شحن المحفظة الآن', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black)),

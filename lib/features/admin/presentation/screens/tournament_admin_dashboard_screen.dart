@@ -10,7 +10,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:e_sport_sudan/features/auth/presentation/screens/login_screen.dart';
 
 class TournamentAdminDashboardScreen extends StatefulWidget {
-  const TournamentAdminDashboardScreen({Key? key}) : super(key: key);
+  const TournamentAdminDashboardScreen({super.key});
 
   @override
   State<TournamentAdminDashboardScreen> createState() => _TournamentAdminDashboardScreenState();
@@ -116,7 +116,7 @@ class _TournamentAdminDashboardScreenState extends State<TournamentAdminDashboar
                     ),
                     const SizedBox(height: 8),
                     DropdownButtonFormField<String>(
-                      value: selectedGame,
+                      initialValue: selectedGame,
                       items: games.map((game) => DropdownMenuItem(value: game, child: Text(game))).toList(),
                       onChanged: (val) => selectedGame = val!,
                       decoration: const InputDecoration(labelText: 'اللعبة'),
@@ -167,7 +167,7 @@ class _TournamentAdminDashboardScreenState extends State<TournamentAdminDashboar
           isUploading
               ? const Padding(
                   padding: EdgeInsets.all(8.0),
-                  child: CircularProgressIndicator(color: AppTheme.primaryGreen),
+                  child: CircularProgressIndicator(color: AppTheme.primaryBlue),
                 )
               : ElevatedButton(
                   onPressed: () async {
@@ -219,7 +219,7 @@ class _TournamentAdminDashboardScreenState extends State<TournamentAdminDashboar
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text('تمت إضافة البطولة بنجاح ✅', style: TextStyle(color: Colors.black)),
-                            backgroundColor: AppTheme.primaryGreen,
+                            backgroundColor: AppTheme.primaryBlue,
                           ),
                         );
                       }
@@ -235,7 +235,7 @@ class _TournamentAdminDashboardScreenState extends State<TournamentAdminDashboar
                       }
                     }
                   },
-                  style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryGreen),
+                  style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryBlue),
                   child: const Text('إضافة'),
                 ),
         ],
@@ -257,7 +257,7 @@ class _TournamentAdminDashboardScreenState extends State<TournamentAdminDashboar
             const Text('تغيير حالة البطولة', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 16),
             ListTile(
-              leading: const Icon(Icons.event_available, color: AppTheme.primaryGreen),
+              leading: const Icon(Icons.event_available, color: AppTheme.primaryBlue),
               title: const Text('التسجيل مفتوح (Upcoming)'),
               onTap: () => _applyStatusChange(ctx, tournamentId, 'upcoming'),
             ),
@@ -285,7 +285,7 @@ class _TournamentAdminDashboardScreenState extends State<TournamentAdminDashboar
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('تم تحديث حالة البطولة بنجاح ✅', style: TextStyle(color: Colors.black)),
-            backgroundColor: AppTheme.primaryGreen,
+            backgroundColor: AppTheme.primaryBlue,
           ),
         );
       }
@@ -323,7 +323,7 @@ class _TournamentAdminDashboardScreenState extends State<TournamentAdminDashboar
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text('تم حذف البطولة بنجاح ✅', style: TextStyle(color: Colors.black)),
-                      backgroundColor: AppTheme.primaryGreen,
+                      backgroundColor: AppTheme.primaryBlue,
                     ),
                   );
                 }
@@ -349,7 +349,7 @@ class _TournamentAdminDashboardScreenState extends State<TournamentAdminDashboar
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('لوحة إدارة البطولات', style: TextStyle(color: AppTheme.primaryGreen, fontWeight: FontWeight.bold)),
+        title: const Text('لوحة إدارة البطولات', style: TextStyle(color: AppTheme.primaryBlue, fontWeight: FontWeight.bold)),
         backgroundColor: AppTheme.backgroundDark,
         elevation: 0,
         actions: [
@@ -361,7 +361,7 @@ class _TournamentAdminDashboardScreenState extends State<TournamentAdminDashboar
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showAddTournamentDialog(context),
-        backgroundColor: AppTheme.primaryGreen,
+        backgroundColor: AppTheme.primaryBlue,
         child: const Icon(Icons.add, color: Colors.black),
       ),
       body: StreamBuilder<List<Map<String, dynamic>>>(
@@ -389,7 +389,7 @@ class _TournamentAdminDashboardScreenState extends State<TournamentAdminDashboar
               Color statusColor = Colors.grey;
               String statusText = status;
               if (status == 'upcoming' || status == 'open') {
-                statusColor = AppTheme.primaryGreen;
+                statusColor = AppTheme.primaryBlue;
                 statusText = 'التسجيل مفتوح';
               } else if (status == 'live') {
                 statusColor = Colors.red;

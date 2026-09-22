@@ -6,6 +6,9 @@ import 'core/widgets/network_aware_widget.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'core/services/notification_service.dart';
+
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,6 +29,7 @@ void main() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
+    await NotificationService().initialize();
   } catch (e) {
     debugPrint('Firebase initialization notice: $e');
   }
@@ -34,12 +38,13 @@ void main() async {
 }
 
 class ESportSudanApp extends StatelessWidget {
-  const ESportSudanApp({Key? key}) : super(key: key);
+  const ESportSudanApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'E-Sport Sudan',
+      navigatorKey: navigatorKey,
       debugShowCheckedModeBanner: false,
       theme: AppTheme.darkTheme,
       // Forcing RTL for Arabic UI

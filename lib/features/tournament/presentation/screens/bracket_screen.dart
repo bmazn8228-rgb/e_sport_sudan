@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:e_sport_sudan/core/theme/app_theme.dart';
+import 'package:e_sport_sudan/core/services/firestore_service.dart';
 
 class BracketScreen extends StatefulWidget {
   final String tournamentTitle;
+  final String tournamentId;
 
-  const BracketScreen({Key? key, required this.tournamentTitle}) : super(key: key);
+  const BracketScreen({
+    super.key,
+    required this.tournamentTitle,
+    required this.tournamentId,
+  });
 
   @override
   State<BracketScreen> createState() => _BracketScreenState();
@@ -36,7 +42,7 @@ class _BracketScreenState extends State<BracketScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text('شجرة المباريات والتصفيات', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-            Text(widget.tournamentTitle, style: const TextStyle(fontSize: 11, color: AppTheme.primaryGreen)),
+            Text(widget.tournamentTitle, style: const TextStyle(fontSize: 11, color: AppTheme.primaryBlue)),
           ],
         ),
       ),
@@ -57,7 +63,7 @@ class _BracketScreenState extends State<BracketScreen> {
                   child: ChoiceChip(
                     label: Text(_stages[index], style: TextStyle(color: isSelected ? Colors.black : Colors.white, fontSize: 12)),
                     selected: isSelected,
-                    selectedColor: AppTheme.primaryGreen,
+                    selectedColor: AppTheme.primaryBlue,
                     backgroundColor: AppTheme.cardDark,
                     onSelected: (selected) {
                       if (selected) setState(() => _selectedStageIndex = index);
@@ -69,12 +75,37 @@ class _BracketScreenState extends State<BracketScreen> {
           ),
 
           // Matches List / Tree
-          const Expanded(
-            child: Center(
-              child: Text(
-                'يتوفر قريباً',
-                style: TextStyle(color: Colors.white54, fontSize: 16),
-              ),
+          Expanded(
+            child: StreamBuilder<List<Map<String, dynamic>>>(
+              stream: FirestoreService().getTournamentMatchesStream(widget.tournamentId),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator(color: AppTheme.primaryBlue));
+                }
+                
+                final matches = snapshot.data ?? [];
+                
+                // Filter matches based on selected stage
+                final stageName = _stages[_selectedStageIndex];
+                final stageMatches = matches.where((m) => m['stage'] == stageName).toList();
+
+                if (stageMatches.isEmpty) {
+                  return const Center(
+                    child: Text(
+                      'لا توجد مباريات في هذه المرحلة حالياً',
+                      style: TextStyle(color: Colors.white54, fontSize: 16),
+                    ),
+                  );
+                }
+
+                return ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: stageMatches.length,
+                  itemBuilder: (context, index) {
+                    return _buildMatchCard(stageMatches[index]);
+                  },
+                );
+              },
             ),
           ),
         ],
@@ -83,7 +114,18 @@ class _BracketScreenState extends State<BracketScreen> {
   }
 
   Widget _buildMatchCard(Map<String, dynamic> match) {
-    final bool isLive = match['status'] == 'جارية الآن';
+    final String status = match['status'] ?? 'غير محدد';
+    final bool isLive = status == 'جارية الآن' || status == 'live';
+    final String matchId = match['id'] ?? '...';
+    final String time = match['time'] ?? 'غير محدد';
+
+    final String teamA = match['teamA'] ?? 'فريق A';
+    final int scoreA = match['scoreA'] ?? 0;
+    
+    final String teamB = match['teamB'] ?? 'فريق B';
+    final int scoreB = match['scoreB'] ?? 0;
+    
+    final String? winner = match['winner'];
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -104,7 +146,7 @@ class _BracketScreenState extends State<BracketScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'مباراة #${match['id']}',
+                  'مباراة #$matchId',
                   style: const TextStyle(fontSize: 11, color: Colors.white54),
                 ),
                 Container(
@@ -114,7 +156,7 @@ class _BracketScreenState extends State<BracketScreen> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
-                    match['status'],
+                    status,
                     style: TextStyle(
                       color: isLive ? Colors.red : Colors.white70,
                       fontSize: 10,
@@ -123,7 +165,7 @@ class _BracketScreenState extends State<BracketScreen> {
                   ),
                 ),
                 Text(
-                  match['time'],
+                  time,
                   style: const TextStyle(fontSize: 11, color: Colors.white54),
                 ),
               ],
@@ -137,15 +179,15 @@ class _BracketScreenState extends State<BracketScreen> {
             child: Column(
               children: [
                 _buildTeamRow(
-                  match['teamA'],
-                  match['scoreA'],
-                  isWinner: match['winner'] == 'teamA',
+                  teamA,
+                  scoreA,
+                  isWinner: winner == 'teamA',
                 ),
                 const SizedBox(height: 10),
                 _buildTeamRow(
-                  match['teamB'],
-                  match['scoreB'],
-                  isWinner: match['winner'] == 'teamB',
+                  teamB,
+                  scoreB,
+                  isWinner: winner == 'teamB',
                 ),
               ],
             ),
@@ -165,7 +207,7 @@ class _BracketScreenState extends State<BracketScreen> {
               width: 4,
               height: 24,
               decoration: BoxDecoration(
-                color: isWinner ? AppTheme.primaryGreen : Colors.transparent,
+                color: isWinner ? AppTheme.primaryBlue : Colors.transparent,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -185,10 +227,10 @@ class _BracketScreenState extends State<BracketScreen> {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
           decoration: BoxDecoration(
-            color: isWinner ? AppTheme.primaryGreen.withOpacity(0.2) : Colors.black,
+            color: isWinner ? AppTheme.primaryBlue.withOpacity(0.2) : Colors.black,
             borderRadius: BorderRadius.circular(6),
             border: Border.all(
-              color: isWinner ? AppTheme.primaryGreen : Colors.white10,
+              color: isWinner ? AppTheme.primaryBlue : Colors.white10,
             ),
           ),
           child: Text(
@@ -196,7 +238,7 @@ class _BracketScreenState extends State<BracketScreen> {
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.bold,
-              color: isWinner ? AppTheme.primaryGreen : Colors.white,
+              color: isWinner ? AppTheme.primaryBlue : Colors.white,
             ),
           ),
         ),

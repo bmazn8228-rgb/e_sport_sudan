@@ -16,13 +16,13 @@ class ESportToast extends StatelessWidget {
   final String? actionLabel;
 
   const ESportToast({
-    Key? key,
+    super.key,
     required this.title,
     required this.message,
     this.type = ToastType.success,
     this.onAction,
     this.actionLabel,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +43,7 @@ class ESportToast extends StatelessWidget {
         icon = Icons.group;
         break;
       case ToastType.wallet:
-        accentColor = AppTheme.primaryGreen;
+        accentColor = AppTheme.primaryBlue;
         icon = Icons.account_balance_wallet;
         break;
     }

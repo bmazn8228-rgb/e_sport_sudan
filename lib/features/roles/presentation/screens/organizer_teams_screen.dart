@@ -3,7 +3,7 @@ import 'package:e_sport_sudan/core/theme/app_theme.dart';
 import 'package:e_sport_sudan/core/services/firestore_service.dart';
 
 class OrganizerTeamsScreen extends StatelessWidget {
-  const OrganizerTeamsScreen({Key? key}) : super(key: key);
+  const OrganizerTeamsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +17,7 @@ class OrganizerTeamsScreen extends StatelessWidget {
         stream: FirestoreService().getAllTeamsStream(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator(color: AppTheme.primaryGreen));
+            return const Center(child: CircularProgressIndicator(color: AppTheme.primaryBlue));
           }
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return const Center(child: Text('لا يوجد فرق', style: TextStyle(color: Colors.white54, fontSize: 16)));
@@ -34,7 +34,7 @@ class OrganizerTeamsScreen extends StatelessWidget {
                 margin: const EdgeInsets.only(bottom: 12),
                 child: ListTile(
                   leading: const CircleAvatar(
-                    backgroundColor: AppTheme.primaryGreen,
+                    backgroundColor: AppTheme.primaryBlue,
                     child: Icon(Icons.shield, color: Colors.black),
                   ),
                   title: Text(team['name'] ?? 'فريق مجهول', style: const TextStyle(fontWeight: FontWeight.bold)),
@@ -76,7 +76,7 @@ class OrganizerTeamsScreen extends StatelessWidget {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text('تم حذف الفريق بنجاح ✅', style: TextStyle(color: Colors.black)),
-                      backgroundColor: AppTheme.primaryGreen,
+                      backgroundColor: AppTheme.primaryBlue,
                     ),
                   );
                 }

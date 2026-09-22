@@ -2,24 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
-  static const Color primaryGreen = Color(0xFF00FF7F);
-  static const Color backgroundDark = Color(0xFF121212);
-  static const Color cardDark = Color(0xFF1E1E1E);
+  // Logo Colors
+  static const Color primaryBlue = Color(0xFF0099FF); // Neon/Electric Blue
+  static const Color primaryRed = Color(0xFFFF3300); // Fiery Red/Orange
+  static const Color backgroundDark = Color(0xFF0A0E17); // Deep dark background
+  static const Color cardDark = Color(0xFF131A26); // Slightly lighter for cards
 
   static ThemeData get darkTheme {
     return ThemeData(
       brightness: Brightness.dark,
       scaffoldBackgroundColor: backgroundDark,
-      primaryColor: primaryGreen,
+      primaryColor: primaryBlue,
       colorScheme: const ColorScheme.dark(
-        primary: primaryGreen,
+        primary: primaryBlue,
+        secondary: primaryRed,
         surface: cardDark,
       ),
       textTheme: GoogleFonts.cairoTextTheme(ThemeData.dark().textTheme),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: primaryGreen,
-          foregroundColor: Colors.black,
+          backgroundColor: primaryBlue,
+          foregroundColor: Colors.white,
           minimumSize: const Size(double.infinity, 50),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
@@ -36,7 +39,7 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: primaryGreen, width: 1.5),
+          borderSide: const BorderSide(color: primaryBlue, width: 1.5),
         ),
       ),
     );

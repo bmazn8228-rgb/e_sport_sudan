@@ -4,6 +4,7 @@ import 'package:e_sport_sudan/core/theme/app_theme.dart';
 import 'package:e_sport_sudan/core/services/firestore_service.dart';
 import 'bracket_screen.dart';
 import 'tournament_registration_screen.dart';
+import 'tournament_details_screen.dart';
 
 class TournamentsScreen extends StatefulWidget {
   final bool isGuest;
@@ -114,18 +115,18 @@ class _TournamentsScreenState extends State<TournamentsScreen> {
                             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                             decoration: BoxDecoration(
                               color: isSelected
-                                  ? AppTheme.primaryGreen
+                                  ? AppTheme.primaryBlue
                                   : AppTheme.cardDark.withValues(alpha: 0.7),
                               borderRadius: BorderRadius.circular(20),
                               border: Border.all(
                                 color: isSelected
-                                    ? AppTheme.primaryGreen
+                                    ? AppTheme.primaryBlue
                                     : Colors.white.withValues(alpha: 0.08),
                               ),
                               boxShadow: isSelected
                                   ? [
                                       BoxShadow(
-                                        color: AppTheme.primaryGreen.withValues(alpha: 0.3),
+                                        color: AppTheme.primaryBlue.withValues(alpha: 0.3),
                                         blurRadius: 10,
                                         offset: const Offset(0, 2),
                                       ),
@@ -159,13 +160,26 @@ class _TournamentsScreenState extends State<TournamentsScreen> {
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(
-                    child: CircularProgressIndicator(color: AppTheme.primaryGreen),
+                    child: CircularProgressIndicator(color: AppTheme.primaryBlue),
                   );
                 }
 
                 if (snapshot.hasError) {
-                  return const Center(
-                    child: Text('حدث خطأ في تحميل البطولات.', style: TextStyle(color: Colors.white54)),
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text('حدث خطأ في تحميل البطولات.', style: TextStyle(color: Colors.white54)),
+                        const SizedBox(height: 16),
+                        ElevatedButton.icon(
+                          onPressed: () {
+                            setState(() {}); // Trigger a rebuild to retry the stream
+                          },
+                          icon: const Icon(Icons.refresh),
+                          label: const Text('إعادة المحاولة'),
+                        ),
+                      ],
+                    ),
                   );
                 }
 
@@ -234,7 +248,7 @@ class _TournamentsScreenState extends State<TournamentsScreen> {
     
     if (status == 'upcoming' || status == 'open') {
       statusText = 'التسجيل مفتوح';
-      statusColor = AppTheme.primaryGreen;
+      statusColor = AppTheme.primaryBlue;
     } else if (status == 'live') {
       statusText = 'جارية الآن';
       statusColor = Colors.redAccent;
@@ -253,7 +267,14 @@ class _TournamentsScreenState extends State<TournamentsScreen> {
 
     final double fillPercentage = maxTeams > 0 ? (registered / maxTeams).clamp(0.0, 1.0) : 0.0;
 
-    return Container(
+    return GestureDetector(
+      onTap: () {
+        HapticFeedback.lightImpact();
+        Navigator.push(context, MaterialPageRoute(
+          builder: (context) => TournamentDetailsScreen(tournament: t),
+        ));
+      },
+      child: Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
@@ -268,7 +289,7 @@ class _TournamentsScreenState extends State<TournamentsScreen> {
         ),
         boxShadow: [
           BoxShadow(
-            color: (isLive ? Colors.red : AppTheme.primaryGreen).withValues(alpha: 0.06),
+            color: (isLive ? Colors.red : AppTheme.primaryBlue).withValues(alpha: 0.06),
             blurRadius: 16,
             offset: const Offset(0, 6),
           ),
@@ -345,7 +366,7 @@ class _TournamentsScreenState extends State<TournamentsScreen> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.sports_esports_rounded, size: 14, color: AppTheme.primaryGreen),
+                    const Icon(Icons.sports_esports_rounded, size: 14, color: AppTheme.primaryBlue),
                     const SizedBox(width: 4),
                     Text(game, style: const TextStyle(color: Colors.white70, fontSize: 12)),
                   ],
@@ -386,7 +407,7 @@ class _TournamentsScreenState extends State<TournamentsScreen> {
                   Text(
                     '${(fillPercentage * 100).toInt()}%',
                     style: TextStyle(
-                      color: fillPercentage >= 1.0 ? Colors.redAccent : AppTheme.primaryGreen,
+                      color: fillPercentage >= 1.0 ? Colors.redAccent : AppTheme.primaryBlue,
                       fontSize: 11,
                       fontWeight: FontWeight.bold,
                     ),
@@ -400,7 +421,7 @@ class _TournamentsScreenState extends State<TournamentsScreen> {
                   value: fillPercentage,
                   backgroundColor: Colors.white.withValues(alpha: 0.08),
                   valueColor: AlwaysStoppedAnimation<Color>(
-                    fillPercentage >= 1.0 ? Colors.redAccent : AppTheme.primaryGreen,
+                    fillPercentage >= 1.0 ? Colors.redAccent : AppTheme.primaryBlue,
                   ),
                   minHeight: 6,
                 ),
@@ -427,7 +448,7 @@ class _TournamentsScreenState extends State<TournamentsScreen> {
                     icon: const Icon(Icons.app_registration_rounded, size: 18),
                     label: const Text('تسجيل الفريق', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppTheme.primaryGreen,
+                      backgroundColor: AppTheme.primaryBlue,
                       padding: const EdgeInsets.symmetric(vertical: 12),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                     ),
@@ -442,7 +463,10 @@ class _TournamentsScreenState extends State<TournamentsScreen> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => BracketScreen(tournamentTitle: title),
+                        builder: (context) => BracketScreen(
+                          tournamentTitle: title,
+                          tournamentId: t['id'] ?? '',
+                        ),
                       ),
                     );
                   },
@@ -460,6 +484,6 @@ class _TournamentsScreenState extends State<TournamentsScreen> {
           ),
         ],
       ),
-    );
+    ));
   }
 }

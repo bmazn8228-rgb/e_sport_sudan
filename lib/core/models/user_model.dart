@@ -96,6 +96,7 @@ class UserModel {
   final String uid;
   final String email;
   final String displayName;
+  final String? ign;
   final String phone;
   final String? photoUrl;
   final String? gameId;
@@ -107,6 +108,7 @@ class UserModel {
     required this.uid,
     required this.email,
     required this.displayName,
+    this.ign,
     required this.phone,
     this.photoUrl,
     this.gameId,
@@ -120,6 +122,7 @@ class UserModel {
       'uid': uid,
       'email': email,
       'displayName': displayName,
+      'ign': ign,
       'phone': phone,
       'photoUrl': photoUrl,
       'gameId': gameId,
@@ -134,6 +137,7 @@ class UserModel {
       uid: id,
       email: map['email'] ?? '',
       displayName: map['displayName'] ?? '',
+      ign: map['ign'],
       phone: map['phone'] ?? '',
       photoUrl: map['photoUrl'],
       gameId: map['gameId'],

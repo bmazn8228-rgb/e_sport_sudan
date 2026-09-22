@@ -3,7 +3,7 @@ import 'package:e_sport_sudan/core/theme/app_theme.dart';
 import 'package:e_sport_sudan/core/services/firestore_service.dart';
 
 class OrganizerComplaintsScreen extends StatelessWidget {
-  const OrganizerComplaintsScreen({Key? key}) : super(key: key);
+  const OrganizerComplaintsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +22,7 @@ class OrganizerComplaintsScreen extends StatelessWidget {
         stream: FirestoreService().getComplaintsStream(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator(color: AppTheme.primaryGreen));
+            return const Center(child: CircularProgressIndicator(color: AppTheme.primaryBlue));
           }
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return const Center(child: Text('لا توجد اعتراضات', style: TextStyle(color: Colors.white54, fontSize: 16)));
@@ -81,7 +81,7 @@ class OrganizerComplaintsScreen extends StatelessWidget {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                       content: Text('تم حذف الشكوى بنجاح ✅', style: TextStyle(color: Colors.black)),
-                      backgroundColor: AppTheme.primaryGreen,
+                      backgroundColor: AppTheme.primaryBlue,
                     ),
                   );
                 }
@@ -140,10 +140,11 @@ class OrganizerComplaintsScreen extends StatelessWidget {
                       'title': titleController.text,
                       'description': descController.text,
                       'status': 'pending',
+                      'date': DateTime.now().toIso8601String(),
                     });
                     if (context.mounted) {
                       Navigator.pop(context);
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('تم إضافة الشكوى بنجاح', style: TextStyle(color: Colors.black)), backgroundColor: AppTheme.primaryGreen));
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('تم إضافة الشكوى بنجاح', style: TextStyle(color: Colors.black)), backgroundColor: AppTheme.primaryBlue));
                     }
                   } catch (e) {
                     if (context.mounted) {

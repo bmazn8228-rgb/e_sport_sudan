@@ -5,12 +5,15 @@ import 'package:e_sport_sudan/core/services/auth_service.dart';
 import 'package:e_sport_sudan/core/services/firestore_service.dart';
 import 'package:e_sport_sudan/features/auth/presentation/screens/login_screen.dart';
 import 'package:e_sport_sudan/features/main/presentation/screens/main_screen.dart';
-import 'package:e_sport_sudan/features/admin/presentation/screens/admin_dashboard_screen.dart';
-import 'package:e_sport_sudan/features/admin/presentation/screens/referee_dashboard_screen.dart';
-import 'package:e_sport_sudan/features/admin/presentation/screens/tournament_admin_dashboard_screen.dart';
+
+
+import 'package:e_sport_sudan/features/roles/presentation/screens/referee_dashboard.dart';
+import 'package:e_sport_sudan/features/roles/presentation/screens/organizer_dashboard.dart';
+import 'package:e_sport_sudan/features/roles/presentation/screens/super_admin_dashboard.dart';
+import 'package:e_sport_sudan/features/admin/presentation/screens/deposit_requests_screen.dart';
 
 class RootScreen extends StatefulWidget {
-  const RootScreen({Key? key}) : super(key: key);
+  const RootScreen({super.key});
 
   @override
   State<RootScreen> createState() => _RootScreenState();
@@ -51,22 +54,26 @@ class _RootScreenState extends State<RootScreen> {
             }
 
             final userModel = userSnapshot.data;
+            Widget dashboard;
+
             if (userModel == null) {
               // If user is authenticated but not in firestore, treat as player or error
               // For now, let's sign out to reset state or just show MainScreen
               return const MainScreen();
             }
 
-            // Route based on role
-            if (userModel.role == UserRole.player) {
-              return const MainScreen();
-            } else if (userModel.role == UserRole.referee) {
-              return const RefereeDashboardScreen();
-            } else if (userModel.role == UserRole.tournamentAdmin) {
-              return const TournamentAdminDashboardScreen();
-            } else {
-              // Any other admin role goes to the Admin Dashboard (for now)
-              return const AdminDashboardScreen();
+            // Route each role to its dedicated dashboard
+            switch (userModel.role) {
+              case UserRole.player:
+                return const MainScreen();
+              case UserRole.referee:
+                return const RefereeDashboard();
+              case UserRole.tournamentAdmin:
+                return const OrganizerDashboard();
+              case UserRole.financeAdmin:
+                return const DepositRequestsScreen();
+              case UserRole.superAdmin:
+                return const SuperAdminDashboard();
             }
           },
         );

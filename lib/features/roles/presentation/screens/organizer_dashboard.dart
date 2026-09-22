@@ -6,8 +6,70 @@ import 'organizer_matches_screen.dart';
 import 'organizer_complaints_screen.dart';
 import 'organizer_teams_screen.dart';
 
-class OrganizerDashboard extends StatelessWidget {
-  const OrganizerDashboard({Key? key}) : super(key: key);
+class OrganizerDashboard extends StatefulWidget {
+  const OrganizerDashboard({super.key});
+
+  @override
+  State<OrganizerDashboard> createState() => _OrganizerDashboardState();
+}
+
+class _OrganizerDashboardState extends State<OrganizerDashboard> {
+  Map<String, dynamic>? _activeTournament;
+
+  void _showTournamentPicker(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppTheme.cardDark,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (ctx) => Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const SizedBox(height: 12),
+          Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(2))),
+          const SizedBox(height: 16),
+          const Text('اختر البطولة النشطة', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          const SizedBox(height: 12),
+          StreamBuilder<List<Map<String, dynamic>>>(
+            stream: FirestoreService().getTournamentsStream(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Padding(
+                  padding: EdgeInsets.all(24),
+                  child: CircularProgressIndicator(color: AppTheme.primaryBlue),
+                );
+              }
+              final tournaments = snapshot.data ?? [];
+              if (tournaments.isEmpty) {
+                return const Padding(
+                  padding: EdgeInsets.all(24),
+                  child: Text('لا توجد بطولات حالياً', style: TextStyle(color: Colors.white54)),
+                );
+              }
+              return ListView.builder(
+                shrinkWrap: true,
+                itemCount: tournaments.length,
+                itemBuilder: (context, index) {
+                  final t = tournaments[index];
+                  final isActive = _activeTournament?['id'] == t['id'];
+                  return ListTile(
+                    leading: Icon(Icons.emoji_events, color: isActive ? AppTheme.primaryBlue : Colors.white54),
+                    title: Text(t['title'] ?? t['name'] ?? 'بطولة', style: TextStyle(color: isActive ? AppTheme.primaryBlue : Colors.white, fontWeight: isActive ? FontWeight.bold : FontWeight.normal)),
+                    subtitle: Text(t['game'] ?? '', style: const TextStyle(color: Colors.white54, fontSize: 12)),
+                    trailing: isActive ? const Icon(Icons.check_circle, color: AppTheme.primaryBlue) : null,
+                    onTap: () {
+                      setState(() => _activeTournament = t);
+                      Navigator.pop(ctx);
+                    },
+                  );
+                },
+              );
+            },
+          ),
+          const SizedBox(height: 16),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +83,7 @@ class OrganizerDashboard extends StatelessWidget {
             margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
-              color: Colors.orange.withOpacity(0.2),
+              color: Colors.orange.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(color: Colors.orange),
             ),
@@ -40,7 +102,7 @@ class OrganizerDashboard extends StatelessWidget {
               decoration: BoxDecoration(
                 color: AppTheme.cardDark,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppTheme.primaryGreen.withOpacity(0.4)),
+                border: Border.all(color: AppTheme.primaryBlue.withValues(alpha: 0.4)),
               ),
               child: Row(
                 children: [
@@ -48,25 +110,30 @@ class OrganizerDashboard extends StatelessWidget {
                     width: 48,
                     height: 48,
                     decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(10)),
-                    child: const Icon(Icons.emoji_events, color: AppTheme.primaryGreen, size: 28),
+                    child: const Icon(Icons.emoji_events, color: AppTheme.primaryBlue, size: 28),
                   ),
                   const SizedBox(width: 12),
-                  const Expanded(
+                  Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('النطاق والتحكم الميداني', style: TextStyle(fontSize: 11, color: Colors.white54)),
-                        Text('كأس السودان الكبرى 2025', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                        const Text('البطولة النشطة', style: TextStyle(fontSize: 11, color: Colors.white54)),
+                        Text(
+                          _activeTournament != null
+                              ? (_activeTournament!['title'] ?? _activeTournament!['name'] ?? 'بطولة')
+                              : 'اختر بطولة...',
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                        ),
                       ],
                     ),
                   ),
                   OutlinedButton(
-                    onPressed: () {},
+                    onPressed: () => _showTournamentPicker(context),
                     style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: Colors.white24),
+                      side: const BorderSide(color: AppTheme.primaryBlue),
                       visualDensity: VisualDensity.compact,
                     ),
-                    child: const Text('تبديل', style: TextStyle(color: Colors.white, fontSize: 11)),
+                    child: const Text('تبديل', style: TextStyle(color: AppTheme.primaryBlue, fontSize: 11)),
                   ),
                 ],
               ),
@@ -78,7 +145,7 @@ class OrganizerDashboard extends StatelessWidget {
             const SizedBox(height: 12),
             Row(
               children: [
-                _buildStreamStatTile('الفرق المشاركة', FirestoreService().getAllTeamsStream(), Icons.groups, AppTheme.primaryGreen, () {
+                _buildStreamStatTile('الفرق المشاركة', FirestoreService().getAllTeamsStream(), Icons.groups, AppTheme.primaryBlue, () {
                   Navigator.push(context, MaterialPageRoute(builder: (context) => const OrganizerTeamsScreen()));
                 }),
                 const SizedBox(width: 10),
@@ -123,8 +190,8 @@ class OrganizerDashboard extends StatelessWidget {
                     onPressed: () {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          backgroundColor: AppTheme.primaryGreen,
-                          content: Text('تم تشغيل محرك TME وتوليد القرعة تلقائياً للأدوار الإقصائية!', style: TextStyle(color: Colors.black)),
+                          backgroundColor: Colors.orange,
+                          content: Text('قريباً: سيتم إضافة خوارزمية التوزيع التلقائي في التحديث القادم!', style: TextStyle(color: Colors.black)),
                         ),
                       );
                     },
@@ -136,7 +203,11 @@ class OrganizerDashboard extends StatelessWidget {
                     children: [
                       Expanded(
                         child: OutlinedButton.icon(
-                          onPressed: () {},
+                          onPressed: () {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('ميزة الجدولة تحت التطوير 🚧'), backgroundColor: Colors.orange),
+                            );
+                          },
                           icon: const Icon(Icons.schedule, size: 18, color: Colors.white),
                           label: const Text('جدولة المباريات', style: TextStyle(color: Colors.white, fontSize: 12)),
                           style: OutlinedButton.styleFrom(side: const BorderSide(color: Colors.white24)),
@@ -145,10 +216,14 @@ class OrganizerDashboard extends StatelessWidget {
                       const SizedBox(width: 10),
                       Expanded(
                         child: OutlinedButton.icon(
-                          onPressed: () {},
-                          icon: const Icon(Icons.verified, size: 18, color: AppTheme.primaryGreen),
-                          label: const Text('اعتماد النتائج', style: TextStyle(color: AppTheme.primaryGreen, fontSize: 12)),
-                          style: OutlinedButton.styleFrom(side: const BorderSide(color: AppTheme.primaryGreen)),
+                          onPressed: () {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('ميزة الاعتماد المجمع قيد التطوير 🚧'), backgroundColor: Colors.orange),
+                            );
+                          },
+                          icon: const Icon(Icons.verified, size: 18, color: AppTheme.primaryBlue),
+                          label: const Text('اعتماد النتائج', style: TextStyle(color: AppTheme.primaryBlue, fontSize: 12)),
+                          style: OutlinedButton.styleFrom(side: const BorderSide(color: AppTheme.primaryBlue)),
                         ),
                       ),
                     ],

@@ -6,7 +6,7 @@ import '../../../../core/models/user_model.dart';
 import '../../../../core/services/firestore_service.dart';
 
 class AdminDashboardScreen extends StatefulWidget {
-  const AdminDashboardScreen({Key? key}) : super(key: key);
+  const AdminDashboardScreen({super.key});
 
   @override
   State<AdminDashboardScreen> createState() => _AdminDashboardScreenState();
@@ -57,7 +57,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
               decoration: BoxDecoration(
                 color: AppTheme.cardDark,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppTheme.primaryGreen.withOpacity(0.4)),
+                border: Border.all(color: AppTheme.primaryBlue.withOpacity(0.4)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -69,17 +69,17 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                     children: [
                       Text(
                         _activeRole.displayNameArabic,
-                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.primaryGreen),
+                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.primaryBlue),
                       ),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
-                          color: AppTheme.primaryGreen.withOpacity(0.2),
+                          color: AppTheme.primaryBlue.withOpacity(0.2),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
                           _activeRole.toValue().toUpperCase(),
-                          style: const TextStyle(color: AppTheme.primaryGreen, fontSize: 11, fontWeight: FontWeight.bold),
+                          style: const TextStyle(color: AppTheme.primaryBlue, fontSize: 11, fontWeight: FontWeight.bold),
                         ),
                       ),
                     ],
@@ -95,7 +95,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                       return ChoiceChip(
                         label: Text(role.displayNameArabic, style: TextStyle(color: isSelected ? Colors.black : Colors.white, fontSize: 11)),
                         selected: isSelected,
-                        selectedColor: AppTheme.primaryGreen,
+                        selectedColor: AppTheme.primaryBlue,
                         backgroundColor: Colors.white10,
                         onSelected: (_) => setState(() => _activeRole = role),
                       );
@@ -183,7 +183,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
         return [
           _buildActionCard('إدارة كافة الحسابات والأدوار', 'تحديد وتغيير رتب المستخدمين ومنح صلاحيات الأدمن', Icons.admin_panel_settings, Colors.purple),
           _buildActionCard('إدارة قواعد الأمان (Security Rules)', 'تطبيق سياسات Firestore والحماية الشاملة', Icons.security, Colors.blue),
-          _buildActionCard('الوصول المالي والبطولات الكامل', 'صلاحيات مطلقة للتعديل والحذف لكافة الجداول', Icons.all_inclusive, AppTheme.primaryGreen),
+          _buildActionCard('الوصول المالي والبطولات الكامل', 'صلاحيات مطلقة للتعديل والحذف لكافة الجداول', Icons.all_inclusive, AppTheme.primaryBlue),
         ];
 
       case UserRole.tournamentAdmin:
@@ -210,7 +210,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
       case UserRole.player:
         return [
           _buildActionCard('إنشاء وإدارة الفريق الخاص', 'تعديل بيانات فريقه وإضافة اللاعبين واللوقو', Icons.group_add, Colors.blue),
-          _buildActionCard('التسجيل في البطولات وشحن الرصيد', 'دفع الرسوم عبر المحفظة وإرفاق إشعار التحويل', Icons.sports_esports, AppTheme.primaryGreen),
+          _buildActionCard('التسجيل في البطولات وشحن الرصيد', 'دفع الرسوم عبر المحفظة وإرفاق إشعار التحويل', Icons.sports_esports, AppTheme.primaryBlue),
           _buildActionCard('المشاركة في الدردشة وتصفح التصنيفات', 'متابعة البث الحي والتعليق ورؤية الترتيب العام', Icons.chat, Colors.cyan),
         ];
     }
@@ -334,7 +334,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                         style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 12),
                       ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppTheme.primaryGreen,
+                        backgroundColor: AppTheme.primaryBlue,
                         padding: const EdgeInsets.symmetric(vertical: 12),
                       ),
                     ),
@@ -419,13 +419,13 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                   controller: titleController,
                   decoration: const InputDecoration(
                     hintText: 'مثال: نهائي بطولة السودان - الهلال ضد المريخ',
-                    prefixIcon: Icon(Icons.title, color: AppTheme.primaryGreen),
+                    prefixIcon: Icon(Icons.title, color: AppTheme.primaryBlue),
                   ),
                 ),
                 const SizedBox(height: 14),
                 SwitchListTile(
                   contentPadding: EdgeInsets.zero,
-                  activeColor: AppTheme.primaryGreen,
+                  activeThumbColor: AppTheme.primaryBlue,
                   title: const Text('تفعيل البث وإظهاره للمستخدمين الآن', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
                   subtitle: const Text('عند التفعيل سيظهر البث فوراً في الواجهة الرئيسية وتبويب المباريات', style: TextStyle(fontSize: 11, color: Colors.white54)),
                   value: isLive,
@@ -460,7 +460,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
                                     content: Text('تم تحديث ونشر رابط البث المباشر للمستخدمين بنجاح ✅', style: TextStyle(color: Colors.black)),
-                                    backgroundColor: AppTheme.primaryGreen,
+                                    backgroundColor: AppTheme.primaryBlue,
                                   ),
                                 );
                               }
@@ -478,7 +478,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                         : const Icon(Icons.cloud_upload, color: Colors.black),
                     label: Text(isSaving ? 'جاري الحفظ...' : 'نشر وتحديث البث المباشر للمستخدمين 🚀', style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppTheme.primaryGreen,
+                      backgroundColor: AppTheme.primaryBlue,
                       padding: const EdgeInsets.symmetric(vertical: 14),
                     ),
                   ),

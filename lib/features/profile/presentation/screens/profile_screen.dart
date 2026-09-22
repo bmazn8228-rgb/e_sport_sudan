@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import 'package:e_sport_sudan/core/theme/app_theme.dart';
 import 'package:e_sport_sudan/core/widgets/animated_lottie_icon.dart';
 import 'package:e_sport_sudan/features/team/presentation/screens/team_management_screen.dart';
@@ -32,6 +33,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool _isLoading = true;
   bool _isImageUploading = false;
 
+  int _totalMatches = 0;
+  int _wins = 0;
+  String _winRate = '0%';
+  int _points = 0;
+  
   @override
   void initState() {
     super.initState();
@@ -48,6 +54,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
             _userModel = userModel;
             _isLoading = false;
           });
+          if (userModel?.teamId != null && userModel!.teamId!.isNotEmpty) {
+            _loadTeamData(userModel.teamId!);
+          }
         }
       } else {
         if (mounted) {
@@ -61,12 +70,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
+  Future<void> _loadTeamData(String teamId) async {
+    try {
+      final teamData = await FirestoreService().getTeam(teamId);
+      if (teamData != null && mounted) {
+        setState(() {
+          _points = teamData['points'] ?? 0;
+        });
+      }
+    } catch (e) {
+      // Handle error implicitly
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
       return const Scaffold(
         body: Center(
-          child: CircularProgressIndicator(color: AppTheme.primaryGreen),
+          child: CircularProgressIndicator(color: AppTheme.primaryBlue),
         ),
       );
     }
@@ -109,6 +131,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
               icon: const Icon(Icons.logout_rounded, color: Colors.redAccent, size: 20),
               onPressed: () async {
                 HapticFeedback.mediumImpact();
+                final confirm = await showDialog<bool>(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: const Text('تسجيل الخروج'),
+                    content: const Text('هل أنت متأكد أنك تريد تسجيل الخروج؟'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, false),
+                        child: const Text('إلغاء'),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, true),
+                        child: const Text('تسجيل الخروج', style: TextStyle(color: Colors.redAccent)),
+                      ),
+                    ],
+                  ),
+                );
+                
+                if (confirm != true) return;
+
                 await AuthService().signOut();
                 if (context.mounted) {
                   Navigator.pushAndRemoveUntil(
@@ -167,7 +209,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const SizedBox(height: 20),
             
             // 4. Match History
-            _buildMatchHistory(),
+            if (_userModel?.teamId != null && _userModel!.teamId!.isNotEmpty)
+              _buildMatchHistory(),
             const SizedBox(height: 20),
 
             // 5. Apple Inset Group: Financial Services
@@ -185,7 +228,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     title: 'محفظة اللاعب (المحفظة الإلكترونية)',
                     subtitle: 'إدارة الرصيد، الشحن عبر بنكك، وسحب الجوائز',
                     lottieAsset: 'assets/lottie/wallet.json',
-                    color: AppTheme.primaryGreen,
+                    color: AppTheme.primaryBlue,
                     onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const WalletScreen())),
                   ),
                 ],
@@ -262,7 +305,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         title: 'إدارة الصلاحيات وقاعدة البيانات السحابية ☁️',
                         subtitle: 'فحص صلاحيات الأدوار وبث المباريات وتهيئة الجداول',
                         icon: Icons.cloud_sync_rounded,
-                        color: AppTheme.primaryGreen,
+                        color: AppTheme.primaryBlue,
                         onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const AdminDashboardScreen())),
                       ),
                     ],
@@ -278,6 +321,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: OutlinedButton.icon(
                 onPressed: () async {
                   HapticFeedback.mediumImpact();
+                  final confirm = await showDialog<bool>(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: const Text('تسجيل الخروج'),
+                      content: const Text('هل أنت متأكد أنك تريد تسجيل الخروج؟'),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context, false),
+                          child: const Text('إلغاء'),
+                        ),
+                        TextButton(
+                          onPressed: () => Navigator.pop(context, true),
+                          child: const Text('تسجيل الخروج', style: TextStyle(color: Colors.redAccent)),
+                        ),
+                      ],
+                    ),
+                  );
+                  
+                  if (confirm != true) return;
+
                   await AuthService().signOut();
                   if (!context.mounted) return;
                   Navigator.pushAndRemoveUntil(
@@ -380,10 +443,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: AppTheme.primaryGreen.withValues(alpha: 0.4), width: 1.5),
+        border: Border.all(color: AppTheme.primaryBlue.withValues(alpha: 0.4), width: 1.5),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.primaryGreen.withValues(alpha: 0.12),
+            color: AppTheme.primaryBlue.withValues(alpha: 0.12),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -405,9 +468,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       width: 48,
                       height: 48,
                       decoration: BoxDecoration(
-                        color: AppTheme.primaryGreen.withValues(alpha: 0.15),
+                        color: AppTheme.primaryBlue.withValues(alpha: 0.15),
                         shape: BoxShape.circle,
-                        border: Border.all(color: AppTheme.primaryGreen.withValues(alpha: 0.4)),
+                        border: Border.all(color: AppTheme.primaryBlue.withValues(alpha: 0.4)),
                         image: (_userModel?.photoUrl != null && _userModel!.photoUrl!.isNotEmpty)
                             ? DecorationImage(
                                 image: CachedNetworkImageProvider(_userModel!.photoUrl!),
@@ -418,10 +481,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       child: _isImageUploading
                           ? const Padding(
                               padding: EdgeInsets.all(14.0),
-                              child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.primaryGreen),
+                              child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.primaryBlue),
                             )
                           : (_userModel?.photoUrl == null || _userModel!.photoUrl!.isEmpty)
-                              ? const Icon(Icons.person_rounded, color: AppTheme.primaryGreen, size: 24)
+                              ? const Icon(Icons.person_rounded, color: AppTheme.primaryBlue, size: 24)
                               : null,
                     ),
                   ),
@@ -439,7 +502,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: const [
-                  Text('بطاقة الهوية الرقمية 🇸🇩', style: TextStyle(color: AppTheme.primaryGreen, fontSize: 11, fontWeight: FontWeight.bold)),
+                  Text('بطاقة الهوية الرقمية 🇸🇩', style: TextStyle(color: AppTheme.primaryBlue, fontSize: 11, fontWeight: FontWeight.bold)),
                   SizedBox(height: 2),
                   Text('E-SPORT SUDAN', style: TextStyle(color: Colors.white38, fontSize: 9, letterSpacing: 1.2, fontWeight: FontWeight.w600)),
                 ],
@@ -467,7 +530,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 children: const [
                   Text('التقييم الوطني', style: TextStyle(color: Colors.white38, fontSize: 10)),
                   SizedBox(height: 3),
-                  Text('يتوفر قريباً', style: TextStyle(color: AppTheme.primaryGreen, fontWeight: FontWeight.bold, fontSize: 14)),
+                  Text('يتوفر قريباً', style: TextStyle(color: AppTheme.primaryBlue, fontWeight: FontWeight.bold, fontSize: 14)),
                 ],
               ),
             ],
@@ -487,6 +550,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildBackCard() {
+    final user = FirebaseAuth.instance.currentUser;
+    final uid = user?.uid ?? '000000';
+
     return Container(
       width: double.infinity,
       height: 195,
@@ -516,8 +582,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
               color: Colors.white,
               borderRadius: BorderRadius.circular(14),
             ),
-            child: const Center(
-              child: Icon(Icons.qr_code_2_rounded, size: 105, color: Colors.black),
+            child: Center(
+              child: QrImageView(
+                data: uid,
+                version: QrVersions.auto,
+                size: 105.0,
+                backgroundColor: Colors.white,
+              ),
             ),
           ),
           const SizedBox(width: 16),
@@ -530,7 +601,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 SizedBox(height: 6),
                 Text('امسح الرمز للتحقق من هوية اللاعب وصلاحية تسجيله في بطولات الاتحاد.', style: TextStyle(color: Colors.white54, fontSize: 10, height: 1.3)),
                 SizedBox(height: 10),
-                Text('معتمد رسمياً 🇸🇩', style: TextStyle(color: AppTheme.primaryGreen, fontWeight: FontWeight.bold, fontSize: 11)),
+                Text('معتمد رسمياً 🇸🇩', style: TextStyle(color: AppTheme.primaryBlue, fontWeight: FontWeight.bold, fontSize: 11)),
                 SizedBox(height: 2),
                 Text('انقر للعودة للواجهة 🔄', style: TextStyle(color: Colors.white38, fontSize: 9)),
               ],
@@ -553,15 +624,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: Row(
         children: [
           Expanded(
-            child: _buildMiniStatPillar('المباريات', 'يتوفر قريباً', Icons.sports_esports_rounded, AppTheme.primaryGreen),
+            child: _buildMiniStatPillar('المباريات', '$_totalMatches', Icons.sports_esports_rounded, AppTheme.primaryBlue),
           ),
           Container(width: 1, height: 40, color: Colors.white.withValues(alpha: 0.06)),
           Expanded(
-            child: _buildMiniStatPillar('نسبة الفوز', 'يتوفر قريباً', Icons.trending_up_rounded, Colors.orangeAccent),
+            child: _buildMiniStatPillar('نسبة الفوز', _winRate, Icons.trending_up_rounded, Colors.orangeAccent),
           ),
           Container(width: 1, height: 40, color: Colors.white.withValues(alpha: 0.06)),
           Expanded(
-            child: _buildMiniStatPillar('التصنيف', 'يتوفر قريباً', Icons.military_tech_rounded, Colors.amber),
+            child: _buildMiniStatPillar('النقاط', '$_points', Icons.military_tech_rounded, Colors.amber),
           ),
         ],
       ),
@@ -581,6 +652,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildTrophyCabinet() {
+    List<Widget> badges = [];
+
+    if (_wins >= 1) {
+      badges.add(_buildBadge('أول انتصار', 'assets/lottie/trophy.json', Colors.amber));
+    }
+    if (_wins >= 5) {
+      badges.add(_buildBadge('المحارب', 'assets/lottie/gamepad.json', Colors.orange));
+    }
+    if (_totalMatches >= 10) {
+      badges.add(_buildBadge('المخضرم', 'assets/lottie/trophy.json', Colors.purple));
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -594,21 +677,48 @@ class _ProfileScreenState extends State<ProfileScreen> {
             borderRadius: BorderRadius.circular(20),
             border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
           ),
-          child: Column(
-            children: [
-              const AnimatedLottieIcon(lottieAsset: 'assets/lottie/trophy.json', width: 60, height: 60),
-              const SizedBox(height: 8),
-              const Text('يتوفر قريباً', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.white70)),
-              const SizedBox(height: 4),
-              const Text('ستظهر أوسمة البطولات والجوائز التنافسية المحققة هنا.', style: TextStyle(color: Colors.white38, fontSize: 11), textAlign: TextAlign.center),
-            ],
-          ),
+          child: badges.isEmpty
+              ? Column(
+                  children: [
+                    const AnimatedLottieIcon(lottieAsset: 'assets/lottie/trophy.json', width: 60, height: 60),
+                    const SizedBox(height: 8),
+                    const Text('لا توجد إنجازات بعد', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.white70)),
+                    const SizedBox(height: 4),
+                    const Text('العب مباريات وحقق انتصارات لفتح الشارات!', style: TextStyle(color: Colors.white38, fontSize: 11), textAlign: TextAlign.center),
+                  ],
+                )
+              : Wrap(
+                  spacing: 16,
+                  runSpacing: 16,
+                  alignment: WrapAlignment.center,
+                  children: badges,
+                ),
         ),
       ],
     );
   }
 
+  Widget _buildBadge(String title, String lottie, Color color) {
+    return Column(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.1),
+            shape: BoxShape.circle,
+            border: Border.all(color: color.withValues(alpha: 0.5)),
+          ),
+          child: AnimatedLottieIcon(lottieAsset: lottie, width: 40, height: 40),
+        ),
+        const SizedBox(height: 8),
+        Text(title, style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.bold)),
+      ],
+    );
+  }
+
   Widget _buildMatchHistory() {
+    if (_userModel?.teamId == null || _userModel!.teamId!.isEmpty) return const SizedBox.shrink();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -622,14 +732,107 @@ class _ProfileScreenState extends State<ProfileScreen> {
             borderRadius: BorderRadius.circular(20),
             border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
           ),
-          child: Column(
-            children: [
-              const AnimatedLottieIcon(lottieAsset: 'assets/lottie/gamepad.json', width: 60, height: 60),
-              const SizedBox(height: 8),
-              const Text('يتوفر قريباً', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.white70)),
-              const SizedBox(height: 4),
-              const Text('سجل تاريخي كامل لنتائج مبارياتك وبطولاتك السابقة.', style: TextStyle(color: Colors.white38, fontSize: 11), textAlign: TextAlign.center),
-            ],
+          child: StreamBuilder<List<Map<String, dynamic>>>(
+            stream: FirestoreService().getTeamMatchesStream(_userModel!.teamId!),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator(color: AppTheme.primaryBlue));
+              }
+
+              final matches = snapshot.data ?? [];
+              
+              if (matches.isNotEmpty && mounted) {
+                // We shouldn't setState during build. Let's schedule it for next frame or just calculate locally if we only use it here.
+                // Wait, _totalMatches and _winRate are in state.
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  int total = matches.length;
+                  int wins = 0;
+                  for (var m in matches) {
+                    bool isTeamA = m['teamAId'] == _userModel!.teamId || m['teamA'] == _userModel!.teamId;
+                    if ((isTeamA && m['winner'] == 'teamA') || (!isTeamA && m['winner'] == 'teamB')) {
+                      wins++;
+                    }
+                  }
+                  if (_totalMatches != total || _wins != wins) {
+                    setState(() {
+                      _totalMatches = total;
+                      _wins = wins;
+                      _winRate = total > 0 ? '${((wins / total) * 100).toStringAsFixed(1)}%' : '0%';
+                    });
+                  }
+                });
+              }
+
+              if (matches.isEmpty) {
+                return Column(
+                  children: [
+                    const AnimatedLottieIcon(lottieAsset: 'assets/lottie/gamepad.json', width: 60, height: 60),
+                    const SizedBox(height: 8),
+                    const Text('لا توجد مباريات', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.white70)),
+                    const SizedBox(height: 4),
+                    const Text('لم يلعب فريقك أي مباريات بعد.', style: TextStyle(color: Colors.white38, fontSize: 11), textAlign: TextAlign.center),
+                  ],
+                );
+              }
+
+              return ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: matches.length > 5 ? 5 : matches.length,
+                itemBuilder: (context, index) {
+                  final match = matches[index];
+                  final bool isTeamA = match['teamAId'] == _userModel!.teamId || match['teamA'] == _userModel!.teamId;
+                  final String opponent = isTeamA ? (match['teamB'] ?? 'غير محدد') : (match['teamA'] ?? 'غير محدد');
+                  final bool isWinner = (isTeamA && match['winner'] == 'teamA') || (!isTeamA && match['winner'] == 'teamB');
+                  final int myScore = isTeamA ? (match['scoreA'] ?? 0) : (match['scoreB'] ?? 0);
+                  final int opponentScore = isTeamA ? (match['scoreB'] ?? 0) : (match['scoreA'] ?? 0);
+                  
+                  String status = match['status'] ?? 'غير محدد';
+                  
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: 8),
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.04),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(6),
+                              decoration: BoxDecoration(
+                                color: isWinner ? AppTheme.primaryBlue.withValues(alpha: 0.2) : Colors.red.withValues(alpha: 0.2),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(isWinner ? Icons.emoji_events : Icons.close, color: isWinner ? AppTheme.primaryBlue : Colors.red, size: 16),
+                            ),
+                            const SizedBox(width: 12),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('ضد $opponent', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                                const SizedBox(height: 2),
+                                Text(status, style: const TextStyle(color: Colors.white54, fontSize: 11)),
+                              ],
+                            ),
+                          ],
+                        ),
+                        Text(
+                          '$myScore - $opponentScore',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: isWinner ? AppTheme.primaryBlue : Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              );
+            },
           ),
         ),
       ],

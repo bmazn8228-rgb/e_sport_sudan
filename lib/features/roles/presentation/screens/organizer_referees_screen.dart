@@ -3,7 +3,7 @@ import 'package:e_sport_sudan/core/theme/app_theme.dart';
 import 'package:e_sport_sudan/core/services/firestore_service.dart';
 
 class OrganizerRefereesScreen extends StatelessWidget {
-  const OrganizerRefereesScreen({Key? key}) : super(key: key);
+  const OrganizerRefereesScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +17,7 @@ class OrganizerRefereesScreen extends StatelessWidget {
         stream: FirestoreService().getUsersByRoleStream('referee'),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator(color: AppTheme.primaryGreen));
+            return const Center(child: CircularProgressIndicator(color: AppTheme.primaryBlue));
           }
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return const Center(child: Text('لا يوجد حكام', style: TextStyle(color: Colors.white54, fontSize: 16)));

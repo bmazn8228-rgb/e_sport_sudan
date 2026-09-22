@@ -3,7 +3,7 @@ import 'package:e_sport_sudan/core/theme/app_theme.dart';
 import 'package:e_sport_sudan/features/main/presentation/screens/root_screen.dart';
 
 class OnboardingScreen extends StatefulWidget {
-  const OnboardingScreen({Key? key}) : super(key: key);
+  const OnboardingScreen({super.key});
 
   @override
   State<OnboardingScreen> createState() => _OnboardingScreenState();
@@ -119,19 +119,35 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                if (_currentPage < _pages.length - 1)
-                  TextButton(
-                    onPressed: _finishOnboarding,
-                    child: Text(
-                      'تخطي',
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.5),
-                        fontSize: 16,
-                      ),
-                    ),
-                  )
-                else
-                  const SizedBox(width: 60), // Placeholder
+                SizedBox(
+                  width: 80,
+                  child: _currentPage == 0
+                      ? TextButton(
+                          onPressed: _finishOnboarding,
+                          child: Text(
+                            'تخطي',
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.5),
+                              fontSize: 16,
+                            ),
+                          ),
+                        )
+                      : TextButton(
+                          onPressed: () {
+                            _pageController.previousPage(
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeInOut,
+                            );
+                          },
+                          child: Text(
+                            'رجوع',
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.5),
+                              fontSize: 16,
+                            ),
+                          ),
+                        ),
+                ),
 
                 Row(
                   children: List.generate(
@@ -143,7 +159,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       width: _currentPage == index ? 24 : 8,
                       decoration: BoxDecoration(
                         color: _currentPage == index
-                            ? AppTheme.primaryGreen
+                            ? AppTheme.primaryBlue
                             : Colors.white.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(4),
                       ),
@@ -162,13 +178,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     child: Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: AppTheme.primaryGreen.withValues(alpha: 0.2),
+                        color: AppTheme.primaryBlue.withValues(alpha: 0.2),
                         shape: BoxShape.circle,
-                        border: Border.all(color: AppTheme.primaryGreen),
+                        border: Border.all(color: AppTheme.primaryBlue),
                       ),
                       child: const Icon(
                         Icons.arrow_forward_ios,
-                        color: AppTheme.primaryGreen,
+                        color: AppTheme.primaryBlue,
                         size: 20,
                       ),
                     ),
@@ -177,7 +193,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   ElevatedButton(
                     onPressed: _finishOnboarding,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppTheme.primaryGreen,
+                      backgroundColor: AppTheme.primaryBlue,
                       foregroundColor: Colors.black,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 24,
@@ -187,7 +203,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         borderRadius: BorderRadius.circular(30),
                       ),
                       elevation: 10,
-                      shadowColor: AppTheme.primaryGreen.withValues(alpha: 0.5),
+                      shadowColor: AppTheme.primaryBlue.withValues(alpha: 0.5),
                     ),
                     child: const Text(
                       'ابدأ الآن',

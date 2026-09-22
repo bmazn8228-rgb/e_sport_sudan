@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:e_sport_sudan/core/theme/app_theme.dart';
 import 'package:e_sport_sudan/core/services/firestore_service.dart';
+import 'package:e_sport_sudan/features/team/presentation/screens/team_details_screen.dart';
 
 class RankingsScreen extends StatefulWidget {
   const RankingsScreen({super.key});
@@ -61,13 +62,13 @@ class _RankingsScreenState extends State<RankingsScreen> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
               decoration: BoxDecoration(
-                color: AppTheme.primaryGreen.withValues(alpha: 0.15),
+                color: AppTheme.primaryBlue.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: AppTheme.primaryGreen.withValues(alpha: 0.3)),
+                border: Border.all(color: AppTheme.primaryBlue.withValues(alpha: 0.3)),
               ),
               child: const Text(
                 'مزامنة سحابية ☁️',
-                style: TextStyle(color: AppTheme.primaryGreen, fontSize: 10, fontWeight: FontWeight.bold),
+                style: TextStyle(color: AppTheme.primaryBlue, fontSize: 10, fontWeight: FontWeight.bold),
               ),
             ),
           ],
@@ -96,18 +97,18 @@ class _RankingsScreenState extends State<RankingsScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
                       decoration: BoxDecoration(
                         color: isSelected
-                            ? AppTheme.primaryGreen
+                            ? AppTheme.primaryBlue
                             : AppTheme.cardDark.withValues(alpha: 0.8),
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
                           color: isSelected
-                              ? AppTheme.primaryGreen
+                              ? AppTheme.primaryBlue
                               : Colors.white.withValues(alpha: 0.08),
                         ),
                         boxShadow: isSelected
                             ? [
                                 BoxShadow(
-                                  color: AppTheme.primaryGreen.withValues(alpha: 0.3),
+                                  color: AppTheme.primaryBlue.withValues(alpha: 0.3),
                                   blurRadius: 10,
                                   offset: const Offset(0, 2),
                                 ),
@@ -175,7 +176,7 @@ class _RankingsScreenState extends State<RankingsScreen> {
             color: isSelected ? AppTheme.cardDark : Colors.transparent,
             borderRadius: BorderRadius.circular(12),
             border: isSelected
-                ? Border.all(color: AppTheme.primaryGreen.withValues(alpha: 0.4), width: 1)
+                ? Border.all(color: AppTheme.primaryBlue.withValues(alpha: 0.4), width: 1)
                 : null,
             boxShadow: isSelected
                 ? [
@@ -191,7 +192,7 @@ class _RankingsScreenState extends State<RankingsScreen> {
             child: Text(
               label,
               style: TextStyle(
-                color: isSelected ? AppTheme.primaryGreen : Colors.white60,
+                color: isSelected ? AppTheme.primaryBlue : Colors.white60,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                 fontSize: 12,
               ),
@@ -216,7 +217,7 @@ class _RankingsScreenState extends State<RankingsScreen> {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(
-            child: CircularProgressIndicator(color: AppTheme.primaryGreen),
+            child: CircularProgressIndicator(color: AppTheme.primaryBlue),
           );
         }
 
@@ -401,7 +402,7 @@ class _RankingsScreenState extends State<RankingsScreen> {
         Text(
           '$mmr MMR',
           style: TextStyle(
-            color: isGold ? AppTheme.primaryGreen : Colors.white60,
+            color: isGold ? AppTheme.primaryBlue : Colors.white60,
             fontSize: 10,
             fontWeight: FontWeight.bold,
           ),
@@ -460,7 +461,14 @@ class _RankingsScreenState extends State<RankingsScreen> {
     final wins = item['wins'] ?? 0;
     final city = item['city']?.toString() ?? 'السودان';
 
-    return Container(
+    return GestureDetector(
+      onTap: _selectedTabIndex == 0 ? () {
+        HapticFeedback.lightImpact();
+        Navigator.push(context, MaterialPageRoute(
+          builder: (context) => TeamDetailsScreen(team: item),
+        ));
+      } : null,
+      child: Container(
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
@@ -531,12 +539,12 @@ class _RankingsScreenState extends State<RankingsScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
-                  color: AppTheme.primaryGreen.withValues(alpha: 0.12),
+                  color: AppTheme.primaryBlue.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
                   '$mmr MMR',
-                  style: const TextStyle(fontWeight: FontWeight.bold, color: AppTheme.primaryGreen, fontSize: 12),
+                  style: const TextStyle(fontWeight: FontWeight.bold, color: AppTheme.primaryBlue, fontSize: 12),
                 ),
               ),
               const SizedBox(height: 3),
@@ -548,7 +556,7 @@ class _RankingsScreenState extends State<RankingsScreen> {
           ),
         ],
       ),
-    );
+    ));
   }
 
   Widget _buildStatsView() {
@@ -556,7 +564,7 @@ class _RankingsScreenState extends State<RankingsScreen> {
       future: _firestoreService.getGameStats(_selectedGame),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator(color: AppTheme.primaryGreen));
+          return const Center(child: CircularProgressIndicator(color: AppTheme.primaryBlue));
         }
 
         final stats = snapshot.data;
@@ -598,12 +606,12 @@ class _RankingsScreenState extends State<RankingsScreen> {
             children: [
               Text(
                 'إحصائيات $_selectedGame السحابية',
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.primaryGreen),
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.primaryBlue),
               ),
               const SizedBox(height: 16),
               _buildStatCard('إجمالي المباريات الملعوبة', stats['total_matches']?.toString() ?? '0', Icons.sports_esports_rounded, Colors.cyanAccent),
               const SizedBox(height: 12),
-              _buildStatCard('عدد اللاعبين المسجلين', stats['total_players']?.toString() ?? '0', Icons.people_alt_rounded, AppTheme.primaryGreen),
+              _buildStatCard('عدد اللاعبين المسجلين', stats['total_players']?.toString() ?? '0', Icons.people_alt_rounded, AppTheme.primaryBlue),
               const SizedBox(height: 12),
               _buildStatCard(
                 _selectedGame == 'PUBG Mobile' ? 'السلاح الأكثر استخداماً' : 'العنصر الأكثر طلباً',

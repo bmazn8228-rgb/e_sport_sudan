@@ -1,12 +1,11 @@
 import 'dart:async';
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:e_sport_sudan/core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 
 class NetworkAwareWidget extends StatefulWidget {
   final Widget child;
 
-  const NetworkAwareWidget({Key? key, required this.child}) : super(key: key);
+  const NetworkAwareWidget({super.key, required this.child});
 
   @override
   State<NetworkAwareWidget> createState() => _NetworkAwareWidgetState();

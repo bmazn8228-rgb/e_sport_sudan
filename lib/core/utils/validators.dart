@@ -3,8 +3,7 @@ class Validators {
     if (value == null || value.trim().isEmpty) {
       return 'مطلوب إدخال البريد الإلكتروني';
     }
-    // Basic email regex
-    final emailRegex = RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
+    final emailRegex = RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$");
     if (!emailRegex.hasMatch(value.trim())) {
       return 'صيغة البريد الإلكتروني غير صحيحة';
     }

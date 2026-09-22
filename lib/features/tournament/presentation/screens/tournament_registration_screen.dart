@@ -7,7 +7,7 @@ import 'package:e_sport_sudan/core/utils/connectivity_helper.dart';
 class TournamentRegistrationScreen extends StatefulWidget {
   final Map<String, dynamic> tournamentData;
 
-  const TournamentRegistrationScreen({Key? key, required this.tournamentData}) : super(key: key);
+  const TournamentRegistrationScreen({super.key, required this.tournamentData});
 
   @override
   State<TournamentRegistrationScreen> createState() => _TournamentRegistrationScreenState();
@@ -66,6 +66,8 @@ class _TournamentRegistrationScreenState extends State<TournamentRegistrationScr
           }
           return;
         }
+        
+        if (!mounted) return;
 
         if (_selectedPaymentMethod == 'المحفظة الإلكترونية (الرصيد المتاح)') {
           // Simulate a balance check. Required: 25000, Available: 15000 (Mocked to fail for demonstration)
@@ -114,7 +116,7 @@ class _TournamentRegistrationScreenState extends State<TournamentRegistrationScr
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text('تسجيل البطولة', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-            Text(widget.tournamentData['title'] ?? 'بدون اسم', style: const TextStyle(fontSize: 11, color: AppTheme.primaryGreen)),
+            Text(widget.tournamentData['title'] ?? 'بدون اسم', style: const TextStyle(fontSize: 11, color: AppTheme.primaryBlue)),
           ],
         ),
       ),
@@ -196,7 +198,7 @@ class _TournamentRegistrationScreenState extends State<TournamentRegistrationScr
             children: [
               Text(
                 'الخطوة $_currentStep من 5',
-                style: const TextStyle(color: AppTheme.primaryGreen, fontWeight: FontWeight.bold, fontSize: 13),
+                style: const TextStyle(color: AppTheme.primaryBlue, fontWeight: FontWeight.bold, fontSize: 13),
               ),
               Text(
                 steps[_currentStep - 1],
@@ -216,10 +218,10 @@ class _TournamentRegistrationScreenState extends State<TournamentRegistrationScr
                   margin: const EdgeInsets.symmetric(horizontal: 2),
                   height: 4,
                   decoration: BoxDecoration(
-                    color: isDone || isActive ? AppTheme.primaryGreen : Colors.white12,
+                    color: isDone || isActive ? AppTheme.primaryBlue : Colors.white12,
                     borderRadius: BorderRadius.circular(2),
                     boxShadow: isActive
-                        ? [BoxShadow(color: AppTheme.primaryGreen.withOpacity(0.5), blurRadius: 4)]
+                        ? [BoxShadow(color: AppTheme.primaryBlue.withOpacity(0.5), blurRadius: 4)]
                         : null,
                   ),
                 ),
@@ -277,7 +279,7 @@ class _TournamentRegistrationScreenState extends State<TournamentRegistrationScr
               color: Colors.white.withOpacity(0.05),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: _teamLogoFileName != null ? AppTheme.primaryGreen : Colors.white24,
+                color: _teamLogoFileName != null ? AppTheme.primaryBlue : Colors.white24,
                 style: BorderStyle.solid,
                 width: 1.5,
               ),
@@ -287,14 +289,14 @@ class _TournamentRegistrationScreenState extends State<TournamentRegistrationScr
               children: [
                 Icon(
                   _teamLogoFileName != null ? Icons.check_circle : Icons.image,
-                  color: _teamLogoFileName != null ? AppTheme.primaryGreen : Colors.white70,
+                  color: _teamLogoFileName != null ? AppTheme.primaryBlue : Colors.white70,
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
                     _teamLogoFileName ?? 'اضغط هنا لرفع صورة شعار الفريق',
                     style: TextStyle(
-                      color: _teamLogoFileName != null ? AppTheme.primaryGreen : Colors.white70,
+                      color: _teamLogoFileName != null ? AppTheme.primaryBlue : Colors.white70,
                       fontWeight: _teamLogoFileName != null ? FontWeight.bold : FontWeight.normal,
                     ),
                     overflow: TextOverflow.ellipsis,
@@ -381,12 +383,12 @@ class _TournamentRegistrationScreenState extends State<TournamentRegistrationScr
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text('تم إضافة اللاعب بنجاح ✅', style: TextStyle(color: Colors.black)),
-                    backgroundColor: AppTheme.primaryGreen,
+                    backgroundColor: AppTheme.primaryBlue,
                   ),
                 );
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.primaryGreen,
+                backgroundColor: AppTheme.primaryBlue,
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
@@ -433,7 +435,7 @@ class _TournamentRegistrationScreenState extends State<TournamentRegistrationScr
         const SizedBox(height: 20),
         Row(
           children: [
-            Checkbox(value: true, onChanged: (v) {}, activeColor: AppTheme.primaryGreen),
+            Checkbox(value: true, onChanged: (v) {}, activeColor: AppTheme.primaryBlue),
             const Expanded(
               child: Text(
                 'أقر أنا قائد الفريق بالالتزام بجميع القوانين واللوائح الصادرة من الاتحاد السوداني للرياضات الإلكترونية.',
@@ -474,7 +476,7 @@ class _TournamentRegistrationScreenState extends State<TournamentRegistrationScr
               Text('رقم الحساب: 2459812', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, letterSpacing: 1)),
               Text('الاسم: الاتحاد السوداني للرياضات الإلكترونية', style: TextStyle(fontSize: 12, color: Colors.white70)),
               SizedBox(height: 4),
-              Text('المبلغ المطلوب: 10,000 جنيه سوداني', style: TextStyle(fontSize: 13, color: AppTheme.primaryGreen, fontWeight: FontWeight.bold)),
+              Text('المبلغ المطلوب: 10,000 جنيه سوداني', style: TextStyle(fontSize: 13, color: AppTheme.primaryBlue, fontWeight: FontWeight.bold)),
             ],
           ),
         ),
@@ -482,7 +484,7 @@ class _TournamentRegistrationScreenState extends State<TournamentRegistrationScr
         const Text('طريقة التحويل المستخدمة', style: TextStyle(fontWeight: FontWeight.bold)),
         const SizedBox(height: 6),
         DropdownButtonFormField<String>(
-          value: _selectedPaymentMethod,
+          initialValue: _selectedPaymentMethod,
           items: [
             'المحفظة الإلكترونية (الرصيد المتاح)',
             'بنكك (Bankak - بنك الخرطوم)',
@@ -498,13 +500,13 @@ class _TournamentRegistrationScreenState extends State<TournamentRegistrationScr
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: AppTheme.primaryGreen.withOpacity(0.1),
+              color: AppTheme.primaryBlue.withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppTheme.primaryGreen.withOpacity(0.3)),
+              border: Border.all(color: AppTheme.primaryBlue.withOpacity(0.3)),
             ),
             child: Row(
               children: [
-                const Icon(Icons.account_balance_wallet, color: AppTheme.primaryGreen),
+                const Icon(Icons.account_balance_wallet, color: AppTheme.primaryBlue),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
@@ -548,7 +550,7 @@ class _TournamentRegistrationScreenState extends State<TournamentRegistrationScr
                 color: Colors.white.withOpacity(0.05),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: _receiptFileName != null ? AppTheme.primaryGreen : Colors.white24,
+                  color: _receiptFileName != null ? AppTheme.primaryBlue : Colors.white24,
                   style: BorderStyle.solid,
                   width: 1.5,
                 ),
@@ -558,14 +560,14 @@ class _TournamentRegistrationScreenState extends State<TournamentRegistrationScr
                 children: [
                   Icon(
                     _receiptFileName != null ? Icons.check_circle : Icons.upload_file,
-                    color: _receiptFileName != null ? AppTheme.primaryGreen : Colors.white70,
+                    color: _receiptFileName != null ? AppTheme.primaryBlue : Colors.white70,
                   ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
                       _receiptFileName ?? 'اضغط هنا لرفع صورة إشعار التحويل',
                       style: TextStyle(
-                        color: _receiptFileName != null ? AppTheme.primaryGreen : Colors.white70,
+                        color: _receiptFileName != null ? AppTheme.primaryBlue : Colors.white70,
                         fontWeight: _receiptFileName != null ? FontWeight.bold : FontWeight.normal,
                       ),
                       overflow: TextOverflow.ellipsis,
@@ -588,7 +590,7 @@ class _TournamentRegistrationScreenState extends State<TournamentRegistrationScr
           width: 80,
           height: 80,
           decoration: const BoxDecoration(
-            color: AppTheme.primaryGreen,
+            color: AppTheme.primaryBlue,
             shape: BoxShape.circle,
           ),
           child: const Icon(Icons.check, size: 48, color: Colors.black),
@@ -612,10 +614,10 @@ class _TournamentRegistrationScreenState extends State<TournamentRegistrationScr
           decoration: BoxDecoration(
             color: AppTheme.cardDark,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppTheme.primaryGreen),
+            border: Border.all(color: AppTheme.primaryBlue),
             boxShadow: [
               BoxShadow(
-                color: AppTheme.primaryGreen.withOpacity(0.2),
+                color: AppTheme.primaryBlue.withOpacity(0.2),
                 blurRadius: 16,
                 spreadRadius: 2,
               ),
@@ -626,7 +628,7 @@ class _TournamentRegistrationScreenState extends State<TournamentRegistrationScr
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('بطاقة مشاركة معتمدة', style: TextStyle(color: AppTheme.primaryGreen, fontWeight: FontWeight.bold)),
+                  const Text('بطاقة مشاركة معتمدة', style: TextStyle(color: AppTheme.primaryBlue, fontWeight: FontWeight.bold)),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(4)),
@@ -671,20 +673,20 @@ class _TournamentRegistrationScreenState extends State<TournamentRegistrationScr
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppTheme.primaryGreen.withOpacity(0.1),
+        color: AppTheme.primaryBlue.withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppTheme.primaryGreen.withOpacity(0.3)),
+        border: Border.all(color: AppTheme.primaryBlue.withOpacity(0.3)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.info_outline, color: AppTheme.primaryGreen, size: 20),
+          const Icon(Icons.info_outline, color: AppTheme.primaryBlue, size: 20),
           const SizedBox(width: 10),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: const TextStyle(color: AppTheme.primaryGreen, fontWeight: FontWeight.bold, fontSize: 13)),
+                Text(title, style: const TextStyle(color: AppTheme.primaryBlue, fontWeight: FontWeight.bold, fontSize: 13)),
                 const SizedBox(height: 2),
                 Text(desc, style: const TextStyle(color: Colors.white70, fontSize: 11)),
               ],
@@ -704,7 +706,7 @@ class _TournamentRegistrationScreenState extends State<TournamentRegistrationScr
       decoration: BoxDecoration(
         color: AppTheme.cardDark,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: isLeader ? AppTheme.primaryGreen.withOpacity(0.5) : Colors.white10),
+        border: Border.all(color: isLeader ? AppTheme.primaryBlue.withOpacity(0.5) : Colors.white10),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -714,7 +716,7 @@ class _TournamentRegistrationScreenState extends State<TournamentRegistrationScr
               children: [
                 Icon(
                   isLeader ? Icons.star : Icons.person,
-                  color: isLeader ? Colors.orange : AppTheme.primaryGreen,
+                  color: isLeader ? Colors.orange : AppTheme.primaryBlue,
                   size: 20,
                 ),
                 const SizedBox(width: 12),
@@ -765,7 +767,7 @@ class _TournamentRegistrationScreenState extends State<TournamentRegistrationScr
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text('تم حذف اللاعب ($removedPlayer) من الفريق بنجاح ✅', style: const TextStyle(color: Colors.black)),
-                    backgroundColor: AppTheme.primaryGreen,
+                    backgroundColor: AppTheme.primaryBlue,
                   ),
                 );
               },

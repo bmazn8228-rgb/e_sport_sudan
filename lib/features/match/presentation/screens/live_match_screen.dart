@@ -7,7 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 class LiveMatchScreen extends StatefulWidget {
   final String matchId;
-  const LiveMatchScreen({Key? key, required this.matchId}) : super(key: key);
+  const LiveMatchScreen({super.key, required this.matchId});
 
   @override
   State<LiveMatchScreen> createState() => _LiveMatchScreenState();
@@ -18,6 +18,7 @@ class _LiveMatchScreenState extends State<LiveMatchScreen> {
   final TextEditingController _chatController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   String _currentVideoId = '';
+  bool _isSending = false;
 
   @override
   void dispose() {
@@ -40,7 +41,7 @@ class _LiveMatchScreenState extends State<LiveMatchScreen> {
           flags: const YoutubePlayerFlags(
             isLive: true,
             autoPlay: true,
-            mute: false,
+            mute: true, // Muted by default to prevent sudden noise
             forceHD: false,
           ),
         );
@@ -50,12 +51,12 @@ class _LiveMatchScreenState extends State<LiveMatchScreen> {
 
   void _sendMessage() async {
     final message = _chatController.text.trim();
-    if (message.isEmpty) return;
+    if (message.isEmpty || _isSending) return;
 
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
 
-    _chatController.clear();
+    setState(() => _isSending = true);
 
     try {
       await FirestoreService().sendChatMessage(
@@ -65,10 +66,11 @@ class _LiveMatchScreenState extends State<LiveMatchScreen> {
         message: message,
       );
 
-      // Scroll to bottom
+      _chatController.clear();
+
       if (_scrollController.hasClients) {
         _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent + 100,
+          0.0,
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeOut,
         );
@@ -82,6 +84,10 @@ class _LiveMatchScreenState extends State<LiveMatchScreen> {
           ),
         );
       }
+    }
+
+    if (mounted) {
+      setState(() => _isSending = false);
     }
   }
 
@@ -129,7 +135,7 @@ class _LiveMatchScreenState extends State<LiveMatchScreen> {
         stream: FirestoreService().getLiveMatchStream(widget.matchId),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator(color: AppTheme.primaryGreen));
+            return const Center(child: CircularProgressIndicator(color: AppTheme.primaryBlue));
           }
           if (snapshot.hasError || !snapshot.hasData || !snapshot.data!.exists) {
             return Center(
@@ -204,10 +210,10 @@ class _LiveMatchScreenState extends State<LiveMatchScreen> {
                       YoutubePlayer(
                         controller: _controller!,
                         showVideoProgressIndicator: true,
-                        progressIndicatorColor: AppTheme.primaryGreen,
+                        progressIndicatorColor: AppTheme.primaryBlue,
                         progressColors: const ProgressBarColors(
-                          playedColor: AppTheme.primaryGreen,
-                          handleColor: AppTheme.primaryGreen,
+                          playedColor: AppTheme.primaryBlue,
+                          handleColor: AppTheme.primaryBlue,
                         ),
                       )
                     else
@@ -254,7 +260,7 @@ class _LiveMatchScreenState extends State<LiveMatchScreen> {
                             child: Text('${matchData['scoreA']} - ${matchData['scoreB']}', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.orange)),
                           ),
                           const SizedBox(height: 8),
-                          Text(matchData['time'] ?? 'منتظر', style: const TextStyle(color: AppTheme.primaryGreen, fontSize: 12)),
+                          Text(matchData['time'] ?? 'منتظر', style: const TextStyle(color: AppTheme.primaryBlue, fontSize: 12)),
                         ],
                       ),
                       _buildTeam(matchData['teamB'] ?? 'فريق ب', 'ضيف', Icons.security),
@@ -281,7 +287,7 @@ class _LiveMatchScreenState extends State<LiveMatchScreen> {
                         ),
                         child: const Row(
                           children: [
-                            Icon(Icons.forum, color: AppTheme.primaryGreen, size: 18),
+                            Icon(Icons.forum, color: AppTheme.primaryBlue, size: 18),
                             SizedBox(width: 8),
                             Text('الدردشة المباشرة', style: TextStyle(fontWeight: FontWeight.bold)),
                           ],
@@ -295,10 +301,11 @@ class _LiveMatchScreenState extends State<LiveMatchScreen> {
                             if (!chatSnapshot.hasData) {
                               return const Center(child: CircularProgressIndicator());
                             }
-                            final messages = chatSnapshot.data!;
+                            final messages = chatSnapshot.data!.reversed.toList();
                             
                             return ListView.builder(
                               controller: _scrollController,
+                              reverse: true,
                               padding: const EdgeInsets.all(12),
                               itemCount: messages.length,
                               itemBuilder: (context, index) {
@@ -311,8 +318,8 @@ class _LiveMatchScreenState extends State<LiveMatchScreen> {
                                     children: [
                                       CircleAvatar(
                                         radius: 14,
-                                        backgroundColor: AppTheme.primaryGreen.withOpacity(0.2),
-                                        child: Text((msg['senderName'] ?? '?')[0].toString().toUpperCase(), style: const TextStyle(color: AppTheme.primaryGreen, fontSize: 12)),
+                                        backgroundColor: AppTheme.primaryBlue.withOpacity(0.2),
+                                        child: Text((msg['senderName'] ?? '?')[0].toString().toUpperCase(), style: const TextStyle(color: AppTheme.primaryBlue, fontSize: 12)),
                                       ),
                                       const SizedBox(width: 10),
                                       Expanded(
@@ -326,12 +333,12 @@ class _LiveMatchScreenState extends State<LiveMatchScreen> {
                                                   style: TextStyle(
                                                     fontWeight: FontWeight.bold, 
                                                     fontSize: 12, 
-                                                    color: isModerator ? AppTheme.primaryGreen : Colors.orange
+                                                    color: isModerator ? AppTheme.primaryBlue : Colors.orange
                                                   )
                                                 ),
                                                 if (isModerator) ...[
                                                   const SizedBox(width: 4),
-                                                  const Icon(Icons.verified, color: AppTheme.primaryGreen, size: 12),
+                                                  const Icon(Icons.verified, color: AppTheme.primaryBlue, size: 12),
                                                 ],
                                               ],
                                             ),
@@ -378,12 +385,18 @@ class _LiveMatchScreenState extends State<LiveMatchScreen> {
                             const SizedBox(width: 8),
                             Container(
                               decoration: const BoxDecoration(
-                                color: AppTheme.primaryGreen,
+                                color: AppTheme.primaryBlue,
                                 shape: BoxShape.circle,
                               ),
                               child: IconButton(
-                                icon: const Icon(Icons.send, color: Colors.black, size: 18),
-                                onPressed: _sendMessage,
+                                icon: _isSending
+                                    ? const SizedBox(
+                                        width: 18,
+                                        height: 18,
+                                        child: CircularProgressIndicator(color: Colors.black, strokeWidth: 2),
+                                      )
+                                    : const Icon(Icons.send, color: Colors.black, size: 18),
+                                onPressed: _isSending ? null : _sendMessage,
                               ),
                             ),
                           ],

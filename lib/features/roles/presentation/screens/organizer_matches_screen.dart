@@ -3,7 +3,7 @@ import 'package:e_sport_sudan/core/theme/app_theme.dart';
 import 'package:e_sport_sudan/core/services/firestore_service.dart';
 
 class OrganizerMatchesScreen extends StatelessWidget {
-  const OrganizerMatchesScreen({Key? key}) : super(key: key);
+  const OrganizerMatchesScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +17,7 @@ class OrganizerMatchesScreen extends StatelessWidget {
         stream: FirestoreService().getAllMatchesStream(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator(color: AppTheme.primaryGreen));
+            return const Center(child: CircularProgressIndicator(color: AppTheme.primaryBlue));
           }
           
           final matches = snapshot.data?.where((m) => m['status'] == 'completed').toList() ?? [];

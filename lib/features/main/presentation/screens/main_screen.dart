@@ -18,7 +18,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 class MainScreen extends StatefulWidget {
   final bool isGuest;
-  const MainScreen({Key? key, this.isGuest = false}) : super(key: key);
+  const MainScreen({super.key, this.isGuest = false});
 
   @override
   State<MainScreen> createState() => _MainScreenState();
@@ -32,7 +32,7 @@ class _MainScreenState extends State<MainScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!widget.isGuest) {
-        NotificationService().initialize(context);
+        NotificationService().initialize();
       }
     });
   }
@@ -114,12 +114,12 @@ class _MainScreenState extends State<MainScreen> {
                     ),
                     decoration: BoxDecoration(
                       color: isSelected
-                          ? AppTheme.primaryGreen.withValues(alpha: 0.15)
+                          ? AppTheme.primaryBlue.withValues(alpha: 0.15)
                           : Colors.transparent,
                       borderRadius: BorderRadius.circular(20),
                       border: isSelected
                           ? Border.all(
-                              color: AppTheme.primaryGreen.withValues(
+                              color: AppTheme.primaryBlue.withValues(
                                 alpha: 0.35,
                               ),
                               width: 1,
@@ -132,7 +132,7 @@ class _MainScreenState extends State<MainScreen> {
                         Icon(
                           item['icon'] as IconData,
                           color: isSelected
-                              ? AppTheme.primaryGreen
+                              ? AppTheme.primaryBlue
                               : Colors.white54,
                           size: 22,
                         ),
@@ -141,7 +141,7 @@ class _MainScreenState extends State<MainScreen> {
                           item['label'] as String,
                           style: TextStyle(
                             color: isSelected
-                                ? AppTheme.primaryGreen
+                                ? AppTheme.primaryBlue
                                 : Colors.white54,
                             fontSize: 10,
                             fontWeight: isSelected
@@ -165,8 +165,7 @@ class _MainScreenState extends State<MainScreen> {
 class HomeScreen extends StatelessWidget {
   final bool isGuest;
   final Function(int)? onNavigateTab;
-  const HomeScreen({Key? key, this.isGuest = false, this.onNavigateTab})
-    : super(key: key);
+  const HomeScreen({super.key, this.isGuest = false, this.onNavigateTab});
 
   @override
   Widget build(BuildContext context) {
@@ -182,7 +181,7 @@ class HomeScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: AppTheme.primaryGreen.withValues(alpha: 0.4),
+                  color: AppTheme.primaryBlue.withValues(alpha: 0.4),
                 ),
                 image: const DecorationImage(
                   image: AssetImage('assets/images/app_logo.jpg'),
@@ -271,12 +270,12 @@ class HomeScreen extends StatelessWidget {
                     margin: const EdgeInsets.all(6),
                     padding: const EdgeInsets.all(6),
                     decoration: BoxDecoration(
-                      color: AppTheme.primaryGreen.withValues(alpha: 0.15),
+                      color: AppTheme.primaryBlue.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Icon(
                       Icons.tune_rounded,
-                      color: AppTheme.primaryGreen,
+                      color: AppTheme.primaryBlue,
                       size: 18,
                     ),
                   ),
@@ -297,7 +296,7 @@ class HomeScreen extends StatelessWidget {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(
                     child: CircularProgressIndicator(
-                      color: AppTheme.primaryGreen,
+                      color: AppTheme.primaryBlue,
                     ),
                   );
                 }
@@ -320,18 +319,18 @@ class HomeScreen extends StatelessWidget {
                       height: 220,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(24),
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFF0D2818), Color(0xFF040F08)],
+                        gradient: LinearGradient(
+                          colors: [AppTheme.primaryBlue.withValues(alpha: 0.1), AppTheme.primaryRed.withValues(alpha: 0.1)],
                           begin: Alignment.topRight,
                           end: Alignment.bottomLeft,
                         ),
                         border: Border.all(
-                          color: AppTheme.primaryGreen.withValues(alpha: 0.4),
+                          color: AppTheme.primaryBlue.withValues(alpha: 0.4),
                           width: 1.2,
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: AppTheme.primaryGreen.withValues(
+                            color: AppTheme.primaryBlue.withValues(
                               alpha: 0.18,
                             ),
                             blurRadius: 24,
@@ -360,7 +359,7 @@ class HomeScreen extends StatelessWidget {
                                 vertical: 5,
                               ),
                               decoration: BoxDecoration(
-                                color: AppTheme.primaryGreen,
+                                color: AppTheme.primaryBlue,
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: const Text(
@@ -481,7 +480,7 @@ class HomeScreen extends StatelessWidget {
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: AppTheme.primaryGreen,
+                            backgroundColor: AppTheme.primaryBlue,
                             padding: const EdgeInsets.symmetric(vertical: 14),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),
@@ -504,7 +503,7 @@ class HomeScreen extends StatelessWidget {
             _buildSectionHeader(
               'مبارياتي القادمة',
               Icons.timer,
-              AppTheme.primaryGreen,
+              AppTheme.primaryBlue,
             ),
             const SizedBox(height: 12),
             _buildUpcomingMatchCard(),
@@ -526,6 +525,7 @@ class HomeScreen extends StatelessWidget {
                       MaterialPageRoute(
                         builder: (context) => const BracketScreen(
                           tournamentTitle: 'بطولة السودان الكبرى 2025',
+                          tournamentId: '',
                         ),
                       ),
                     );
@@ -533,7 +533,7 @@ class HomeScreen extends StatelessWidget {
                   child: const Text(
                     'شجرة المباريات',
                     style: TextStyle(
-                      color: AppTheme.primaryGreen,
+                      color: AppTheme.primaryBlue,
                       fontSize: 13,
                     ),
                   ),
@@ -562,7 +562,7 @@ class HomeScreen extends StatelessWidget {
                   child: const Text(
                     'عرض الكل',
                     style: TextStyle(
-                      color: AppTheme.primaryGreen,
+                      color: AppTheme.primaryBlue,
                       fontSize: 13,
                     ),
                   ),
@@ -618,7 +618,7 @@ class HomeScreen extends StatelessWidget {
           context,
           'فريق جديد',
           Icons.group_add,
-          AppTheme.primaryGreen,
+          AppTheme.primaryBlue,
           () {
             Navigator.push(
               context,
@@ -717,15 +717,15 @@ class HomeScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: AppTheme.primaryGreen.withValues(alpha: 0.12),
+              color: AppTheme.primaryBlue.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: AppTheme.primaryGreen.withValues(alpha: 0.25),
+                color: AppTheme.primaryBlue.withValues(alpha: 0.25),
               ),
             ),
             child: const Icon(
               Icons.schedule_rounded,
-              color: AppTheme.primaryGreen,
+              color: AppTheme.primaryBlue,
               size: 24,
             ),
           ),
@@ -764,7 +764,7 @@ class HomeScreen extends StatelessWidget {
               border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
             ),
             child: const Center(
-              child: CircularProgressIndicator(color: AppTheme.primaryGreen),
+              child: CircularProgressIndicator(color: AppTheme.primaryBlue),
             ),
           );
         }
@@ -830,7 +830,7 @@ class HomeScreen extends StatelessWidget {
           width: double.infinity,
           padding: const EdgeInsets.all(18),
           decoration: BoxDecoration(
-            gradient: const LinearGradient(
+            gradient: LinearGradient(
               colors: [Color(0xFF261217), Color(0xFF131822)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
@@ -957,7 +957,7 @@ class HomeScreen extends StatelessWidget {
                     ),
                   ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.primaryGreen,
+                    backgroundColor: AppTheme.primaryBlue,
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
@@ -1020,7 +1020,7 @@ class HomeScreen extends StatelessWidget {
             },
             style: OutlinedButton.styleFrom(
               side: BorderSide(
-                color: AppTheme.primaryGreen.withValues(alpha: 0.4),
+                color: AppTheme.primaryBlue.withValues(alpha: 0.4),
               ),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -1030,7 +1030,7 @@ class HomeScreen extends StatelessWidget {
             child: const Text(
               'عرض',
               style: TextStyle(
-                color: AppTheme.primaryGreen,
+                color: AppTheme.primaryBlue,
                 fontSize: 12,
                 fontWeight: FontWeight.bold,
               ),

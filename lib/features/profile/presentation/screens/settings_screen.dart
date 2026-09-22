@@ -5,9 +5,11 @@ import 'package:e_sport_sudan/core/services/auth_service.dart';
 import 'package:e_sport_sudan/core/services/firestore_service.dart';
 import 'package:e_sport_sudan/core/models/user_model.dart';
 import 'package:e_sport_sudan/core/services/notification_service.dart';
+import 'package:e_sport_sudan/features/profile/presentation/screens/edit_profile_screen.dart';
+import 'package:e_sport_sudan/features/profile/presentation/screens/security_settings_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
-  const SettingsScreen({Key? key}) : super(key: key);
+  const SettingsScreen({super.key});
 
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
@@ -60,12 +62,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
+  void _showComingSoon() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('هذه الميزة ستتوفر قريباً!', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        backgroundColor: AppTheme.primaryBlue,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
       return const Scaffold(
         backgroundColor: AppTheme.backgroundDark,
-        body: Center(child: CircularProgressIndicator(color: AppTheme.primaryGreen)),
+        body: Center(child: CircularProgressIndicator(color: AppTheme.primaryBlue)),
       );
     }
 
@@ -88,14 +99,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 title: 'تعديل الملف الشخصي',
                 subtitle: 'تغيير الاسم، الصورة، واسم اللاعب',
                 icon: Icons.edit,
-                onTap: () {},
+                onTap: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => const EditProfileScreen()));
+                },
               ),
               _buildDivider(),
               _buildListTile(
                 title: 'الأمان وكلمة المرور',
                 subtitle: 'تغيير كلمة المرور، المصادقة الثنائية',
                 icon: Icons.security,
-                onTap: () {},
+                onTap: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => const SecuritySettingsScreen()));
+                },
               ),
             ]),
             const SizedBox(height: 20),
@@ -107,14 +122,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 title: 'الألعاب المفضلة',
                 subtitle: 'تخصيص البطولات والأخبار حسب ألعابك',
                 icon: Icons.gamepad,
-                onTap: () {},
+                onTap: _showComingSoon,
               ),
               _buildDivider(),
               _buildListTile(
                 title: 'تفضيلات شجرة المباريات',
                 subtitle: 'طريقة عرض النتائج والمواجهات',
                 icon: Icons.account_tree,
-                onTap: () {},
+                onTap: _showComingSoon,
               ),
             ]),
             const SizedBox(height: 20),
@@ -173,14 +188,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 title: 'طرق الدفع',
                 subtitle: 'إدارة الحسابات البنكية (بنكك، فوري)',
                 icon: Icons.payment,
-                onTap: () {},
+                onTap: _showComingSoon,
               ),
               _buildDivider(),
               _buildListTile(
                 title: 'سجل المعاملات المالي',
                 subtitle: 'عرض المبالغ المسحوبة والمودعة',
                 icon: Icons.history,
-                onTap: () {},
+                onTap: _showComingSoon,
               ),
             ]),
             const SizedBox(height: 20),
@@ -192,7 +207,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 title: 'إخفاء الإحصائيات',
                 subtitle: 'تحديد من يمكنه رؤية إحصائياتك',
                 icon: Icons.visibility_off,
-                onTap: () {},
+                onTap: _showComingSoon,
               ),
             ]),
             const SizedBox(height: 20),
@@ -232,17 +247,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 leading: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: AppTheme.primaryGreen.withOpacity(0.15),
+                    color: AppTheme.primaryBlue.withOpacity(0.15),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Icon(Icons.language, color: AppTheme.primaryGreen, size: 22),
+                  child: const Icon(Icons.language, color: AppTheme.primaryBlue, size: 22),
                 ),
                 title: const Text('لغة التطبيق', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
                 subtitle: Text(_settings.language, style: const TextStyle(color: Colors.white54, fontSize: 11)),
                 trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.white38),
-                onTap: () {
-                  // Show language picker dialog
-                },
+                onTap: _showComingSoon,
               ),
             ]),
             const SizedBox(height: 20),
@@ -254,21 +267,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 title: 'مركز المساعدة والأسئلة الشائعة',
                 subtitle: 'قوانين البطولات وطرق السحب',
                 icon: Icons.question_answer,
-                onTap: () {},
+                onTap: _showComingSoon,
               ),
               _buildDivider(),
               _buildListTile(
                 title: 'التواصل مع الدعم الفني',
                 subtitle: 'رفع تذكرة لمشكلة فنية',
                 icon: Icons.support_agent,
-                onTap: () {},
+                onTap: _showComingSoon,
               ),
               _buildDivider(),
               _buildListTile(
                 title: 'الشروط والأحكام / الخصوصية',
                 subtitle: 'اقرأ سياسات الاستخدام',
                 icon: Icons.article,
-                onTap: () {},
+                onTap: _showComingSoon,
               ),
             ]),
             const SizedBox(height: 24),
@@ -305,7 +318,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       padding: const EdgeInsets.only(bottom: 12, right: 4),
       child: Row(
         children: [
-          Icon(icon, color: AppTheme.primaryGreen, size: 20),
+          Icon(icon, color: AppTheme.primaryBlue, size: 20),
           const SizedBox(width: 8),
           Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
         ],
@@ -339,10 +352,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
       leading: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: AppTheme.primaryGreen.withOpacity(0.15),
+          color: AppTheme.primaryBlue.withOpacity(0.15),
           borderRadius: BorderRadius.circular(10),
         ),
-        child: Icon(icon, color: AppTheme.primaryGreen, size: 22),
+        child: Icon(icon, color: AppTheme.primaryBlue, size: 22),
       ),
       title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
       subtitle: Text(subtitle, style: const TextStyle(color: Colors.white54, fontSize: 11)),
@@ -362,7 +375,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
       subtitle: Text(subtitle, style: const TextStyle(color: Colors.white54, fontSize: 11)),
       value: value,
-      activeColor: AppTheme.primaryGreen,
+      activeThumbColor: AppTheme.primaryBlue,
       onChanged: onChanged,
     );
   }

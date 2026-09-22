@@ -2,6 +2,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 import '../widgets/esport_toast.dart';
+import '../../main.dart';
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -16,7 +17,7 @@ class NotificationService {
   factory NotificationService() => _instance;
   NotificationService._internal();
 
-  Future<void> initialize(BuildContext context) async {
+  Future<void> initialize() async {
     // Request permissions for iOS and newer Android versions
     NotificationSettings settings = await _fcm.requestPermission(
       alert: true,
@@ -43,11 +44,14 @@ class NotificationService {
 
     // Foreground handler
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      _showForegroundNotification(context, message);
+      _showForegroundNotification(message);
     });
   }
 
-  void _showForegroundNotification(BuildContext context, RemoteMessage message) {
+  void _showForegroundNotification(RemoteMessage message) {
+    final context = navigatorKey.currentContext;
+    if (context == null) return;
+
     if (message.notification != null) {
       // Determine type based on data payload
       ToastType type = ToastType.success;

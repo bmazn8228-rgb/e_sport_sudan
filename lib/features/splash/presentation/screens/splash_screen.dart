@@ -3,7 +3,7 @@ import 'package:e_sport_sudan/core/theme/app_theme.dart';
 import 'package:e_sport_sudan/features/onboarding/presentation/screens/onboarding_screen.dart';
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({Key? key}) : super(key: key);
+  const SplashScreen({super.key});
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
@@ -73,7 +73,7 @@ class _SplashScreenState extends State<SplashScreen>
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: AppTheme.primaryGreen.withValues(alpha: 0.2),
+                          color: AppTheme.primaryBlue.withValues(alpha: 0.2),
                           blurRadius: 40,
                           spreadRadius: 10,
                         ),

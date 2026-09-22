@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:e_sport_sudan/core/theme/app_theme.dart';
 import 'package:e_sport_sudan/core/services/firestore_service.dart';
 import 'package:e_sport_sudan/core/services/auth_service.dart';
@@ -7,7 +6,7 @@ import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'package:e_sport_sudan/features/auth/presentation/screens/login_screen.dart';
 
 class RefereeDashboardScreen extends StatelessWidget {
-  const RefereeDashboardScreen({Key? key}) : super(key: key);
+  const RefereeDashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +57,7 @@ class RefereeDashboardScreen extends StatelessWidget {
                 child: ListTile(
                   title: Text(match['title'] ?? 'مباراة', style: const TextStyle(fontWeight: FontWeight.bold)),
                   subtitle: Text('${match['scoreA']} - ${match['scoreB']} | ${match['status']}'),
-                  trailing: const Icon(Icons.settings, color: AppTheme.primaryGreen),
+                  trailing: const Icon(Icons.settings, color: AppTheme.primaryBlue),
                   onTap: () {
                     Navigator.push(
                       context,
@@ -81,7 +80,7 @@ class MatchControlRoom extends StatefulWidget {
   final String matchId;
   final Map<String, dynamic> initialData;
 
-  const MatchControlRoom({Key? key, required this.matchId, required this.initialData}) : super(key: key);
+  const MatchControlRoom({super.key, required this.matchId, required this.initialData});
 
   @override
   State<MatchControlRoom> createState() => _MatchControlRoomState();
@@ -120,7 +119,7 @@ class _MatchControlRoomState extends State<MatchControlRoom> {
         _timeController.text.trim(),
       );
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('تم تحديث النتيجة بنجاح', style: TextStyle(color: Colors.black)), backgroundColor: AppTheme.primaryGreen));
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('تم تحديث النتيجة بنجاح', style: TextStyle(color: Colors.black)), backgroundColor: AppTheme.primaryBlue));
       }
     } catch (e) {
       if (mounted) {
@@ -147,7 +146,7 @@ class _MatchControlRoomState extends State<MatchControlRoom> {
         videoId,
       );
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('تم تحديث رابط البث المباشر بنجاح ✅', style: TextStyle(color: Colors.black)), backgroundColor: AppTheme.primaryGreen));
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('تم تحديث رابط البث المباشر بنجاح ✅', style: TextStyle(color: Colors.black)), backgroundColor: AppTheme.primaryBlue));
       }
     } catch (e) {
       if (mounted) {
@@ -178,7 +177,7 @@ class _MatchControlRoomState extends State<MatchControlRoom> {
               ),
               child: Column(
                 children: [
-                  const Text('إدارة النتيجة', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.primaryGreen)),
+                  const Text('إدارة النتيجة', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.primaryBlue)),
                   const SizedBox(height: 16),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -244,7 +243,7 @@ class _MatchControlRoomState extends State<MatchControlRoom> {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryGreen),
+                      style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryBlue),
                       onPressed: _isLoading ? null : _updateScore,
                       child: const Text('تحديث النتيجة والوقت', style: TextStyle(color: Colors.black)),
                     ),
@@ -265,7 +264,7 @@ class _MatchControlRoomState extends State<MatchControlRoom> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('إدارة البث', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.primaryGreen)),
+                  const Text('إدارة البث', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.primaryBlue)),
                   const SizedBox(height: 16),
                   TextField(
                     controller: _youtubeController,

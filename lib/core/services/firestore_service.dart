@@ -26,6 +26,41 @@ class FirestoreService {
     await _db.collection('users').doc(uid).set({'settings': settings.toMap()}, SetOptions(merge: true));
   }
 
+  Future<Map<String, dynamic>> getDashboardMetrics() async {
+    try {
+      final usersCount = await _db.collection('users').count().get();
+      final teamsCount = await _db.collection('teams').count().get();
+      final tournamentsCount = await _db.collection('tournaments').count().get();
+      
+      // For sum, if `aggregate` is not natively supported by the older SDK version, 
+      // we can do a client-side sum for this specific query, or maintain a running total in a metadata doc.
+      // Since this is just an admin dashboard, a client-side sum over deposits is acceptable for now.
+      final txSnapshot = await _db.collection('transactions')
+          .where('type', isEqualTo: 'deposit')
+          .where('status', isEqualTo: 'approved')
+          .get();
+          
+      double totalFees = 0;
+      for (var doc in txSnapshot.docs) {
+        totalFees += (doc.data()['amount'] as num?)?.toDouble() ?? 0;
+      }
+
+      return {
+        'usersCount': usersCount.count ?? 0,
+        'teamsCount': teamsCount.count ?? 0,
+        'tournamentsCount': tournamentsCount.count ?? 0,
+        'totalFees': totalFees,
+      };
+    } catch (e) {
+      return {
+        'usersCount': 0,
+        'teamsCount': 0,
+        'tournamentsCount': 0,
+        'totalFees': 0.0,
+      };
+    }
+  }
+
   Stream<List<Map<String, dynamic>>> getUsersByRoleStream(String role) {
     return _db.collection('users').where('role', isEqualTo: role).snapshots().map(
       (snapshot) => snapshot.docs.map((doc) {
@@ -63,11 +98,80 @@ class FirestoreService {
     await _db.collection('tournaments').doc(tournamentId).delete();
   }
 
+
   // =========================================================================
-  // 3. Teams (الفرق)
+  // 5. Wallet & Transactions
   // =========================================================================
+  Stream<List<Map<String, dynamic>>> getPendingDepositRequestsStream() {
+    return _db.collection('transactions')
+        .where('type', isEqualTo: 'deposit')
+        .where('status', isEqualTo: 'pending')
+        .orderBy('createdAt', descending: true)
+        .snapshots().map((snapshot) => snapshot.docs.map((doc) {
+          final data = doc.data();
+          data['id'] = doc.id;
+          return data;
+        }).toList());
+  }
+
+  Future<void> updateDepositRequestStatus(String docId, String status, double amount, String userId) async {
+    await _db.runTransaction((transaction) async {
+      final docRef = _db.collection('transactions').doc(docId);
+      final snapshot = await transaction.get(docRef);
+      if (!snapshot.exists) return;
+      
+      if (snapshot.data()?['status'] != 'pending') return; // Already processed
+
+      transaction.update(docRef, {'status': status});
+      
+      if (status == 'approved') {
+        final userRef = _db.collection('users').doc(userId);
+        final userSnapshot = await transaction.get(userRef);
+        if (userSnapshot.exists) {
+          final currentBalance = (userSnapshot.data()?['walletBalance'] as num?)?.toDouble() ?? 0.0;
+          transaction.update(userRef, {'walletBalance': currentBalance + amount});
+        }
+      }
+    });
+  }
+
+  // =========================================================================
+  // 6. Leaderboards (التصنيفات)
+  // =========================================================================
+  Future<String> createTeam(Map<String, dynamic> teamData, String creatorUid) async {
+    final docRef = await _db.collection('teams').add(teamData);
+    await _db.collection('users').doc(creatorUid).update({'teamId': docRef.id});
+    return docRef.id;
+  }
+
+  Future<void> joinTeam(String teamId, String uid, Map<String, dynamic> playerRosterData) async {
+    // Add user to team roster array
+    await _db.collection('teams').doc(teamId).update({
+      'roster': FieldValue.arrayUnion([playerRosterData])
+    });
+    // Update user doc
+    await _db.collection('users').doc(uid).update({'teamId': teamId});
+  }
+
+  Future<void> leaveTeam(String teamId, String uid, Map<String, dynamic> playerRosterData) async {
+    // Remove user from team roster array
+    await _db.collection('teams').doc(teamId).update({
+      'roster': FieldValue.arrayRemove([playerRosterData])
+    });
+    // Update user doc
+    await _db.collection('users').doc(uid).update({'teamId': FieldValue.delete()});
+  }
+
   Future<void> registerTeam(Map<String, dynamic> teamData) async {
     await _db.collection('teams').add(teamData);
+  }
+
+  Future<Map<String, dynamic>?> getTeam(String teamId) async {
+    final doc = await _db.collection('teams').doc(teamId).get();
+    if (!doc.exists) return null;
+    final data = doc.data();
+    data?['id'] = doc.id;
+    return data;
   }
 
   Stream<List<Map<String, dynamic>>> getTeamsStream({required String game}) {
@@ -231,6 +335,18 @@ class FirestoreService {
     );
   }
 
+  Stream<List<Map<String, dynamic>>> getTournamentMatchesStream(String tournamentId) {
+    return _db
+        .collection('matches')
+        .where('tournamentId', isEqualTo: tournamentId)
+        .snapshots()
+        .map((snapshot) => snapshot.docs.map((doc) {
+              final data = doc.data();
+              data['id'] = doc.id;
+              return data;
+            }).toList());
+  }
+
   Stream<List<Map<String, dynamic>>> getMatchChatStream(String matchId) {
     return _db
         .collection('matches')
@@ -240,6 +356,20 @@ class FirestoreService {
         .limitToLast(50)
         .snapshots()
         .map((snapshot) => snapshot.docs.map((doc) => doc.data()).toList());
+  }
+
+  Stream<List<Map<String, dynamic>>> getTeamMatchesStream(String teamId) {
+    // Note: Since Firestore doesn't support logical OR in simple where clauses natively across fields without composite indexes,
+    // we fetch matches where the team is either teamAId or teamBId on the client for this demo, or we can just fetch all matches and filter,
+    // or use a more robust backend logic. Here we just fetch all and filter for simplicity since it's a small dataset.
+    return _db
+        .collection('matches')
+        .snapshots()
+        .map((snapshot) => snapshot.docs.map((doc) {
+              final data = doc.data();
+              data['id'] = doc.id;
+              return data;
+            }).where((m) => m['teamAId'] == teamId || m['teamBId'] == teamId || m['teamA'] == teamId || m['teamB'] == teamId).toList());
   }
 
   Future<void> sendChatMessage({
@@ -279,6 +409,19 @@ class FirestoreService {
       'createdAt': FieldValue.serverTimestamp(),
     });
   }
+
+  Stream<List<Map<String, dynamic>>> getTransactionsStream(String userId) {
+    return _db
+        .collection('transactions')
+        .where('userId', isEqualTo: userId)
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .map((snapshot) => snapshot.docs.map((doc) {
+              final data = doc.data();
+              data['id'] = doc.id;
+              return data;
+            }).toList());
+  }
   // =========================================================================
   // 7. Data Seeding / تهيئة الجداول والبيانات الأولية والصلاحيات
   // =========================================================================
@@ -299,6 +442,10 @@ class FirestoreService {
     );
   }
 
+  Future<void> updateComplaintStatus(String complaintId, String newStatus) async {
+    await _db.collection('complaints').doc(complaintId).update({'status': newStatus});
+  }
+
   Future<void> addComplaint(Map<String, dynamic> data) async {
     data['createdAt'] = FieldValue.serverTimestamp();
     await _db.collection('complaints').add(data);
@@ -307,4 +454,99 @@ class FirestoreService {
   Future<void> deleteComplaint(String complaintId) async {
     await _db.collection('complaints').doc(complaintId).delete();
   }
+
+  // =========================================================================
+  // 9. Wallet Balance Stream
+  // =========================================================================
+  Stream<double> getUserWalletStream(String uid) {
+    return _db.collection('users').doc(uid).snapshots().map((doc) {
+      if (!doc.exists) return 0.0;
+      return (doc.data()?['walletBalance'] as num?)?.toDouble() ?? 0.0;
+    });
+  }
+
+  // =========================================================================
+  // 10. Referee — Match Management
+  // =========================================================================
+  Stream<List<Map<String, dynamic>>> getMatchesForRefereeStream(String refereeUid) {
+    return _db.collection('matches')
+        .where('refereeId', isEqualTo: refereeUid)
+        .where('status', isEqualTo: 'scheduled')
+        .snapshots()
+        .map((snapshot) => snapshot.docs.map((doc) {
+              final data = doc.data();
+              data['id'] = doc.id;
+              return data;
+            }).toList());
+  }
+
+  Future<void> submitMatchResult({
+    required String matchId,
+    required int scoreA,
+    required int scoreB,
+    required String screenshotUrl,
+    required String refereeId,
+  }) async {
+    await _db.collection('matches').doc(matchId).update({
+      'scoreA': scoreA,
+      'scoreB': scoreB,
+      'screenshotUrl': screenshotUrl,
+      'status': 'completed',
+      'refereeId': refereeId,
+      'completedAt': FieldValue.serverTimestamp(),
+    });
+  }
+
+  // =========================================================================
+  // 11. Tournament Registrations
+  // =========================================================================
+  Stream<List<Map<String, dynamic>>> getTournamentRegistrationsStream(String tournamentId) {
+    return _db.collection('tournaments').doc(tournamentId)
+        .collection('registrations')
+        .snapshots()
+        .map((snapshot) => snapshot.docs.map((doc) {
+              final data = doc.data();
+              data['id'] = doc.id;
+              return data;
+            }).toList());
+  }
+
+  // =========================================================================
+  // 12. Players Search
+  // =========================================================================
+  Stream<List<Map<String, dynamic>>> searchPlayersStream(String query) {
+    if (query.isEmpty) return const Stream.empty();
+    return _db.collection('users')
+        .where('role', isEqualTo: 'player')
+        .orderBy('displayName')
+        .startAt([query])
+        .endAt(['$query\uf8ff'])
+        .limit(20)
+        .snapshots()
+        .map((snapshot) => snapshot.docs.map((doc) {
+              final data = doc.data();
+              data['id'] = doc.id;
+              return data;
+            }).toList());
+  }
+
+  Stream<List<Map<String, dynamic>>> searchAllUsersStream(String query) {
+    if (query.isEmpty) return const Stream.empty();
+    return _db.collection('users')
+        .orderBy('displayName')
+        .startAt([query])
+        .endAt(['$query\uf8ff'])
+        .limit(20)
+        .snapshots()
+        .map((snapshot) => snapshot.docs.map((doc) {
+              final data = doc.data();
+              data['id'] = doc.id;
+              return data;
+            }).toList());
+  }
+
+  Future<void> updateUserRole(String userId, String roleValue) async {
+    await _db.collection('users').doc(userId).update({'role': roleValue});
+  }
 }
+

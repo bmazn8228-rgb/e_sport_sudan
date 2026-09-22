@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter/foundation.dart';
 import '../models/user_model.dart';
 import 'firestore_service.dart';
@@ -25,7 +26,19 @@ class AuthService {
       User? user = result.user;
       if (user != null) {
         // Fetch user from Firestore to get their role
-        return await _firestoreService.getUser(user.uid);
+        UserModel? userModel = await _firestoreService.getUser(user.uid);
+        if (userModel == null) {
+          // Fallback: create a basic user doc if they exist in Auth but not Firestore
+          userModel = UserModel(
+            uid: user.uid,
+            email: user.email ?? email,
+            displayName: user.displayName ?? 'Player',
+            phone: '',
+            role: UserRole.player,
+          );
+          await _firestoreService.saveUser(userModel);
+        }
+        return userModel;
       }
       return null;
     } catch (e) {
@@ -39,6 +52,8 @@ class AuthService {
     required String password,
     required String displayName,
     required String phone,
+    String? ign,
+    String? gameId,
   }) async {
     try {
       UserCredential result = await _auth.createUserWithEmailAndPassword(
@@ -67,6 +82,8 @@ class AuthService {
           uid: user.uid,
           email: email,
           displayName: displayName,
+          ign: ign,
+          gameId: gameId,
           phone: phone,
           role: assignedRole,
         );
@@ -87,6 +104,71 @@ class AuthService {
       await _auth.signOut();
     } catch (e) {
       debugPrint('Error signing out: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> sendPasswordResetEmail(String email) async {
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
+    } catch (e) {
+      debugPrint('Error resetting password: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> changePassword(String currentPassword, String newPassword) async {
+    try {
+      final user = _auth.currentUser;
+      if (user == null || user.email == null) {
+        throw Exception('User not logged in or email is null');
+      }
+      
+      // Re-authenticate
+      final cred = EmailAuthProvider.credential(email: user.email!, password: currentPassword);
+      await user.reauthenticateWithCredential(cred);
+      
+      // Update password
+      await user.updatePassword(newPassword);
+    } catch (e) {
+      debugPrint('Error changing password: $e');
+      rethrow;
+    }
+  }
+
+  Future<UserModel?> signInWithGoogle() async {
+    try {
+      final GoogleSignIn googleSignIn = GoogleSignIn();
+      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+      
+      if (googleUser != null) {
+        final GoogleSignInAuthentication googleAuth = googleUser.authentication;
+        final AuthCredential credential = GoogleAuthProvider.credential(
+          accessToken: googleAuth.accessToken,
+          idToken: googleAuth.idToken,
+        );
+        
+        UserCredential result = await _auth.signInWithCredential(credential);
+        User? user = result.user;
+        if (user != null) {
+          UserModel? userModel = await _firestoreService.getUser(user.uid);
+          // If this is a new user from Google, save basic info
+          if (userModel == null) {
+             userModel = UserModel(
+                uid: user.uid,
+                email: user.email ?? '',
+                displayName: user.displayName ?? 'Google User',
+                phone: '',
+                role: UserRole.player,
+             );
+             await _firestoreService.saveUser(userModel);
+          }
+          return userModel;
+        }
+      }
+      return null;
+    } catch (e) {
+      debugPrint('Error signing in with Google: $e');
       rethrow;
     }
   }
