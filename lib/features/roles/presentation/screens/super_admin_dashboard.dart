@@ -17,7 +17,6 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard> {
   String _searchQuery = '';
 
   Map<String, dynamic>? _metrics;
-  bool _isLoadingMetrics = true;
 
   @override
   void initState() {
@@ -30,7 +29,6 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard> {
     if (mounted) {
       setState(() {
         _metrics = metrics;
-        _isLoadingMetrics = false;
       });
     }
   }

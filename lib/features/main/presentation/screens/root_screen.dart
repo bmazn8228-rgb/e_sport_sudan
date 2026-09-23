@@ -54,7 +54,6 @@ class _RootScreenState extends State<RootScreen> {
             }
 
             final userModel = userSnapshot.data;
-            Widget dashboard;
 
             if (userModel == null) {
               // If user is authenticated but not in firestore, treat as player or error

@@ -26,7 +26,6 @@ class _BracketScreenState extends State<BracketScreen> {
     'النهائي 🏆',
   ];
 
-  final List<Map<String, dynamic>> _quarterFinals = [];
 
   @override
   Widget build(BuildContext context) {
