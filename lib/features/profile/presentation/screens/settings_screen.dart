@@ -99,8 +99,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 title: 'تعديل الملف الشخصي',
                 subtitle: 'تغيير الاسم، الصورة، واسم اللاعب',
                 icon: Icons.edit,
-                onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (_) => const EditProfileScreen()));
+                onTap: () async {
+                  final res = await Navigator.push(context, MaterialPageRoute(builder: (_) => const EditProfileScreen()));
+                  if (res == true && mounted) {
+                    _loadSettings();
+                  }
                 },
               ),
               _buildDivider(),

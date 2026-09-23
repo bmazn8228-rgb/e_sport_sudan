@@ -139,12 +139,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             child: IconButton(
               icon: const Icon(Icons.settings_rounded, size: 20),
-              onPressed: () {
+              onPressed: () async {
                 HapticFeedback.lightImpact();
-                Navigator.push(
+                await Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => const SettingsScreen()),
                 );
+                if (mounted) {
+                  _loadUser();
+                }
               },
             ),
           ),

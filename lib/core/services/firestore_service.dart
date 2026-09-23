@@ -13,9 +13,17 @@ class FirestoreService {
   // 1. Users & Admin Roles
   // =========================================================================
   Future<UserModel?> getUser(String uid) async {
-    final doc = await _db.collection('users').doc(uid).get();
-    if (!doc.exists || doc.data() == null) return null;
-    return UserModel.fromMap(doc.data()!, doc.id);
+    try {
+      final doc = await _db
+          .collection('users')
+          .doc(uid)
+          .get()
+          .timeout(const Duration(seconds: 5));
+      if (!doc.exists || doc.data() == null) return null;
+      return UserModel.fromMap(doc.data()!, doc.id);
+    } catch (e) {
+      return null;
+    }
   }
 
   Future<void> saveUser(UserModel user) async {
