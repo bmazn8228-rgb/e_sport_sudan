@@ -129,16 +129,51 @@ class AuthService {
   Future<void> changePassword(String currentPassword, String newPassword) async {
     try {
       final user = _auth.currentUser;
-      if (user == null || user.email == null) {
-        throw Exception('User not logged in or email is null');
+      if (user == null) {
+        throw FirebaseAuthException(
+          code: 'user-not-found',
+          message: 'المستخدم غير مسجل الدخول حالياً.',
+        );
       }
       
-      // Re-authenticate
-      final cred = EmailAuthProvider.credential(email: user.email!, password: currentPassword);
-      await user.reauthenticateWithCredential(cred);
-      
+      final email = user.email?.trim();
+      if (email == null || email.isEmpty) {
+        throw FirebaseAuthException(
+          code: 'invalid-email',
+          message: 'لا يوجد بريد إلكتروني مرتبط بحسابك.',
+        );
+      }
+
+      final trimmedCurrent = currentPassword.trim();
+      final trimmedNew = newPassword.trim();
+
+      if (trimmedNew.length < 6) {
+        throw FirebaseAuthException(
+          code: 'weak-password',
+          message: 'كلمة المرور الجديدة يجب أن تكون 6 أحرف أو أرقام على الأقل.',
+        );
+      }
+
+      // Try re-authenticating with the user's current password
+      try {
+        final cred = EmailAuthProvider.credential(email: email, password: currentPassword);
+        await user.reauthenticateWithCredential(cred);
+      } on FirebaseAuthException catch (_) {
+        // If failed and currentPassword has whitespace, try trimmed
+        if (currentPassword != trimmedCurrent) {
+          try {
+            final credTrimmed = EmailAuthProvider.credential(email: email, password: trimmedCurrent);
+            await user.reauthenticateWithCredential(credTrimmed);
+          } catch (_) {
+            rethrow;
+          }
+        } else {
+          rethrow;
+        }
+      }
+
       // Update password
-      await user.updatePassword(newPassword);
+      await user.updatePassword(trimmedNew);
     } catch (e) {
       debugPrint('Error changing password: $e');
       rethrow;
