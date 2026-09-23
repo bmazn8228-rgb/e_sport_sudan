@@ -113,26 +113,73 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             },
           ),
           Positioned(
-            bottom: 50,
-            left: 20,
-            right: 20,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            bottom: 40,
+            left: 24,
+            right: 24,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                SizedBox(
-                  width: 80,
-                  child: _currentPage == 0
-                      ? TextButton(
-                          onPressed: _finishOnboarding,
-                          child: Text(
-                            'تخطي',
+                // مؤشر الصفحات الترحيبية
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(
+                    _pages.length,
+                    (index) => AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      margin: const EdgeInsets.symmetric(horizontal: 4),
+                      height: 8,
+                      width: _currentPage == index ? 28 : 8,
+                      decoration: BoxDecoration(
+                        color: _currentPage == index
+                            ? AppTheme.primaryBlue
+                            : Colors.white.withValues(alpha: 0.25),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+
+                // يظهر زر الدخول فقط عندما يصل المستخدم لآخر صورة ويشاهد جميع الصور الترحيبية
+                if (_currentPage == _pages.length - 1) ...[
+                  SizedBox(
+                    width: double.infinity,
+                    height: 56,
+                    child: ElevatedButton(
+                      onPressed: _finishOnboarding,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppTheme.primaryBlue,
+                        foregroundColor: Colors.black,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        elevation: 10,
+                        shadowColor: AppTheme.primaryBlue.withValues(alpha: 0.5),
+                      ),
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'دخول',
                             style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.5),
-                              fontSize: 16,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 0.5,
                             ),
                           ),
-                        )
-                      : TextButton(
+                          SizedBox(width: 10),
+                          Icon(Icons.login_rounded, size: 24, color: Colors.black),
+                        ],
+                      ),
+                    ),
+                  ),
+                ] else ...[
+                  // أزرار التنقل بين الصور السابقة والتالية
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      if (_currentPage > 0)
+                        TextButton(
                           onPressed: () {
                             _pageController.previousPage(
                               duration: const Duration(milliseconds: 300),
@@ -140,79 +187,45 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             );
                           },
                           child: Text(
-                            'رجوع',
+                            'السابق',
                             style: TextStyle(
-                              color: Colors.white.withValues(alpha: 0.5),
+                              color: Colors.white.withValues(alpha: 0.7),
                               fontSize: 16,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
+                        )
+                      else
+                        const SizedBox(width: 70),
+
+                      ElevatedButton.icon(
+                        onPressed: () {
+                          _pageController.nextPage(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppTheme.primaryBlue,
+                          foregroundColor: Colors.black,
+                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
                         ),
-                ),
-
-                Row(
-                  children: List.generate(
-                    _pages.length,
-                    (index) => AnimatedContainer(
-                      duration: const Duration(milliseconds: 300),
-                      margin: const EdgeInsets.symmetric(horizontal: 4),
-                      height: 8,
-                      width: _currentPage == index ? 24 : 8,
-                      decoration: BoxDecoration(
-                        color: _currentPage == index
-                            ? AppTheme.primaryBlue
-                            : Colors.white.withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(4),
+                        icon: const Icon(Icons.arrow_forward_rounded, size: 20, color: Colors.black),
+                        label: const Text(
+                          'التالي',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                        ),
                       ),
-                    ),
+                    ],
                   ),
-                ),
-
-                if (_currentPage < _pages.length - 1)
-                  GestureDetector(
-                    onTap: () {
-                      _pageController.nextPage(
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.easeInOut,
-                      );
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: AppTheme.primaryBlue.withValues(alpha: 0.2),
-                        shape: BoxShape.circle,
-                        border: Border.all(color: AppTheme.primaryBlue),
-                      ),
-                      child: const Icon(
-                        Icons.arrow_forward_ios,
-                        color: AppTheme.primaryBlue,
-                        size: 20,
-                      ),
-                    ),
-                  )
-                else
-                  ElevatedButton(
-                    onPressed: _finishOnboarding,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppTheme.primaryBlue,
-                      foregroundColor: Colors.black,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 16,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      elevation: 10,
-                      shadowColor: AppTheme.primaryBlue.withValues(alpha: 0.5),
-                    ),
-                    child: const Text(
-                      'ابدأ الآن',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
+                ],
               ],
             ),
           ),
