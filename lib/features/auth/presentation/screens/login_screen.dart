@@ -11,7 +11,8 @@ import 'register_screen.dart';
 import 'package:e_sport_sudan/core/services/biometric_service.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+  final String? prefilledEmail;
+  const LoginScreen({super.key, this.prefilledEmail});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -33,6 +34,9 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     super.initState();
+    if (widget.prefilledEmail != null) {
+      _identifierController.text = widget.prefilledEmail!;
+    }
     _checkBiometricStatus();
   }
 

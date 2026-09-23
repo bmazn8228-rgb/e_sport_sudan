@@ -5,7 +5,7 @@ import 'package:e_sport_sudan/core/utils/connectivity_helper.dart';
 import 'package:e_sport_sudan/core/utils/validators.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:e_sport_sudan/core/services/auth_service.dart';
-import 'package:e_sport_sudan/features/main/presentation/screens/root_screen.dart';
+import 'login_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -86,18 +86,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
       if (mounted) {
         setState(() => _isLoading = false);
         if (user != null || AuthService().currentUser != null) {
+          final registeredEmail = _emailController.text.trim();
+
+          // تسجيل الخروج لتأكيد الدخول اليدوي من قبل المستخدم
+          await AuthService().signOut();
+
+          if (!mounted) return;
+
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('تم إنشاء الحساب بنجاح! مرحباً بك في سودان إي سبورت 🎉'),
+              content: Text('تم إنشاء الحساب بنجاح! يرجى تسجيل الدخول ببياناتك الجديدة 🎉'),
               backgroundColor: AppTheme.primaryBlue,
-              duration: Duration(seconds: 3),
+              duration: Duration(seconds: 4),
             ),
           );
 
-          // الانتقال مباشرة إلى التطبيق بحساب اللاعب الجديد
+          // التوجيه فوراً إلى شاشة تسجيل الدخول مع تعبئة البريد تلقائياً
           Navigator.pushAndRemoveUntil(
             context,
-            MaterialPageRoute(builder: (context) => const RootScreen()),
+            MaterialPageRoute(
+              builder: (context) => LoginScreen(
+                prefilledEmail: registeredEmail,
+              ),
+            ),
             (route) => false,
           );
         } else {
@@ -118,17 +129,27 @@ class _RegisterScreenState extends State<RegisterScreen> {
       if (mounted) {
         setState(() => _isLoading = false);
 
-        // إذا كان الحساب قد أُنشئ بالفعل في Firebase
+        // إذا كان الحساب قد أُنشئ بالفعل في Firebase رغم الاستثناء الجانبي
         if (AuthService().currentUser != null) {
+          final registeredEmail = _emailController.text.trim();
+          await AuthService().signOut();
+
+          if (!mounted) return;
+
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('تم إنشاء الحساب بنجاح! مرحباً بك في سودان إي سبورت 🎉'),
+              content: Text('تم إنشاء الحساب بنجاح! يرجى تسجيل الدخول ببياناتك الجديدة 🎉'),
               backgroundColor: AppTheme.primaryBlue,
+              duration: Duration(seconds: 4),
             ),
           );
           Navigator.pushAndRemoveUntil(
             context,
-            MaterialPageRoute(builder: (context) => const RootScreen()),
+            MaterialPageRoute(
+              builder: (context) => LoginScreen(
+                prefilledEmail: registeredEmail,
+              ),
+            ),
             (route) => false,
           );
           return;
