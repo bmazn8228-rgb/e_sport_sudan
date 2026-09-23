@@ -3,7 +3,10 @@ import 'dart:ui';
 import 'package:e_sport_sudan/core/theme/app_theme.dart';
 import 'package:e_sport_sudan/core/utils/connectivity_helper.dart';
 import 'package:e_sport_sudan/core/utils/validators.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:e_sport_sudan/core/services/auth_service.dart';
+import 'package:e_sport_sudan/features/main/presentation/screens/root_screen.dart';
+
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
 
@@ -82,44 +85,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
       if (mounted) {
         setState(() => _isLoading = false);
-        if (user != null) {
-          // فايربيز يقوم بتسجيل الدخول تلقائياً بعد إنشاء الحساب
-          // نقوم بتسجيل الخروج لتوجيه المستخدم لصفحة تسجيل الدخول
-          await AuthService().signOut();
+        if (user != null || AuthService().currentUser != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('تم إنشاء الحساب بنجاح! مرحباً بك في سودان إي سبورت 🎉'),
+              backgroundColor: AppTheme.primaryBlue,
+              duration: Duration(seconds: 3),
+            ),
+          );
 
-          if (mounted) {
-            await showDialog(
-              context: context,
-              barrierDismissible: false,
-              builder: (BuildContext context) {
-                return AlertDialog(
-                  backgroundColor: AppTheme.cardDark,
-                  title: const Row(
-                    children: [
-                      Icon(Icons.check_circle, color: AppTheme.primaryBlue),
-                      SizedBox(width: 8),
-                      Text('نجاح التسجيل', style: TextStyle(color: Colors.white)),
-                    ],
-                  ),
-                  content: const Text(
-                    'تم إنشاء الحساب بنجاح! يرجى تسجيل الدخول باستخدام بياناتك الجديدة.',
-                    style: TextStyle(color: Colors.white70),
-                  ),
-                  actions: [
-                    TextButton(
-                      onPressed: () {
-                        Navigator.of(context).pop(); // Close dialog
-                        if (mounted) {
-                          Navigator.of(context).pop(); // Close register screen
-                        }
-                      },
-                      child: const Text('انتقال لتسجيل الدخول', style: TextStyle(color: AppTheme.primaryBlue, fontWeight: FontWeight.bold)),
-                    ),
-                  ],
-                );
-              },
-            );
-          }
+          // الانتقال مباشرة إلى التطبيق بحساب اللاعب الجديد
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const RootScreen()),
+            (route) => false,
+          );
         } else {
           showDialog(
             context: context,
@@ -137,12 +117,49 @@ class _RegisterScreenState extends State<RegisterScreen> {
     } catch (e) {
       if (mounted) {
         setState(() => _isLoading = false);
+
+        // إذا كان الحساب قد أُنشئ بالفعل في Firebase
+        if (AuthService().currentUser != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('تم إنشاء الحساب بنجاح! مرحباً بك في سودان إي سبورت 🎉'),
+              backgroundColor: AppTheme.primaryBlue,
+            ),
+          );
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const RootScreen()),
+            (route) => false,
+          );
+          return;
+        }
+
+        String errorMessage = 'حدث خطأ أثناء إنشاء الحساب. يرجى المحاولة لاحقاً.';
+        if (e is FirebaseAuthException) {
+          switch (e.code) {
+            case 'email-already-in-use':
+              errorMessage = 'هذا البريد الإلكتروني مستخدم بالفعل بحساب آخر.';
+              break;
+            case 'weak-password':
+              errorMessage = 'كلمة المرور ضعيفة جداً. يجب أن تكون 6 خانات على الأقل.';
+              break;
+            case 'invalid-email':
+              errorMessage = 'صيغة البريد الإلكتروني غير صحيحة.';
+              break;
+            case 'network-request-failed':
+              errorMessage = 'تعذر الاتصال بالشبكة. يرجى التأكد من اتصال الإنترنت.';
+              break;
+            default:
+              errorMessage = e.message ?? errorMessage;
+          }
+        }
+
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
             backgroundColor: AppTheme.cardDark,
-            title: const Text('فشل التسجيل', style: TextStyle(color: Colors.red)),
-            content: const Text('تأكد من أن البريد الإلكتروني غير مستخدم مسبقاً وأن كلمة المرور قوية.', style: TextStyle(color: Colors.white)),
+            title: const Text('تنبيه التسجيل', style: TextStyle(color: Colors.redAccent)),
+            content: Text(errorMessage, style: const TextStyle(color: Colors.white)),
             actions: [
               TextButton(onPressed: () => Navigator.pop(context), child: const Text('حسناً', style: TextStyle(color: AppTheme.primaryBlue))),
             ],

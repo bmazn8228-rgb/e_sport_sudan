@@ -144,6 +144,7 @@ class _LoginScreenState extends State<LoginScreen> {
             // Optional: If they unchecked it and we wanted to clear it. For now, leave it alone or clear it.
           }
 
+          if (!mounted) return;
           Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(builder: (context) => const RootScreen()),

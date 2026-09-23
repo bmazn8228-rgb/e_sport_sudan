@@ -63,6 +63,11 @@ class AuthService {
       
       User? user = result.user;
       if (user != null) {
+        // Update user display name in Firebase Auth
+        try {
+          await user.updateDisplayName(displayName);
+        } catch (_) {}
+
         // Determine role based on hardcoded admin emails
         UserRole assignedRole = UserRole.player;
         final lowerEmail = email.toLowerCase();
@@ -88,8 +93,12 @@ class AuthService {
           role: assignedRole,
         );
         
-        // Save to Firestore
-        await _firestoreService.saveUser(newUser);
+        // Save to Firestore with graceful handling
+        try {
+          await _firestoreService.saveUser(newUser);
+        } catch (e) {
+          debugPrint('Notice: Error saving user to Firestore: $e');
+        }
         return newUser;
       }
       return null;
