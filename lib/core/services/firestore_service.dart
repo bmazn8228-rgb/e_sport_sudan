@@ -136,11 +136,13 @@ class FirestoreService {
   }
 
   // =========================================================================
-  // 6. Leaderboards (التصنيفات)
+  // 6. Leaderboards (التصنيفات والفرق)
   // =========================================================================
   Future<String> createTeam(Map<String, dynamic> teamData, String creatorUid) async {
     final docRef = await _db.collection('teams').add(teamData);
-    await _db.collection('users').doc(creatorUid).update({'teamId': docRef.id});
+    await _db.collection('users').doc(creatorUid).set({
+      'teamId': docRef.id,
+    }, SetOptions(merge: true));
     return docRef.id;
   }
 
@@ -149,8 +151,10 @@ class FirestoreService {
     await _db.collection('teams').doc(teamId).update({
       'roster': FieldValue.arrayUnion([playerRosterData])
     });
-    // Update user doc
-    await _db.collection('users').doc(uid).update({'teamId': teamId});
+    // Update user doc safely
+    await _db.collection('users').doc(uid).set({
+      'teamId': teamId,
+    }, SetOptions(merge: true));
   }
 
   Future<void> leaveTeam(String teamId, String uid, Map<String, dynamic> playerRosterData) async {
@@ -158,8 +162,10 @@ class FirestoreService {
     await _db.collection('teams').doc(teamId).update({
       'roster': FieldValue.arrayRemove([playerRosterData])
     });
-    // Update user doc
-    await _db.collection('users').doc(uid).update({'teamId': FieldValue.delete()});
+    // Update user doc safely
+    await _db.collection('users').doc(uid).set({
+      'teamId': FieldValue.delete(),
+    }, SetOptions(merge: true));
   }
 
   Future<void> registerTeam(Map<String, dynamic> teamData) async {

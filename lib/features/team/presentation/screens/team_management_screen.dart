@@ -26,21 +26,50 @@ class _TeamManagementScreenState extends State<TeamManagementScreen> {
   }
 
   Future<void> _loadData() async {
-    if (_userId.isEmpty) return;
+    final authUser = FirebaseAuth.instance.currentUser;
+    if (authUser == null) {
+      if (mounted) setState(() => _isLoading = false);
+      return;
+    }
+
     try {
-      final user = await _firestoreService.getUser(_userId);
-      if (user != null && user.teamId != null && user.teamId!.isNotEmpty) {
+      UserModel? user = await _firestoreService.getUser(authUser.uid);
+      if (user == null) {
+        final fallbackName = (authUser.displayName != null && authUser.displayName!.trim().isNotEmpty)
+            ? authUser.displayName!.trim()
+            : (authUser.email != null && authUser.email!.isNotEmpty)
+                ? authUser.email!.split('@').first
+                : 'لاعب إلكتروني';
+
+        user = UserModel(
+          uid: authUser.uid,
+          email: authUser.email ?? '',
+          displayName: fallbackName,
+          phone: '',
+          role: UserRole.player,
+        );
+        try {
+          await _firestoreService.saveUser(user);
+        } catch (_) {}
+      }
+
+      if (user.teamId != null && user.teamId!.isNotEmpty) {
         final team = await _firestoreService.getTeam(user.teamId!);
-        setState(() {
-          _currentUser = user;
-          _teamData = team;
-          _isLoading = false;
-        });
+        if (mounted) {
+          setState(() {
+            _currentUser = user;
+            _teamData = team;
+            _isLoading = false;
+          });
+        }
       } else {
-        setState(() {
-          _currentUser = user;
-          _isLoading = false;
-        });
+        if (mounted) {
+          setState(() {
+            _currentUser = user;
+            _teamData = null;
+            _isLoading = false;
+          });
+        }
       }
     } catch (e) {
       if (mounted) setState(() => _isLoading = false);
@@ -52,6 +81,14 @@ class _TeamManagementScreenState extends State<TeamManagementScreen> {
     final gameController = TextEditingController();
     final formKey = GlobalKey<FormState>();
     bool isCreating = false;
+
+    final authUser = FirebaseAuth.instance.currentUser;
+    if (authUser == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('يجب تسجيل الدخول أولاً لإنشاء فريق')),
+      );
+      return;
+    }
 
     await showDialog(
       context: context,
@@ -69,25 +106,25 @@ class _TeamManagementScreenState extends State<TeamManagementScreen> {
                   TextFormField(
                     controller: nameController,
                     style: const TextStyle(color: Colors.white),
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: 'اسم الفريق',
-                      labelStyle: const TextStyle(color: Colors.white54),
-                      enabledBorder: OutlineInputBorder(borderSide: const BorderSide(color: Colors.white24)),
-                      focusedBorder: const OutlineInputBorder(borderSide: BorderSide(color: AppTheme.primaryBlue)),
+                      labelStyle: TextStyle(color: Colors.white54),
+                      enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.white24)),
+                      focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: AppTheme.primaryBlue)),
                     ),
-                    validator: (v) => v == null || v.isEmpty ? 'مطلوب' : null,
+                    validator: (v) => v == null || v.trim().isEmpty ? 'يرجى إدخال اسم الفريق' : null,
                   ),
                   const SizedBox(height: 12),
                   TextFormField(
                     controller: gameController,
                     style: const TextStyle(color: Colors.white),
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: 'اللعبة (مثال: PUBG, Free Fire)',
-                      labelStyle: const TextStyle(color: Colors.white54),
-                      enabledBorder: OutlineInputBorder(borderSide: const BorderSide(color: Colors.white24)),
-                      focusedBorder: const OutlineInputBorder(borderSide: BorderSide(color: AppTheme.primaryBlue)),
+                      labelStyle: TextStyle(color: Colors.white54),
+                      enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.white24)),
+                      focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: AppTheme.primaryBlue)),
                     ),
-                    validator: (v) => v == null || v.isEmpty ? 'مطلوب' : null,
+                    validator: (v) => v == null || v.trim().isEmpty ? 'يرجى إدخال اسم اللعبة' : null,
                   ),
                 ],
               ),
@@ -102,37 +139,68 @@ class _TeamManagementScreenState extends State<TeamManagementScreen> {
                   if (formKey.currentState!.validate()) {
                     setStateDialog(() => isCreating = true);
                     try {
+                      final leaderName = (_currentUser?.displayName != null && _currentUser!.displayName.isNotEmpty)
+                          ? _currentUser!.displayName
+                          : (authUser.displayName != null && authUser.displayName!.isNotEmpty)
+                              ? authUser.displayName!
+                              : (authUser.email != null && authUser.email!.isNotEmpty)
+                                  ? authUser.email!.split('@').first
+                                  : 'كابتن الفريق';
+
+                      final leaderIgn = (_currentUser?.ign != null && _currentUser!.ign!.isNotEmpty)
+                          ? _currentUser!.ign!
+                          : '';
+
                       final leaderData = {
-                        'uid': _userId,
-                        'name': _currentUser?.displayName ?? '',
-                        'ign': _currentUser?.ign ?? '',
+                        'uid': authUser.uid,
+                        'name': leaderName,
+                        'ign': leaderIgn,
                         'role': 'كابتن',
                         'isLeader': true,
                       };
+
                       final teamData = {
                         'name': nameController.text.trim(),
                         'game': gameController.text.trim(),
                         'points': 0,
-                        'leaderId': _userId,
+                        'leaderId': authUser.uid,
                         'roster': [leaderData],
                         'createdAt': DateTime.now().toIso8601String(),
                       };
                       
-                      await _firestoreService.createTeam(teamData, _userId);
+                      await _firestoreService.createTeam(teamData, authUser.uid);
+                      
                       if (context.mounted) {
                         Navigator.pop(ctx);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('تم إنشاء الفريق بنجاح! 🏆'),
+                            backgroundColor: AppTheme.primaryBlue,
+                          ),
+                        );
                       }
-                      _loadData();
+                      await _loadData();
                     } catch (e) {
+                      debugPrint('Error creating team: $e');
                       setStateDialog(() => isCreating = false);
                       if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('حدث خطأ أثناء إنشاء الفريق')));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('حدث خطأ أثناء إنشاء الفريق. يرجى المحاولة مرة أخرى.'),
+                            backgroundColor: Colors.redAccent,
+                          ),
+                        );
                       }
                     }
                   }
                 },
-                style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryBlue),
-                child: isCreating ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)) : const Text('إنشاء', style: TextStyle(color: Colors.black)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.primaryBlue,
+                  foregroundColor: Colors.white,
+                ),
+                child: isCreating
+                    ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                    : const Text('إنشاء', style: TextStyle(fontWeight: FontWeight.bold)),
               ),
             ],
           );
