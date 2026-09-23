@@ -14,6 +14,7 @@ class EditProfileScreen extends StatefulWidget {
 class _EditProfileScreenState extends State<EditProfileScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
+  final _ignController = TextEditingController();
   final _phoneController = TextEditingController();
   bool _isLoading = true;
   bool _isSaving = false;
@@ -33,6 +34,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         setState(() {
           _userModel = userModel;
           _nameController.text = userModel.displayName;
+          _ignController.text = userModel.ign ?? '';
           _phoneController.text = userModel.phone;
           _isLoading = false;
         });
@@ -51,6 +53,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         uid: _userModel!.uid,
         email: _userModel!.email,
         displayName: _nameController.text.trim(),
+        ign: _ignController.text.trim().isNotEmpty ? _ignController.text.trim() : null,
         phone: _phoneController.text.trim(),
         photoUrl: _userModel!.photoUrl,
         gameId: _userModel!.gameId,
@@ -86,6 +89,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   void dispose() {
     _nameController.dispose();
+    _ignController.dispose();
     _phoneController.dispose();
     super.dispose();
   }
@@ -111,6 +115,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       label: 'الاسم الكامل',
                       icon: Icons.person,
                       validator: (v) => v!.isEmpty ? 'يرجى إدخال الاسم' : null,
+                    ),
+                    const SizedBox(height: 16),
+                    _buildTextField(
+                      controller: _ignController,
+                      label: 'اسم الشهرة داخل اللعبة (IGN)',
+                      icon: Icons.sports_esports,
+                      validator: (v) => null,
                     ),
                     const SizedBox(height: 16),
                     _buildTextField(

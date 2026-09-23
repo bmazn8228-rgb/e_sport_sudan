@@ -37,6 +37,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   int _wins = 0;
   String _winRate = '0%';
   int _points = 0;
+  String? _teamName;
   
   @override
   void initState() {
@@ -48,13 +49,38 @@ class _ProfileScreenState extends State<ProfileScreen> {
     try {
       final user = AuthService().currentUser;
       if (user != null) {
-        final userModel = await FirestoreService().getUser(user.uid);
+        UserModel? userModel = await FirestoreService().getUser(user.uid);
+        
+        // إذا لم يكن النموذج موجوداً في Firestore لسبب ما
+        if (userModel == null) {
+          final fallbackName = (user.displayName != null && user.displayName!.trim().isNotEmpty)
+              ? user.displayName!.trim()
+              : (user.email != null && user.email!.isNotEmpty)
+                  ? user.email!.split('@').first
+                  : 'لاعب إلكتروني';
+
+          userModel = UserModel(
+            uid: user.uid,
+            email: user.email ?? '',
+            displayName: fallbackName,
+            phone: '',
+            role: UserRole.player,
+          );
+          try {
+            await FirestoreService().saveUser(userModel);
+          } catch (_) {}
+        } else if ((user.displayName == null || user.displayName!.isEmpty) && userModel.displayName.isNotEmpty) {
+          try {
+            await user.updateDisplayName(userModel.displayName);
+          } catch (_) {}
+        }
+
         if (mounted) {
           setState(() {
             _userModel = userModel;
             _isLoading = false;
           });
-          if (userModel?.teamId != null && userModel!.teamId!.isNotEmpty) {
+          if (userModel.teamId != null && userModel.teamId!.isNotEmpty) {
             _loadTeamData(userModel.teamId!);
           }
         }
@@ -76,6 +102,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       if (teamData != null && mounted) {
         setState(() {
           _points = teamData['points'] ?? 0;
+          _teamName = teamData['name'];
         });
       }
     } catch (e) {
@@ -430,7 +457,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final user = FirebaseAuth.instance.currentUser;
     final uid = user?.uid ?? '000000';
     final shortUid = uid.length >= 6 ? uid.substring(0, 6).toUpperCase() : uid.toUpperCase();
-    final displayName = user?.displayName ?? 'لاعب إلكتروني';
+
+    // اسم اللاعب الكامل واسم المستخدم في اللعبة
+    final String fullName = (_userModel?.displayName != null && _userModel!.displayName.trim().isNotEmpty)
+        ? _userModel!.displayName.trim()
+        : (user?.displayName != null && user!.displayName!.trim().isNotEmpty)
+            ? user.displayName!.trim()
+            : (user?.email != null && user!.email!.isNotEmpty)
+                ? user.email!.split('@').first
+                : 'لاعب إلكتروني';
+
+    final String? ign = (_userModel?.ign != null && _userModel!.ign!.trim().isNotEmpty)
+        ? _userModel!.ign!.trim()
+        : null;
 
     return Container(
       width: double.infinity,
@@ -460,45 +499,85 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  GestureDetector(
-                    onTap: _isImageUploading ? null : _pickAndUploadImage,
-                    child: Container(
-                      width: 48,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        color: AppTheme.primaryBlue.withValues(alpha: 0.15),
-                        shape: BoxShape.circle,
-                        border: Border.all(color: AppTheme.primaryBlue.withValues(alpha: 0.4)),
-                        image: (_userModel?.photoUrl != null && _userModel!.photoUrl!.isNotEmpty)
-                            ? DecorationImage(
-                                image: CachedNetworkImageProvider(_userModel!.photoUrl!),
-                                fit: BoxFit.cover,
-                              )
-                            : null,
-                      ),
-                      child: _isImageUploading
-                          ? const Padding(
-                              padding: EdgeInsets.all(14.0),
-                              child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.primaryBlue),
-                            )
-                          : (_userModel?.photoUrl == null || _userModel!.photoUrl!.isEmpty)
-                              ? const Icon(Icons.person_rounded, color: AppTheme.primaryBlue, size: 24)
+              Expanded(
+                child: Row(
+                  children: [
+                    GestureDetector(
+                      onTap: _isImageUploading ? null : _pickAndUploadImage,
+                      child: Container(
+                        width: 48,
+                        height: 48,
+                        decoration: BoxDecoration(
+                          color: AppTheme.primaryBlue.withValues(alpha: 0.15),
+                          shape: BoxShape.circle,
+                          border: Border.all(color: AppTheme.primaryBlue.withValues(alpha: 0.4)),
+                          image: (_userModel?.photoUrl != null && _userModel!.photoUrl!.isNotEmpty)
+                              ? DecorationImage(
+                                  image: CachedNetworkImageProvider(_userModel!.photoUrl!),
+                                  fit: BoxFit.cover,
+                                )
                               : null,
+                        ),
+                        child: _isImageUploading
+                            ? const Padding(
+                                padding: EdgeInsets.all(14.0),
+                                child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.primaryBlue),
+                              )
+                            : (_userModel?.photoUrl == null || _userModel!.photoUrl!.isEmpty)
+                                ? const Icon(Icons.person_rounded, color: AppTheme.primaryBlue, size: 24)
+                                : null,
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(displayName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-                      const SizedBox(height: 2),
-                      const Text('فريق غير محدد', style: TextStyle(color: Colors.white54, fontSize: 11)),
-                    ],
-                  ),
-                ],
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Flexible(
+                                child: Text(
+                                  fullName,
+                                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Colors.white),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              if (ign != null) ...[
+                                const SizedBox(width: 6),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: AppTheme.primaryBlue.withValues(alpha: 0.2),
+                                    borderRadius: BorderRadius.circular(6),
+                                    border: Border.all(color: AppTheme.primaryBlue.withValues(alpha: 0.4)),
+                                  ),
+                                  child: Text(
+                                    '@$ign',
+                                    style: const TextStyle(
+                                      color: AppTheme.primaryBlue,
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            _teamName ?? 'فريق غير محدد (لاعب حر)',
+                            style: const TextStyle(color: Colors.white54, fontSize: 11),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
+              const SizedBox(width: 8),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: const [
@@ -510,7 +589,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ],
           ),
 
-          // Middle Row: Player ID & National Rating
+          // Middle Row: Player ID & In-Game Username (IGN)
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -527,10 +606,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
-                children: const [
-                  Text('التقييم الوطني', style: TextStyle(color: Colors.white38, fontSize: 10)),
-                  SizedBox(height: 3),
-                  Text('يتوفر قريباً', style: TextStyle(color: AppTheme.primaryBlue, fontWeight: FontWeight.bold, fontSize: 14)),
+                children: [
+                  const Text('اسم الشهرة / اللعبة (IGN)', style: TextStyle(color: Colors.white38, fontSize: 10)),
+                  const SizedBox(height: 3),
+                  Text(
+                    ign != null ? '@$ign' : 'غير محدد',
+                    style: TextStyle(
+                      color: ign != null ? AppTheme.primaryBlue : Colors.white54,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                    ),
+                  ),
                 ],
               ),
             ],
