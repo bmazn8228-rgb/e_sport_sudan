@@ -57,9 +57,14 @@ lib/
    flutter run
    ```
 
-## APK Download
-Download the latest Android APK from the releases page:
-[Download APK](https://github.com/bmazn8228-rgb/e_sport_sudan/releases/latest)
+## APK Download 📲
+
+You can download the app directly from GitHub Releases:
+- ⚡ **[Fast Download - Modern Phones (ARM64)](https://github.com/bmazn8228-rgb/e_sport_sudan/releases/download/latest-apk/app-arm64-v8a-release.apk)** (Recommended: **26.3 MB only**)
+- 📱 **[Lightweight Version - Older Phones (ARMv7)](https://github.com/bmazn8228-rgb/e_sport_sudan/releases/download/latest-apk/app-armeabi-v7a-release.apk)** (24.1 MB)
+- 🌐 **[Universal Version (All Devices)](https://github.com/bmazn8228-rgb/e_sport_sudan/releases/download/latest-apk/app-release.apk)** (61.1 MB)
+
+Or visit the [Releases Page](https://github.com/bmazn8228-rgb/e_sport_sudan/releases/tag/latest-apk).
 
 ## Developer
 Developed by [bmazn8228-rgb](https://github.com/bmazn8228-rgb).
