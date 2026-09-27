@@ -8,7 +8,7 @@ class BiometricService {
   BiometricService._internal();
 
   final LocalAuthentication _auth = LocalAuthentication();
-  final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
+  final FlutterSecureStorage _secureStorage = FlutterSecureStorage();
 
   static const String _emailKey = 'secure_login_email';
   static const String _passwordKey = 'secure_login_password';

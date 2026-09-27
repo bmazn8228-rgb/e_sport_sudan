@@ -52,7 +52,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     if (mounted) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const RootScreen()),
+        MaterialPageRoute(builder: (context) => RootScreen()),
       );
     }
   }
@@ -88,7 +88,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     _pages[index]['image']!,
                     fit: BoxFit.cover,
                   ),
-                  // تدرج لوني عميق متطابق مع هوية التطبيق (AppTheme.backgroundDark)
+                  // تدرج لوني عميق متطابق مع هوية التطبيق (Theme.of(context).scaffoldBackgroundColor)
                   Container(
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
@@ -99,7 +99,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         ],
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
-                        stops: const [0.0, 0.55, 0.9],
+                        stops: [0.0, 0.55, 0.9],
                       ),
                     ),
                   ),
@@ -109,7 +109,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     left: 20,
                     right: 20,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 22),
+                      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 22),
                       decoration: BoxDecoration(
                         color: theme.cardColor.withValues(alpha: 0.9),
                         borderRadius: BorderRadius.circular(20),
@@ -121,7 +121,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           BoxShadow(
                             color: Colors.black.withValues(alpha: 0.2),
                             blurRadius: 20,
-                            offset: const Offset(0, 10),
+                            offset: Offset(0, 10),
                           ),
                           BoxShadow(
                             color: AppTheme.primaryBlue.withValues(alpha: 0.1),
@@ -134,7 +134,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         children: [
                           // وسم الهوية الرياضية
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                             decoration: BoxDecoration(
                               color: AppTheme.primaryBlue.withValues(alpha: 0.15),
                               borderRadius: BorderRadius.circular(20),
@@ -145,15 +145,15 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                const Icon(
+                                Icon(
                                   Icons.sports_esports,
                                   size: 14,
                                   color: AppTheme.primaryBlue,
                                 ),
-                                const SizedBox(width: 6),
+                                SizedBox(width: 6),
                                 Text(
                                   _pages[index]['tag']!,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     color: AppTheme.primaryBlue,
                                     fontSize: 12,
                                     fontWeight: FontWeight.bold,
@@ -162,7 +162,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               ],
                             ),
                           ),
-                          const SizedBox(height: 14),
+                          SizedBox(height: 14),
                           // عنوان الصفحة
                           Text(
                             _pages[index]['title']!,
@@ -174,7 +174,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               letterSpacing: 0.5,
                             ),
                           ),
-                          const SizedBox(height: 10),
+                          SizedBox(height: 10),
                           // الوصف التوضيحي
                           Text(
                             _pages[index]['subtitle']!,
@@ -208,8 +208,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   children: List.generate(
                     _pages.length,
                     (index) => AnimatedContainer(
-                      duration: const Duration(milliseconds: 300),
-                      margin: const EdgeInsets.symmetric(horizontal: 4),
+                      duration: Duration(milliseconds: 300),
+                      margin: EdgeInsets.symmetric(horizontal: 4),
                       height: 8,
                       width: _currentPage == index ? 28 : 8,
                       decoration: BoxDecoration(
@@ -234,7 +234,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 22),
+                SizedBox(height: 22),
 
                 // يظهر زر الدخول فقط عند الوصول لآخر صورة ترحيبية
                 if (_currentPage == _pages.length - 1) ...[
@@ -245,14 +245,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       onPressed: _finishOnboarding,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppTheme.primaryBlue,
-                        foregroundColor: Colors.white,
+                        foregroundColor: Theme.of(context).colorScheme.onSurface,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14),
                         ),
                         elevation: 8,
                         shadowColor: AppTheme.primaryBlue.withValues(alpha: 0.5),
                       ),
-                      child: const Row(
+                      child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
@@ -264,7 +264,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             ),
                           ),
                           SizedBox(width: 10),
-                          Icon(Icons.login_rounded, size: 22, color: Colors.white),
+                          Icon(Icons.login_rounded, size: 22, color: Theme.of(context).colorScheme.onSurface),
                         ],
                       ),
                     ),
@@ -278,7 +278,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         OutlinedButton(
                           onPressed: () {
                             _pageController.previousPage(
-                              duration: const Duration(milliseconds: 300),
+                              duration: Duration(milliseconds: 300),
                               curve: Curves.easeInOut,
                             );
                           },
@@ -287,7 +287,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               color: theme.dividerColor.withValues(alpha: 0.2),
                             ),
                             backgroundColor: theme.cardColor,
-                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
@@ -302,32 +302,32 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           ),
                         )
                       else
-                        const SizedBox(width: 80),
+                        SizedBox(width: 80),
 
                       ElevatedButton.icon(
                         onPressed: () {
                           _pageController.nextPage(
-                            duration: const Duration(milliseconds: 300),
+                            duration: Duration(milliseconds: 300),
                             curve: Curves.easeInOut,
                           );
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppTheme.primaryBlue,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                          foregroundColor: Theme.of(context).colorScheme.onSurface,
+                          padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
                           elevation: 6,
                           shadowColor: AppTheme.primaryBlue.withValues(alpha: 0.4),
                         ),
-                        icon: const Icon(Icons.arrow_forward_rounded, size: 18, color: Colors.white),
-                        label: const Text(
+                        icon: Icon(Icons.arrow_forward_rounded, size: 18, color: Theme.of(context).colorScheme.onSurface),
+                        label: Text(
                           'التالي',
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            color: Theme.of(context).colorScheme.onSurface,
                           ),
                         ),
                       ),

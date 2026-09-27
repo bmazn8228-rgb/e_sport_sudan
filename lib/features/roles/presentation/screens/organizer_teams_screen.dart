@@ -1,10 +1,12 @@
+import 'package:e_sport_sudan/core/services/notification_service.dart';
+import 'package:e_sport_sudan/core/widgets/esport_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:e_sport_sudan/core/theme/app_theme.dart';
 import 'package:e_sport_sudan/core/services/firestore_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class OrganizerTeamsScreen extends StatefulWidget {
-  const OrganizerTeamsScreen({super.key});
+  OrganizerTeamsScreen({super.key});
 
   @override
   State<OrganizerTeamsScreen> createState() => _OrganizerTeamsScreenState();
@@ -23,8 +25,8 @@ class _OrganizerTeamsScreenState extends State<OrganizerTeamsScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: AppTheme.cardDark,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setSheetState) => Padding(
           padding: EdgeInsets.only(
@@ -37,34 +39,34 @@ class _OrganizerTeamsScreenState extends State<OrganizerTeamsScreen> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('إضافة وتسجيل فريق جديد', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 14),
+              Text('إضافة وتسجيل فريق جديد', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              SizedBox(height: 14),
               TextField(
                 controller: nameController,
-                decoration: const InputDecoration(labelText: 'اسم الفريق', border: OutlineInputBorder()),
+                decoration: InputDecoration(labelText: 'اسم الفريق', border: OutlineInputBorder()),
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: 12),
               TextField(
                 controller: leaderController,
-                decoration: const InputDecoration(labelText: 'اسم قائد الفريق (الكابتن)', border: OutlineInputBorder()),
+                decoration: InputDecoration(labelText: 'اسم قائد الفريق (الكابتن)', border: OutlineInputBorder()),
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: 12),
               DropdownButtonFormField<String>(
                 initialValue: selectedGame,
-                dropdownColor: AppTheme.cardDark,
-                decoration: const InputDecoration(labelText: 'اللعبة', border: OutlineInputBorder()),
+                dropdownColor: Theme.of(context).colorScheme.surface,
+                decoration: InputDecoration(labelText: 'اللعبة', border: OutlineInputBorder()),
                 items: games.map((g) => DropdownMenuItem(value: g, child: Text(g))).toList(),
                 onChanged: (val) => setSheetState(() => selectedGame = val!),
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 20),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryBlue, padding: const EdgeInsets.symmetric(vertical: 14)),
+                  style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryBlue, padding: EdgeInsets.symmetric(vertical: 14)),
                   onPressed: isSaving ? null : () async {
                     if (nameController.text.trim().isEmpty) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('يرجى إدخال اسم الفريق'), backgroundColor: Colors.orange),
+                        SnackBar(content: Text('يرجى إدخال اسم الفريق'), backgroundColor: Colors.orange),
                       );
                       return;
                     }
@@ -83,7 +85,7 @@ class _OrganizerTeamsScreenState extends State<OrganizerTeamsScreen> {
                       if (ctx.mounted) Navigator.pop(ctx);
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('تمت إضافة الفريق بنجاح ✅', style: TextStyle(color: Colors.black)), backgroundColor: AppTheme.primaryBlue),
+                          SnackBar(content: Text('تمت إضافة الفريق بنجاح ✅', style: TextStyle(color: Colors.black)), backgroundColor: AppTheme.primaryBlue),
                         );
                       }
                     } catch (e) {
@@ -93,7 +95,7 @@ class _OrganizerTeamsScreenState extends State<OrganizerTeamsScreen> {
                       }
                     }
                   },
-                  child: Text(isSaving ? 'جاري الحفظ...' : 'تسجيل الفريق 🛡️', style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+                  child: Text(isSaving ? 'جاري الحفظ...' : 'تسجيل الفريق 🛡️', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
                 ),
               ),
             ],
@@ -108,13 +110,13 @@ class _OrganizerTeamsScreenState extends State<OrganizerTeamsScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: AppTheme.cardDark,
-        title: const Text('تأكيد الحذف', style: TextStyle(color: Colors.white)),
-        content: Text('هل أنت متأكد من رغبتك في حذف فريق "$name"؟', style: const TextStyle(color: Colors.white70)),
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        title: Text('تأكيد الحذف', style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+        content: Text('هل أنت متأكد من رغبتك في حذف فريق "$name"؟', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7))),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('إلغاء', style: TextStyle(color: Colors.white54)),
+            child: Text('إلغاء', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54))),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
@@ -124,7 +126,7 @@ class _OrganizerTeamsScreenState extends State<OrganizerTeamsScreen> {
                 await FirestoreService().deleteTeam(id);
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
+                    SnackBar(
                       content: Text('تم حذف الفريق بنجاح ✅', style: TextStyle(color: Colors.black)),
                       backgroundColor: AppTheme.primaryBlue,
                     ),
@@ -133,15 +135,15 @@ class _OrganizerTeamsScreenState extends State<OrganizerTeamsScreen> {
               } catch (e) {
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('فشل في حذف الفريق ❌', style: TextStyle(color: Colors.white)),
+                    SnackBar(
+                      content: Text('فشل في حذف الفريق ❌', style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
                       backgroundColor: Colors.red,
                     ),
                   );
                 }
               }
             },
-            child: const Text('حذف'),
+            child: Text('حذف'),
           ),
         ],
       ),
@@ -152,31 +154,31 @@ class _OrganizerTeamsScreenState extends State<OrganizerTeamsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('الفرق المشاركة والمعتمدة', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+        title: Text('الفرق المشاركة والمعتمدة', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showAddTeamDialog(context),
         backgroundColor: AppTheme.primaryBlue,
-        child: const Icon(Icons.add, color: Colors.black),
+        child: Icon(Icons.add, color: Colors.black),
       ),
       body: Column(
         children: [
           // Filter Chips
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Row(
               children: [
                 _buildFilterChip('all', 'جميع الألعاب'),
-                const SizedBox(width: 8),
+                SizedBox(width: 8),
                 _buildFilterChip('PUBG Mobile', 'PUBG Mobile'),
-                const SizedBox(width: 8),
+                SizedBox(width: 8),
                 _buildFilterChip('EA FC 25', 'EA FC 25'),
-                const SizedBox(width: 8),
+                SizedBox(width: 8),
                 _buildFilterChip('Free Fire', 'Free Fire'),
-                const SizedBox(width: 8),
+                SizedBox(width: 8),
                 _buildFilterChip('Valorant', 'Valorant'),
               ],
             ),
@@ -186,7 +188,7 @@ class _OrganizerTeamsScreenState extends State<OrganizerTeamsScreen> {
               stream: FirestoreService().getAllTeamsStream(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator(color: AppTheme.primaryBlue));
+                  return Center(child: CircularProgressIndicator(color: AppTheme.primaryBlue));
                 }
 
                 var teams = snapshot.data ?? [];
@@ -195,28 +197,28 @@ class _OrganizerTeamsScreenState extends State<OrganizerTeamsScreen> {
                 }
 
                 if (teams.isEmpty) {
-                  return const Center(child: Text('لا توجد فرق مطابقة للعبة المحددة', style: TextStyle(color: Colors.white54, fontSize: 16)));
+                  return Center(child: Text('لا توجد فرق مطابقة للعبة المحددة', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 16)));
                 }
 
                 return ListView.builder(
-                  padding: const EdgeInsets.all(16),
+                  padding: EdgeInsets.all(16),
                   itemCount: teams.length,
                   itemBuilder: (context, index) {
                     final team = teams[index];
                     return Card(
-                      color: AppTheme.cardDark,
-                      margin: const EdgeInsets.only(bottom: 12),
+                      color: Theme.of(context).colorScheme.surface,
+                      margin: EdgeInsets.only(bottom: 12),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       child: ListTile(
-                        leading: const CircleAvatar(
+                        leading: CircleAvatar(
                           backgroundColor: AppTheme.primaryBlue,
                           child: Icon(Icons.shield, color: Colors.black),
                         ),
-                        title: Text(team['name'] ?? 'فريق مجهول', style: const TextStyle(fontWeight: FontWeight.bold)),
-                        subtitle: Text('اللعبة: ${team['game'] ?? 'غير محدد'}\nالنقاط: ${team['points'] ?? 0} • الانتصارات: ${team['wins'] ?? 0}', style: const TextStyle(color: Colors.white54, fontSize: 12)),
+                        title: Text(team['name'] ?? 'فريق مجهول', style: TextStyle(fontWeight: FontWeight.bold)),
+                        subtitle: Text('اللعبة: ${team['game'] ?? 'غير محدد'}\nالنقاط: ${team['points'] ?? 0} • الانتصارات: ${team['wins'] ?? 0}', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 12)),
                         isThreeLine: true,
                         trailing: IconButton(
-                          icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
+                          icon: Icon(Icons.delete_outline, color: Colors.redAccent),
                           tooltip: 'حذف الفريق',
                           onPressed: () => _confirmDeleteTeam(context, team['id'], team['name'] ?? 'الفريق'),
                         ),
@@ -235,10 +237,10 @@ class _OrganizerTeamsScreenState extends State<OrganizerTeamsScreen> {
   Widget _buildFilterChip(String value, String label) {
     final isSelected = _selectedGame == value;
     return ChoiceChip(
-      label: Text(label, style: TextStyle(color: isSelected ? Colors.black : Colors.white, fontSize: 12)),
+      label: Text(label, style: TextStyle(color: isSelected ? Colors.black : Theme.of(context).colorScheme.onSurface, fontSize: 12)),
       selected: isSelected,
       selectedColor: AppTheme.primaryBlue,
-      backgroundColor: AppTheme.cardDark,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       onSelected: (_) => setState(() => _selectedGame = value),
     );
   }

@@ -67,8 +67,8 @@ class NotificationService {
           message: message.notification!.body ?? '',
           type: type,
         ),
-        displayDuration: const Duration(seconds: 4),
-        animationDuration: const Duration(milliseconds: 500),
+        displayDuration: Duration(seconds: 4),
+        animationDuration: Duration(milliseconds: 500),
       );
     }
   }
@@ -109,7 +109,7 @@ class NotificationService {
         message: message,
         type: type,
       ),
-      displayDuration: const Duration(seconds: 4),
+      displayDuration: Duration(seconds: 4),
     );
   }
 }

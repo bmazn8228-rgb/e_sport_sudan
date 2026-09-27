@@ -133,7 +133,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return const Scaffold(
+      return Scaffold(
         body: Center(
           child: CircularProgressIndicator(color: AppTheme.primaryBlue),
         ),
@@ -146,24 +146,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: const Text(
+        title: Text(
           'الملف الشخصي والبطاقة التنافسية',
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
         ),
         actions: [
           Container(
-            margin: const EdgeInsets.only(left: 8),
+            margin: EdgeInsets.only(left: 8),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.06),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.06),
               borderRadius: BorderRadius.circular(12),
             ),
             child: IconButton(
-              icon: const Icon(Icons.settings_rounded, size: 20),
+              icon: Icon(Icons.settings_rounded, size: 20),
               onPressed: () async {
                 HapticFeedback.lightImpact();
                 await Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const SettingsScreen()),
+                  MaterialPageRoute(builder: (context) => SettingsScreen()),
                 );
                 if (mounted) {
                   _loadUser();
@@ -172,28 +172,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
           Container(
-            margin: const EdgeInsets.only(left: 12),
+            margin: EdgeInsets.only(left: 12),
             decoration: BoxDecoration(
               color: Colors.redAccent.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: IconButton(
-              icon: const Icon(Icons.logout_rounded, color: Colors.redAccent, size: 20),
+              icon: Icon(Icons.logout_rounded, color: Colors.redAccent, size: 20),
               onPressed: () async {
                 HapticFeedback.mediumImpact();
                 final confirm = await showDialog<bool>(
                   context: context,
                   builder: (context) => AlertDialog(
-                    title: const Text('تسجيل الخروج'),
-                    content: const Text('هل أنت متأكد أنك تريد تسجيل الخروج؟'),
+                    title: Text('تسجيل الخروج'),
+                    content: Text('هل أنت متأكد أنك تريد تسجيل الخروج؟'),
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.pop(context, false),
-                        child: const Text('إلغاء'),
+                        child: Text('إلغاء'),
                       ),
                       TextButton(
                         onPressed: () => Navigator.pop(context, true),
-                        child: const Text('تسجيل الخروج', style: TextStyle(color: Colors.redAccent)),
+                        child: Text('تسجيل الخروج', style: TextStyle(color: Colors.redAccent)),
                       ),
                     ],
                   ),
@@ -205,7 +205,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 if (context.mounted) {
                   Navigator.pushAndRemoveUntil(
                     context,
-                    MaterialPageRoute(builder: (context) => const LoginScreen()),
+                    MaterialPageRoute(builder: (context) => LoginScreen()),
                     (route) => false,
                   );
                 }
@@ -215,8 +215,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ],
       ),
       body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
-        padding: const EdgeInsets.only(left: 16.0, right: 16.0, top: 8.0, bottom: 120.0),
+        physics: BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+        padding: EdgeInsets.only(left: 16.0, right: 16.0, top: 8.0, bottom: 120.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -228,7 +228,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               },
               child: TweenAnimationBuilder(
                 tween: Tween<double>(begin: 0, end: _isCardFlipped ? 180 : 0),
-                duration: const Duration(milliseconds: 500),
+                duration: Duration(milliseconds: 500),
                 curve: Curves.easeOutBack,
                 builder: (BuildContext context, double val, Widget? child) {
                   bool isFront = val < 90;
@@ -248,29 +248,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 },
               ),
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
             
             // 2. iOS-Style Stats 3-Pillar Row
             _buildStatsRow(),
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
             
             // 3. Trophy Cabinet (Badges)
             _buildTrophyCabinet(),
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
             
             // 4. Match History
             if (_userModel?.teamId != null && _userModel!.teamId!.isNotEmpty)
               _buildMatchHistory(),
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
 
             // 5. Apple Inset Group: Financial Services
             _buildSectionHeader('الخدمات المالية'),
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
             Container(
               decoration: BoxDecoration(
-                color: AppTheme.cardDark.withValues(alpha: 0.9),
+                color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.9),
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+                border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)),
               ),
               child: Column(
                 children: [
@@ -279,45 +279,45 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     subtitle: 'إدارة الرصيد، الشحن عبر بنكك، وسحب الجوائز',
                     lottieAsset: 'assets/lottie/wallet.json',
                     color: AppTheme.primaryBlue,
-                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const WalletScreen())),
+                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => WalletScreen())),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
 
             // 6. Apple Inset Group: Competitive Services
             _buildSectionHeader('الخدمات التنافسية'),
-            const SizedBox(height: 8),
+            SizedBox(height: 8),
             Container(
               decoration: BoxDecoration(
-                color: AppTheme.cardDark.withValues(alpha: 0.9),
+                color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.9),
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+                border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)),
               ),
               child: Column(
                 children: [
                   _buildPortalTile(
                     title: 'إدارة الفريق والتشكيلة',
-                    subtitle: 'يتوفر قريباً',
+                    subtitle: 'عرض فريقك ودعوة لاعبين',
                     lottieAsset: 'assets/lottie/gamepad.json',
                     color: Colors.cyanAccent,
-                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const TeamManagementScreen())),
+                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => TeamManagementScreen())),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
 
             // 7. Administrative Portals (Based on Role)
             if (role != UserRole.player) ...[
               _buildSectionHeader('بوابات إدارة النظام والصلاحيات'),
-              const SizedBox(height: 8),
+              SizedBox(height: 8),
               Container(
                 decoration: BoxDecoration(
-                  color: AppTheme.cardDark.withValues(alpha: 0.9),
+                  color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.9),
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+                  border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)),
                 ),
                 child: Column(
                   children: [
@@ -327,9 +327,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         subtitle: 'اعتماد إشعارات بنكك وفوري وإيداع الأرصدة في المحافظ',
                         icon: Icons.account_balance_rounded,
                         color: Colors.greenAccent,
-                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const DepositRequestsScreen())),
+                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => DepositRequestsScreen())),
                       ),
-                      Divider(color: Colors.white.withValues(alpha: 0.06), height: 1, indent: 64),
+                      Divider(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.06), height: 1, indent: 64),
                     ],
                     if (role == UserRole.superAdmin || role == UserRole.tournamentAdmin) ...[
                       _buildPortalTile(
@@ -337,17 +337,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         subtitle: 'إدارة المجموعات والقرعة التلقائية وتحديث البيانات',
                         icon: Icons.admin_panel_settings_rounded,
                         color: Colors.orangeAccent,
-                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const OrganizerDashboard())),
+                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => OrganizerDashboard())),
                       ),
-                      Divider(color: Colors.white.withValues(alpha: 0.06), height: 1, indent: 64),
+                      Divider(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.06), height: 1, indent: 64),
                       _buildPortalTile(
                         title: 'لوحة إدارة وإنشاء البطولات',
                         subtitle: 'إنشاء بطولات جديدة، تعديل الحالات، وحذف البطولات',
                         icon: Icons.emoji_events_rounded,
                         color: Colors.amber,
-                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const TournamentAdminDashboardScreen())),
+                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => TournamentAdminDashboardScreen())),
                       ),
-                      Divider(color: Colors.white.withValues(alpha: 0.06), height: 1, indent: 64),
+                      Divider(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.06), height: 1, indent: 64),
                     ],
                     if (role == UserRole.superAdmin || role == UserRole.referee) ...[
                       _buildPortalTile(
@@ -355,10 +355,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         subtitle: 'إدخال النتائج، إدارة البث، وتوثيق النزاهة',
                         icon: Icons.sports_rounded,
                         color: Colors.blueAccent,
-                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const RefereeDashboard())),
+                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => RefereeDashboard())),
                       ),
                       if (role == UserRole.superAdmin)
-                        Divider(color: Colors.white.withValues(alpha: 0.06), height: 1, indent: 64),
+                        Divider(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.06), height: 1, indent: 64),
                     ],
                     if (role == UserRole.superAdmin) ...[
                       _buildPortalTile(
@@ -366,21 +366,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         subtitle: 'السيادة الوطنية واعتماد الرخص والحكام والفرق',
                         icon: Icons.security_rounded,
                         color: Colors.purpleAccent,
-                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const SuperAdminDashboard())),
+                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => SuperAdminDashboard())),
                       ),
-                      Divider(color: Colors.white.withValues(alpha: 0.06), height: 1, indent: 64),
+                      Divider(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.06), height: 1, indent: 64),
                       _buildPortalTile(
                         title: 'إدارة الصلاحيات وقاعدة البيانات السحابية ☁️',
                         subtitle: 'فحص صلاحيات الأدوار وبث المباريات وتهيئة الجداول',
                         icon: Icons.cloud_sync_rounded,
                         color: AppTheme.primaryBlue,
-                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const AdminDashboardScreen())),
+                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => AdminDashboardScreen())),
                       ),
                     ],
                   ],
                 ),
               ),
-              const SizedBox(height: 24),
+              SizedBox(height: 24),
             ],
 
             // 8. Logout Action
@@ -392,16 +392,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   final confirm = await showDialog<bool>(
                     context: context,
                     builder: (context) => AlertDialog(
-                      title: const Text('تسجيل الخروج'),
-                      content: const Text('هل أنت متأكد أنك تريد تسجيل الخروج؟'),
+                      title: Text('تسجيل الخروج'),
+                      content: Text('هل أنت متأكد أنك تريد تسجيل الخروج؟'),
                       actions: [
                         TextButton(
                           onPressed: () => Navigator.pop(context, false),
-                          child: const Text('إلغاء'),
+                          child: Text('إلغاء'),
                         ),
                         TextButton(
                           onPressed: () => Navigator.pop(context, true),
-                          child: const Text('تسجيل الخروج', style: TextStyle(color: Colors.redAccent)),
+                          child: Text('تسجيل الخروج', style: TextStyle(color: Colors.redAccent)),
                         ),
                       ],
                     ),
@@ -413,21 +413,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   if (!context.mounted) return;
                   Navigator.pushAndRemoveUntil(
                     context,
-                    MaterialPageRoute(builder: (context) => const LoginScreen()),
+                    MaterialPageRoute(builder: (context) => LoginScreen()),
                     (route) => false,
                   );
                 },
-                icon: const Icon(Icons.logout_rounded, color: Colors.redAccent, size: 20),
-                label: const Text('تسجيل الخروج من الحساب', style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold, fontSize: 14)),
+                icon: Icon(Icons.logout_rounded, color: Colors.redAccent, size: 20),
+                label: Text('تسجيل الخروج من الحساب', style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold, fontSize: 14)),
                 style: OutlinedButton.styleFrom(
                   side: BorderSide(color: Colors.redAccent.withValues(alpha: 0.3)),
                   backgroundColor: Colors.redAccent.withValues(alpha: 0.06),
-                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  padding: EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                 ),
               ),
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
           ],
         ),
       ),
@@ -436,10 +436,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _buildSectionHeader(String title) {
     return Padding(
-      padding: const EdgeInsets.only(right: 4.0),
+      padding: EdgeInsets.only(right: 4.0),
       child: Text(
         title,
-        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.white70),
+        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
       ),
     );
   }
@@ -468,8 +468,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
         uid: _userModel!.uid,
         email: _userModel!.email,
         displayName: _userModel!.displayName,
-        phone: _userModel!.phone,
-        photoUrl: downloadUrl,
+        ign: _userModel!.ign,
+          phone: _userModel!.phone,
+          photoUrl: downloadUrl,
         gameId: _userModel!.gameId,
         role: _userModel!.role,
         teamId: _userModel!.teamId,
@@ -488,7 +489,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       if (mounted) {
         setState(() => _isImageUploading = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('فشل في رفع الصورة، حاول مرة أخرى.'), backgroundColor: Colors.redAccent),
+          SnackBar(content: Text('فشل في رفع الصورة، حاول مرة أخرى.'), backgroundColor: Colors.redAccent),
         );
       }
     }
@@ -515,9 +516,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Container(
       width: double.infinity,
       height: 195,
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           colors: [Color(0xFF1E293B), Color(0xFF0F172A)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -528,7 +529,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           BoxShadow(
             color: AppTheme.primaryBlue.withValues(alpha: 0.12),
             blurRadius: 20,
-            offset: const Offset(0, 8),
+            offset: Offset(0, 8),
           ),
         ],
       ),
@@ -560,16 +561,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               : null,
                         ),
                         child: _isImageUploading
-                            ? const Padding(
+                            ? Padding(
                                 padding: EdgeInsets.all(14.0),
                                 child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.primaryBlue),
                               )
                             : (_userModel?.photoUrl == null || _userModel!.photoUrl!.isEmpty)
-                                ? const Icon(Icons.person_rounded, color: AppTheme.primaryBlue, size: 24)
+                                ? Icon(Icons.person_rounded, color: AppTheme.primaryBlue, size: 24)
                                 : null,
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    SizedBox(width: 12),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -579,15 +580,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               Flexible(
                                 child: Text(
                                   fullName,
-                                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Colors.white),
+                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Theme.of(context).colorScheme.onSurface),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),
                               ),
                               if (ign != null) ...[
-                                const SizedBox(width: 6),
+                                SizedBox(width: 6),
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                  padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                   decoration: BoxDecoration(
                                     color: AppTheme.primaryBlue.withValues(alpha: 0.2),
                                     borderRadius: BorderRadius.circular(6),
@@ -595,7 +596,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   ),
                                   child: Text(
                                     '@$ign',
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       color: AppTheme.primaryBlue,
                                       fontSize: 10,
                                       fontWeight: FontWeight.bold,
@@ -605,10 +606,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ],
                             ],
                           ),
-                          const SizedBox(height: 2),
+                          SizedBox(height: 2),
                           Text(
                             _teamName ?? 'فريق غير محدد (لاعب حر)',
-                            style: const TextStyle(color: Colors.white54, fontSize: 11),
+                            style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 11),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -618,13 +619,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ],
                 ),
               ),
-              const SizedBox(width: 8),
+              SizedBox(width: 8),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
-                children: const [
+                children: [
                   Text('بطاقة الهوية الرقمية 🇸🇩', style: TextStyle(color: AppTheme.primaryBlue, fontSize: 11, fontWeight: FontWeight.bold)),
                   SizedBox(height: 2),
-                  Text('E-SPORT SUDAN', style: TextStyle(color: Colors.white38, fontSize: 9, letterSpacing: 1.2, fontWeight: FontWeight.w600)),
+                  Text('E-SPORT SUDAN', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 9, letterSpacing: 1.2, fontWeight: FontWeight.w600)),
                 ],
               ),
             ],
@@ -637,23 +638,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('معرف اللاعب (Player ID)', style: TextStyle(color: Colors.white38, fontSize: 10)),
-                  const SizedBox(height: 3),
+                  Text('معرف اللاعب (Player ID)', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 10)),
+                  SizedBox(height: 3),
                   Text(
                     'SD-$shortUid-SDN',
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14, letterSpacing: 1.1),
+                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold, fontSize: 14, letterSpacing: 1.1),
                   ),
                 ],
               ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  const Text('اسم الشهرة / اللعبة (IGN)', style: TextStyle(color: Colors.white38, fontSize: 10)),
-                  const SizedBox(height: 3),
+                  Text('اسم الشهرة / اللعبة (IGN)', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 10)),
+                  SizedBox(height: 3),
                   Text(
                     ign != null ? '@$ign' : 'غير محدد',
                     style: TextStyle(
-                      color: ign != null ? AppTheme.primaryBlue : Colors.white54,
+                      color: ign != null ? AppTheme.primaryBlue : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54),
                       fontWeight: FontWeight.bold,
                       fontSize: 13,
                     ),
@@ -665,10 +666,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
           // Bottom Hint
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: const [
-              Text('المستوى: يتوفر قريباً', style: TextStyle(color: Colors.amber, fontSize: 11, fontWeight: FontWeight.bold)),
-              Text('انقر للقلب 🔄 QR', style: TextStyle(color: Colors.white38, fontSize: 10)),
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Text('انقر للقلب 🔄 QR', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 10)),
+            ],
+          ),
+              Text('انقر للقلب 🔄 QR', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 10)),
             ],
           ),
         ],
@@ -683,20 +686,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Container(
       width: double.infinity,
       height: 195,
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           colors: [Color(0xFF0F172A), Color(0xFF1E293B)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.2), width: 1.5),
+        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2), width: 1.5),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.35),
             blurRadius: 18,
-            offset: const Offset(0, 8),
+            offset: Offset(0, 8),
           ),
         ],
       ),
@@ -706,7 +709,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             width: 120,
             height: 120,
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.onSurface,
               borderRadius: BorderRadius.circular(14),
             ),
             child: Center(
@@ -714,23 +717,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 data: uid,
                 version: QrVersions.auto,
                 size: 105.0,
-                backgroundColor: Colors.white,
+                backgroundColor: Theme.of(context).colorScheme.onSurface,
               ),
             ),
           ),
-          const SizedBox(width: 16),
+          SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
-                Text('رمز التحقق السريع', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.white)),
+              children: [
+                Text('رمز التحقق السريع', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Theme.of(context).colorScheme.onSurface)),
                 SizedBox(height: 6),
-                Text('امسح الرمز للتحقق من هوية اللاعب وصلاحية تسجيله في بطولات الاتحاد.', style: TextStyle(color: Colors.white54, fontSize: 10, height: 1.3)),
+                Text('امسح الرمز للتحقق من هوية اللاعب وصلاحية تسجيله في بطولات الاتحاد.', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 10, height: 1.3)),
                 SizedBox(height: 10),
                 Text('معتمد رسمياً 🇸🇩', style: TextStyle(color: AppTheme.primaryBlue, fontWeight: FontWeight.bold, fontSize: 11)),
                 SizedBox(height: 2),
-                Text('انقر للعودة للواجهة 🔄', style: TextStyle(color: Colors.white38, fontSize: 9)),
+                Text('انقر للعودة للواجهة 🔄', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 9)),
               ],
             ),
           ),
@@ -742,22 +745,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _buildStatsRow() {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppTheme.cardDark.withValues(alpha: 0.9),
+        color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.9),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)),
       ),
       child: Row(
         children: [
           Expanded(
             child: _buildMiniStatPillar('المباريات', '$_totalMatches', Icons.sports_esports_rounded, AppTheme.primaryBlue),
           ),
-          Container(width: 1, height: 40, color: Colors.white.withValues(alpha: 0.06)),
+          Container(width: 1, height: 40, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.06)),
           Expanded(
             child: _buildMiniStatPillar('نسبة الفوز', _winRate, Icons.trending_up_rounded, Colors.orangeAccent),
           ),
-          Container(width: 1, height: 40, color: Colors.white.withValues(alpha: 0.06)),
+          Container(width: 1, height: 40, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.06)),
           Expanded(
             child: _buildMiniStatPillar('النقاط', '$_points', Icons.military_tech_rounded, Colors.amber),
           ),
@@ -770,10 +773,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Column(
       children: [
         Icon(icon, color: color, size: 20),
-        const SizedBox(height: 4),
-        Text(value, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
-        const SizedBox(height: 2),
-        Text(title, style: const TextStyle(color: Colors.white38, fontSize: 10)),
+        SizedBox(height: 4),
+        Text(value, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+        SizedBox(height: 2),
+        Text(title, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 10)),
       ],
     );
   }
@@ -795,23 +798,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildSectionHeader('خزانة الإنجازات (Badges)'),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.symmetric(vertical: 22, horizontal: 16),
+          padding: EdgeInsets.symmetric(vertical: 22, horizontal: 16),
           decoration: BoxDecoration(
-            color: AppTheme.cardDark.withValues(alpha: 0.9),
+            color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.9),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+            border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)),
           ),
           child: badges.isEmpty
               ? Column(
                   children: [
-                    const AnimatedLottieIcon(lottieAsset: 'assets/lottie/trophy.json', width: 60, height: 60),
-                    const SizedBox(height: 8),
-                    const Text('لا توجد إنجازات بعد', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.white70)),
-                    const SizedBox(height: 4),
-                    const Text('العب مباريات وحقق انتصارات لفتح الشارات!', style: TextStyle(color: Colors.white38, fontSize: 11), textAlign: TextAlign.center),
+                    AnimatedLottieIcon(lottieAsset: 'assets/lottie/trophy.json', width: 60, height: 60),
+                    SizedBox(height: 8),
+                    Text('لا توجد إنجازات بعد', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7))),
+                    SizedBox(height: 4),
+                    Text('العب مباريات وحقق انتصارات لفتح الشارات!', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 11), textAlign: TextAlign.center),
                   ],
                 )
               : Wrap(
@@ -829,7 +832,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Column(
       children: [
         Container(
-          padding: const EdgeInsets.all(12),
+          padding: EdgeInsets.all(12),
           decoration: BoxDecoration(
             color: color.withValues(alpha: 0.1),
             shape: BoxShape.circle,
@@ -837,33 +840,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           child: AnimatedLottieIcon(lottieAsset: lottie, width: 40, height: 40),
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
         Text(title, style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.bold)),
       ],
     );
   }
 
   Widget _buildMatchHistory() {
-    if (_userModel?.teamId == null || _userModel!.teamId!.isEmpty) return const SizedBox.shrink();
+    if (_userModel?.teamId == null || _userModel!.teamId!.isEmpty) return SizedBox.shrink();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildSectionHeader('سجل المباريات (Match History)'),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.symmetric(vertical: 22, horizontal: 16),
+          padding: EdgeInsets.symmetric(vertical: 22, horizontal: 16),
           decoration: BoxDecoration(
-            color: AppTheme.cardDark.withValues(alpha: 0.9),
+            color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.9),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+            border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)),
           ),
           child: StreamBuilder<List<Map<String, dynamic>>>(
             stream: FirestoreService().getTeamMatchesStream(_userModel!.teamId!),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator(color: AppTheme.primaryBlue));
+                return Center(child: CircularProgressIndicator(color: AppTheme.primaryBlue));
               }
 
               final matches = snapshot.data ?? [];
@@ -893,18 +896,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
               if (matches.isEmpty) {
                 return Column(
                   children: [
-                    const AnimatedLottieIcon(lottieAsset: 'assets/lottie/gamepad.json', width: 60, height: 60),
-                    const SizedBox(height: 8),
-                    const Text('لا توجد مباريات', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.white70)),
-                    const SizedBox(height: 4),
-                    const Text('لم يلعب فريقك أي مباريات بعد.', style: TextStyle(color: Colors.white38, fontSize: 11), textAlign: TextAlign.center),
+                    AnimatedLottieIcon(lottieAsset: 'assets/lottie/gamepad.json', width: 60, height: 60),
+                    SizedBox(height: 8),
+                    Text('لا توجد مباريات', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7))),
+                    SizedBox(height: 4),
+                    Text('لم يلعب فريقك أي مباريات بعد.', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 11), textAlign: TextAlign.center),
                   ],
                 );
               }
 
               return ListView.builder(
                 shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
+                physics: NeverScrollableScrollPhysics(),
                 itemCount: matches.length > 5 ? 5 : matches.length,
                 itemBuilder: (context, index) {
                   final match = matches[index];
@@ -917,10 +920,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   String status = match['status'] ?? 'غير محدد';
                   
                   return Container(
-                    margin: const EdgeInsets.only(bottom: 8),
-                    padding: const EdgeInsets.all(12),
+                    margin: EdgeInsets.only(bottom: 8),
+                    padding: EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.04),
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.04),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Row(
@@ -929,20 +932,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         Row(
                           children: [
                             Container(
-                              padding: const EdgeInsets.all(6),
+                              padding: EdgeInsets.all(6),
                               decoration: BoxDecoration(
                                 color: isWinner ? AppTheme.primaryBlue.withValues(alpha: 0.2) : Colors.red.withValues(alpha: 0.2),
                                 shape: BoxShape.circle,
                               ),
                               child: Icon(isWinner ? Icons.emoji_events : Icons.close, color: isWinner ? AppTheme.primaryBlue : Colors.red, size: 16),
                             ),
-                            const SizedBox(width: 12),
+                            SizedBox(width: 12),
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('ضد $opponent', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                                const SizedBox(height: 2),
-                                Text(status, style: const TextStyle(color: Colors.white54, fontSize: 11)),
+                                Text('ضد $opponent', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                                SizedBox(height: 2),
+                                Text(status, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 11)),
                               ],
                             ),
                           ],
@@ -951,7 +954,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           '$myScore - $opponentScore',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            color: isWinner ? AppTheme.primaryBlue : Colors.white,
+                            color: isWinner ? AppTheme.primaryBlue : Theme.of(context).colorScheme.onSurface,
                           ),
                         ),
                       ],
@@ -981,7 +984,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       },
       borderRadius: BorderRadius.circular(20),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         child: Row(
           children: [
             Container(
@@ -995,24 +998,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ? AnimatedLottieIcon(lottieAsset: lottieAsset, width: 32, height: 32)
                   : Icon(icon, color: color, size: 20),
             ),
-            const SizedBox(width: 14),
+            SizedBox(width: 14),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
                   ),
-                  const SizedBox(height: 2),
+                  SizedBox(height: 2),
                   Text(
                     subtitle,
-                    style: const TextStyle(color: Colors.white38, fontSize: 11),
+                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 11),
                   ),
                 ],
               ),
             ),
-            const Icon(Icons.chevron_left_rounded, size: 20, color: Colors.white30),
+            Icon(Icons.chevron_left_rounded, size: 20, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.30)),
           ],
         ),
       ),

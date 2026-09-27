@@ -38,7 +38,7 @@ class _LiveMatchScreenState extends State<LiveMatchScreen> {
       } else {
         _controller = YoutubePlayerController(
           initialVideoId: videoId,
-          flags: const YoutubePlayerFlags(
+          flags: YoutubePlayerFlags(
             isLive: true,
             autoPlay: true,
             mute: true, // Muted by default to prevent sudden noise
@@ -71,15 +71,15 @@ class _LiveMatchScreenState extends State<LiveMatchScreen> {
       if (_scrollController.hasClients) {
         _scrollController.animateTo(
           0.0,
-          duration: const Duration(milliseconds: 300),
+          duration: Duration(milliseconds: 300),
           curve: Curves.easeOut,
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('فشل في إرسال الرسالة ❌', style: TextStyle(color: Colors.white)),
+          SnackBar(
+            content: Text('فشل في إرسال الرسالة ❌', style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
             backgroundColor: Colors.red,
           ),
         );
@@ -97,37 +97,61 @@ class _LiveMatchScreenState extends State<LiveMatchScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: const Row(
+        title: Row(
           children: [
-            CircleAvatar(radius: 16, backgroundImage: NetworkImage('https://via.placeholder.com/150')),
+            CircleAvatar(radius: 16, backgroundImage: AssetImage('assets/images/app_logo.jpg'), backgroundColor: Colors.transparent),
             SizedBox(width: 8),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text('E-Sport Sudan', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                  Text('البث المباشر', style: TextStyle(fontSize: 10, color: Colors.white70)),
+                  Text('البث المباشر', style: TextStyle(fontSize: 10, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7))),
                 ],
               ),
             ),
           ],
         ),
         actions: [
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            decoration: BoxDecoration(
-              color: Colors.red,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            alignment: Alignment.center,
-            child: const Row(
-              children: [
-                Icon(Icons.circle, color: Colors.white, size: 8),
-                SizedBox(width: 4),
-                Text('مباشر الآن', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
-              ],
-            ),
+          StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
+            stream: FirestoreService().getLiveMatchStream(widget.matchId),
+            builder: (context, snapshot) {
+              final isLive = (snapshot.hasData && snapshot.data!.exists) ? (snapshot.data!.data()!['isLive'] == true) : false;
+              if (!isLive) return SizedBox.shrink();
+              return TweenAnimationBuilder<double>(
+                tween: Tween(begin: 0.4, end: 1.0),
+                duration: Duration(milliseconds: 1000),
+                curve: Curves.easeInOut,
+                builder: (context, val, child) {
+                  return Opacity(
+                    opacity: val,
+                    child: Container(
+                      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      padding: EdgeInsets.symmetric(horizontal: 12),
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.red.withValues(alpha: 0.5 * val),
+                            blurRadius: 8 * val,
+                            spreadRadius: 2 * val,
+                          )
+                        ]
+                      ),
+                      alignment: Alignment.center,
+                      child: Row(
+                        children: [
+                          Icon(Icons.circle, color: Colors.white, size: 8),
+                          SizedBox(width: 4),
+                          Text('مباشر الآن', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white)),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              );
+            }
           ),
         ],
       ),
@@ -135,20 +159,20 @@ class _LiveMatchScreenState extends State<LiveMatchScreen> {
         stream: FirestoreService().getLiveMatchStream(widget.matchId),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator(color: AppTheme.primaryBlue));
+            return Center(child: CircularProgressIndicator(color: AppTheme.primaryBlue));
           }
           if (snapshot.hasError || !snapshot.hasData || !snapshot.data!.exists) {
             return Center(
               child: Padding(
-                padding: const EdgeInsets.all(24.0),
+                padding: EdgeInsets.all(24.0),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    Icon(Icons.tv_off, color: Colors.white38, size: 64),
+                  children: [
+                    Icon(Icons.tv_off, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), size: 64),
                     SizedBox(height: 16),
-                    Text('لا يوجد بث مباشر نشط حالياً', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                    Text('لا يوجد بث مباشر نشط حالياً', style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 18, fontWeight: FontWeight.bold)),
                     SizedBox(height: 8),
-                    Text('سيبدأ البث فور قيام إدارة البطولة بنقل المباريات', style: TextStyle(color: Colors.white54, fontSize: 13), textAlign: TextAlign.center),
+                    Text('سيبدأ البث فور قيام إدارة البطولة بنقل المباريات', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 13), textAlign: TextAlign.center),
                   ],
                 ),
               ),
@@ -169,7 +193,7 @@ class _LiveMatchScreenState extends State<LiveMatchScreen> {
             children: [
               // Video Player Header Info
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 color: Colors.black45,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -177,12 +201,12 @@ class _LiveMatchScreenState extends State<LiveMatchScreen> {
                     Expanded(
                       child: Text(
                         streamTitle,
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
                         color: isLive ? Colors.red : Colors.grey,
                         borderRadius: BorderRadius.circular(12),
@@ -190,9 +214,9 @@ class _LiveMatchScreenState extends State<LiveMatchScreen> {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.circle, color: Colors.white, size: 8),
-                          const SizedBox(width: 4),
-                          Text(isLive ? 'مباشر الآن' : 'البث متوقف', style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
+                          Icon(Icons.circle, color: Theme.of(context).colorScheme.onSurface, size: 8),
+                          SizedBox(width: 4),
+                          Text(isLive ? 'مباشر الآن' : 'البث متوقف', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
                         ],
                       ),
                     ),
@@ -211,7 +235,7 @@ class _LiveMatchScreenState extends State<LiveMatchScreen> {
                         controller: _controller!,
                         showVideoProgressIndicator: true,
                         progressIndicatorColor: AppTheme.primaryBlue,
-                        progressColors: const ProgressBarColors(
+                        progressColors: ProgressBarColors(
                           playedColor: AppTheme.primaryBlue,
                           handleColor: AppTheme.primaryBlue,
                         ),
@@ -220,10 +244,10 @@ class _LiveMatchScreenState extends State<LiveMatchScreen> {
                       Center(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
-                            Icon(Icons.live_tv, color: Colors.white38, size: 48),
+                          children: [
+                            Icon(Icons.live_tv, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), size: 48),
                             SizedBox(height: 8),
-                            Text('البث المباشر متوقف حالياً أو لم يبدأ بعد', style: TextStyle(color: Colors.white70, fontSize: 14)),
+                            Text('البث المباشر متوقف حالياً أو لم يبدأ بعد', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 14)),
                           ],
                         ),
                       ),
@@ -232,20 +256,20 @@ class _LiveMatchScreenState extends State<LiveMatchScreen> {
                         top: 16,
                         right: 16,
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                           color: Colors.red,
-                          child: const Text('YouTube Live', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                          child: Text('YouTube Live', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                         ),
                       ),
                   ],
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: EdgeInsets.all(16.0),
                 child: Container(
-                  padding: const EdgeInsets.all(16),
+                  padding: EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: AppTheme.cardDark,
+                    color: Theme.of(context).colorScheme.surface,
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Row(
@@ -255,12 +279,12 @@ class _LiveMatchScreenState extends State<LiveMatchScreen> {
                       Column(
                         children: [
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                             decoration: BoxDecoration(color: Colors.black, borderRadius: BorderRadius.circular(8)),
-                            child: Text('${matchData['scoreA']} - ${matchData['scoreB']}', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.orange)),
+                            child: Text('${matchData['scoreA']} - ${matchData['scoreB']}', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.orange)),
                           ),
-                          const SizedBox(height: 8),
-                          Text(matchData['time'] ?? 'منتظر', style: const TextStyle(color: AppTheme.primaryBlue, fontSize: 12)),
+                          SizedBox(height: 8),
+                          Text(matchData['time'] ?? 'منتظر', style: TextStyle(color: AppTheme.primaryBlue, fontSize: 12)),
                         ],
                       ),
                       _buildTeam(matchData['teamB'] ?? 'فريق ب', 'ضيف', Icons.security),
@@ -271,21 +295,21 @@ class _LiveMatchScreenState extends State<LiveMatchScreen> {
               // Live Chat Section
               Expanded(
                 child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 16),
-                  decoration: const BoxDecoration(
-                    color: AppTheme.cardDark,
+                  margin: EdgeInsets.symmetric(horizontal: 16),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surface,
                     borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
                   ),
                   child: Column(
                     children: [
                       // Chat Header
                       Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: const BoxDecoration(
+                        padding: EdgeInsets.all(12),
+                        decoration: BoxDecoration(
                           color: Colors.black26,
                           borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
                         ),
-                        child: const Row(
+                        child: Row(
                           children: [
                             Icon(Icons.forum, color: AppTheme.primaryBlue, size: 18),
                             SizedBox(width: 8),
@@ -299,29 +323,29 @@ class _LiveMatchScreenState extends State<LiveMatchScreen> {
                           stream: FirestoreService().getMatchChatStream(widget.matchId),
                           builder: (context, chatSnapshot) {
                             if (!chatSnapshot.hasData) {
-                              return const Center(child: CircularProgressIndicator());
+                              return Center(child: CircularProgressIndicator());
                             }
                             final messages = chatSnapshot.data!.reversed.toList();
                             
                             return ListView.builder(
                               controller: _scrollController,
                               reverse: true,
-                              padding: const EdgeInsets.all(12),
+                              padding: EdgeInsets.all(12),
                               itemCount: messages.length,
                               itemBuilder: (context, index) {
                                 final msg = messages[index];
                                 final isModerator = msg['isModerator'] ?? false;
                                 return Padding(
-                                  padding: const EdgeInsets.only(bottom: 12),
+                                  padding: EdgeInsets.only(bottom: 12),
                                   child: Row(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       CircleAvatar(
                                         radius: 14,
                                         backgroundColor: AppTheme.primaryBlue.withOpacity(0.2),
-                                        child: Text((msg['senderName'] ?? '?')[0].toString().toUpperCase(), style: const TextStyle(color: AppTheme.primaryBlue, fontSize: 12)),
+                                        child: Text((msg['senderName'] ?? '?')[0].toString().toUpperCase(), style: TextStyle(color: AppTheme.primaryBlue, fontSize: 12)),
                                       ),
-                                      const SizedBox(width: 10),
+                                      SizedBox(width: 10),
                                       Expanded(
                                         child: Column(
                                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -337,13 +361,13 @@ class _LiveMatchScreenState extends State<LiveMatchScreen> {
                                                   )
                                                 ),
                                                 if (isModerator) ...[
-                                                  const SizedBox(width: 4),
-                                                  const Icon(Icons.verified, color: AppTheme.primaryBlue, size: 12),
+                                                  SizedBox(width: 4),
+                                                  Icon(Icons.verified, color: AppTheme.primaryBlue, size: 12),
                                                 ],
                                               ],
                                             ),
-                                            const SizedBox(height: 4),
-                                            Text(msg['message'] ?? '', style: const TextStyle(fontSize: 13)),
+                                            SizedBox(height: 4),
+                                            Text(msg['message'] ?? '', style: TextStyle(fontSize: 13)),
                                           ],
                                         ),
                                       ),
@@ -357,45 +381,45 @@ class _LiveMatchScreenState extends State<LiveMatchScreen> {
                       ),
                       // Chat Input Area
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                        decoration: const BoxDecoration(
+                        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        decoration: BoxDecoration(
                           color: Colors.black26,
-                          border: Border(top: BorderSide(color: Colors.white12)),
+                          border: Border(top: BorderSide(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12))),
                         ),
                         child: Row(
                           children: [
                             Expanded(
                               child: TextField(
                                 controller: _chatController,
-                                style: const TextStyle(fontSize: 13),
+                                style: TextStyle(fontSize: 13),
                                 onSubmitted: (_) => _sendMessage(),
                                 decoration: InputDecoration(
                                   hintText: 'اكتب رسالة...',
-                                  hintStyle: const TextStyle(fontSize: 13, color: Colors.white54),
+                                  hintStyle: TextStyle(fontSize: 13, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54)),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(20),
                                     borderSide: BorderSide.none,
                                   ),
-                                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                                   filled: true,
-                                  fillColor: Colors.white.withOpacity(0.05),
+                                  fillColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
                                 ),
                               ),
                             ),
-                            const SizedBox(width: 8),
+                            SizedBox(width: 8),
                             Container(
-                              decoration: const BoxDecoration(
+                              decoration: BoxDecoration(
                                 color: AppTheme.primaryBlue,
                                 shape: BoxShape.circle,
                               ),
                               child: IconButton(
                                 icon: _isSending
-                                    ? const SizedBox(
+                                    ? SizedBox(
                                         width: 18,
                                         height: 18,
                                         child: CircularProgressIndicator(color: Colors.black, strokeWidth: 2),
                                       )
-                                    : const Icon(Icons.send, color: Colors.black, size: 18),
+                                    : Icon(Icons.send, color: Colors.black, size: 18),
                                 onPressed: _isSending ? null : _sendMessage,
                               ),
                             ),
@@ -416,10 +440,10 @@ class _LiveMatchScreenState extends State<LiveMatchScreen> {
   Widget _buildTeam(String name, String location, IconData icon) {
     return Column(
       children: [
-        CircleAvatar(radius: 20, backgroundColor: Colors.white12, child: Icon(icon, color: Colors.white)),
-        const SizedBox(height: 8),
-        Text(name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-        Text(location, style: const TextStyle(fontSize: 10, color: Colors.white54)),
+        CircleAvatar(radius: 20, backgroundColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12), child: Icon(icon, color: Theme.of(context).colorScheme.onSurface)),
+        SizedBox(height: 8),
+        Text(name, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+        Text(location, style: TextStyle(fontSize: 10, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54))),
       ],
     );
   }

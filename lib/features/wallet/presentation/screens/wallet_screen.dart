@@ -39,17 +39,17 @@ class _WalletScreenState extends State<WalletScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: const Text('المحفظة الإلكترونية', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text('المحفظة الإلكترونية', style: TextStyle(fontWeight: FontWeight.bold)),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Balance Card
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(24),
+              padding: EdgeInsets.all(24),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [AppTheme.primaryBlue, AppTheme.primaryRed.withValues(alpha: 0.1)],
@@ -76,17 +76,17 @@ class _WalletScreenState extends State<WalletScreen> {
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('الرصيد المتاح', style: TextStyle(color: Colors.white70, fontSize: 14)),
-                          const SizedBox(height: 8),
+                          Text('الرصيد المتاح', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 14)),
+                          SizedBox(height: 8),
                           Text(
                             '${balance.toStringAsFixed(2)} ج.س',
-                            style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold),
+                            style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 32, fontWeight: FontWeight.bold),
                           ),
                         ],
                       );
                     },
                   ),
-                  const SizedBox(height: 24),
+                  SizedBox(height: 24),
                   if (!_isAddingFunds)
                     ElevatedButton.icon(
                       onPressed: () {
@@ -94,11 +94,11 @@ class _WalletScreenState extends State<WalletScreen> {
                           _isAddingFunds = true;
                         });
                       },
-                      icon: const Icon(Icons.add, color: Colors.black),
-                      label: const Text('إضافة رصيد', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+                      icon: Icon(Icons.add, color: Colors.black),
+                      label: Text('إضافة رصيد', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        minimumSize: const Size(double.infinity, 48),
+                        backgroundColor: Theme.of(context).colorScheme.onSurface,
+                        minimumSize: Size(double.infinity, 48),
                       ),
                     ),
                 ],
@@ -107,11 +107,11 @@ class _WalletScreenState extends State<WalletScreen> {
             
             // Add Funds Form
             if (_isAddingFunds) ...[
-              const SizedBox(height: 24),
+              SizedBox(height: 24),
               Container(
-                padding: const EdgeInsets.all(16),
+                padding: EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: AppTheme.cardDark,
+                  color: Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(color: AppTheme.primaryBlue.withValues(alpha: 0.3)),
                 ),
@@ -121,9 +121,9 @@ class _WalletScreenState extends State<WalletScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text('طلب إضافة رصيد', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                        Text('طلب إضافة رصيد', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                         IconButton(
-                          icon: const Icon(Icons.close, color: Colors.white54, size: 20),
+                          icon: Icon(Icons.close, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), size: 20),
                           onPressed: () {
                             setState(() {
                               _isAddingFunds = false;
@@ -134,13 +134,13 @@ class _WalletScreenState extends State<WalletScreen> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 16),
-                    const Text('اختر طريقة التحويل', style: TextStyle(fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 8),
+                    SizedBox(height: 16),
+                    Text('اختر طريقة التحويل', style: TextStyle(fontWeight: FontWeight.bold)),
+                    SizedBox(height: 8),
                     DropdownButtonFormField<String>(
                       initialValue: _selectedPaymentMethod,
-                      dropdownColor: AppTheme.cardDark,
-                      decoration: const InputDecoration(
+                      dropdownColor: Theme.of(context).colorScheme.surface,
+                      decoration: InputDecoration(
                         prefixIcon: Icon(Icons.account_balance),
                       ),
                       items: ['بنكك (Bankak - بنك الخرطوم)', 'فوري (Fawry - بنك فيصل)', 'موبايل كاش', 'أخرى']
@@ -153,26 +153,26 @@ class _WalletScreenState extends State<WalletScreen> {
                         if (value != null) setState(() => _selectedPaymentMethod = value);
                       },
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: 16),
                     TextField(
                       controller: _amountController,
                       keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         hintText: 'أدخل قيمة الرصيد (ج.س)',
                         prefixIcon: Icon(Icons.attach_money),
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: 16),
                     TextField(
                       controller: _transactionIdController,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         hintText: 'أدخل رقم المعاملة',
                         prefixIcon: Icon(Icons.receipt_long),
                       ),
                     ),
-                    const SizedBox(height: 16),
-                    const Text('إرفاق صورة الإشعار (مطلوب)', style: TextStyle(fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 8),
+                    SizedBox(height: 16),
+                    Text('إرفاق صورة الإشعار (مطلوب)', style: TextStyle(fontWeight: FontWeight.bold)),
+                    SizedBox(height: 8),
                     InkWell(
                       onTap: () async {
                         final picker = ImagePicker();
@@ -185,12 +185,12 @@ class _WalletScreenState extends State<WalletScreen> {
                         }
                       },
                       child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                        padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.05),
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                            color: _receiptFileName != null ? AppTheme.primaryBlue : Colors.white24,
+                            color: _receiptFileName != null ? AppTheme.primaryBlue : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.24),
                             style: BorderStyle.solid,
                             width: 1.5,
                           ),
@@ -200,14 +200,14 @@ class _WalletScreenState extends State<WalletScreen> {
                           children: [
                             Icon(
                               _receiptFileName != null ? Icons.check_circle : Icons.upload_file,
-                              color: _receiptFileName != null ? AppTheme.primaryBlue : Colors.white70,
+                              color: _receiptFileName != null ? AppTheme.primaryBlue : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                             ),
-                            const SizedBox(width: 12),
+                            SizedBox(width: 12),
                             Expanded(
                               child: Text(
                                 _receiptFileName ?? 'اضغط هنا لرفع صورة إشعار التحويل',
                                 style: TextStyle(
-                                  color: _receiptFileName != null ? AppTheme.primaryBlue : Colors.white70,
+                                  color: _receiptFileName != null ? AppTheme.primaryBlue : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                                   fontWeight: _receiptFileName != null ? FontWeight.bold : FontWeight.normal,
                                 ),
                                 overflow: TextOverflow.ellipsis,
@@ -217,13 +217,13 @@ class _WalletScreenState extends State<WalletScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 24),
+                    SizedBox(height: 24),
                     ElevatedButton(
                       onPressed: _isUploadingReceipt ? null : () async {
                         final amount = double.tryParse(_amountController.text.trim()) ?? 0.0;
                         if (amount <= 0 || _transactionIdController.text.trim().isEmpty || _receiptFile == null) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
+                            SnackBar(
                               content: Text('الرجاء إدخال المبلغ ورقم المعاملة وإرفاق صورة الإشعار أولاً ⚠️'),
                               backgroundColor: Colors.red,
                             ),
@@ -254,7 +254,7 @@ class _WalletScreenState extends State<WalletScreen> {
                           
                           if (!mounted) return;
                           messenger.showSnackBar(
-                            const SnackBar(
+                            SnackBar(
                               content: Text('تم إرسال طلب شحن الرصيد للمراجعة بنجاح ✅', style: TextStyle(color: Colors.black)),
                               backgroundColor: AppTheme.primaryBlue,
                             ),
@@ -281,39 +281,39 @@ class _WalletScreenState extends State<WalletScreen> {
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppTheme.primaryBlue,
-                        minimumSize: const Size(double.infinity, 50),
+                        minimumSize: Size(double.infinity, 50),
                       ),
                       child: _isUploadingReceipt
-                          ? const CircularProgressIndicator(color: Colors.black)
-                          : const Text('تأكيد وإرسال الطلب', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16)),
+                          ? CircularProgressIndicator(color: Colors.black)
+                          : Text('تأكيد وإرسال الطلب', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 16)),
                     ),
                   ],
                 ),
               ),
             ],
 
-            const SizedBox(height: 32),
+            SizedBox(height: 32),
             
-            const Text('سجل العمليات', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 16),
+            Text('سجل العمليات', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            SizedBox(height: 16),
             
             // Transactions List
             StreamBuilder<List<Map<String, dynamic>>>(
               stream: _firestoreService.getTransactionsStream(_userId),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator(color: AppTheme.primaryBlue));
+                  return Center(child: CircularProgressIndicator(color: AppTheme.primaryBlue));
                 }
                 
                 final txs = snapshot.data ?? [];
                 
                 if (txs.isEmpty) {
-                  return const Center(
+                  return Center(
                     child: Padding(
                       padding: EdgeInsets.all(32.0),
                       child: Text(
                         'لا توجد عمليات سابقة',
-                        style: TextStyle(color: Colors.white54, fontSize: 16),
+                        style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 16),
                       ),
                     ),
                   );
@@ -321,7 +321,7 @@ class _WalletScreenState extends State<WalletScreen> {
 
                 return ListView.builder(
                   shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
+                  physics: NeverScrollableScrollPhysics(),
                   itemCount: txs.length,
                   itemBuilder: (context, index) {
                     final tx = txs[index];
@@ -336,7 +336,7 @@ class _WalletScreenState extends State<WalletScreen> {
                     }
                     
                     String statusText = '';
-                    Color statusColor = Colors.white54;
+                    Color statusColor = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54);
                     if (tx['status'] == 'pending') {
                       statusText = ' (قيد المراجعة)';
                       statusColor = Colors.orangeAccent;
@@ -349,36 +349,36 @@ class _WalletScreenState extends State<WalletScreen> {
                     }
 
                     return Container(
-                      margin: const EdgeInsets.only(bottom: 12),
-                      padding: const EdgeInsets.all(16),
+                      margin: EdgeInsets.only(bottom: 12),
+                      padding: EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: AppTheme.cardDark,
+                        color: Theme.of(context).colorScheme.surface,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(
                         children: [
                           Container(
-                            padding: const EdgeInsets.all(10),
+                            padding: EdgeInsets.all(10),
                             decoration: BoxDecoration(
                               color: isPositive ? AppTheme.primaryBlue.withValues(alpha: 0.2) : Colors.red.withValues(alpha: 0.2),
                               shape: BoxShape.circle,
                             ),
                             child: Icon(isPositive ? Icons.arrow_downward : Icons.arrow_upward, color: isPositive ? AppTheme.primaryBlue : Colors.red, size: 20),
                           ),
-                          const SizedBox(width: 16),
+                          SizedBox(width: 16),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Row(
                                   children: [
-                                    Expanded(child: Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14))),
+                                    Expanded(child: Text(title, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14))),
                                     if (statusText.isNotEmpty)
                                       Text(statusText, style: TextStyle(color: statusColor, fontSize: 11, fontWeight: FontWeight.bold)),
                                   ],
                                 ),
-                                const SizedBox(height: 4),
-                                Text(dateStr, style: const TextStyle(color: Colors.white54, fontSize: 12)),
+                                SizedBox(height: 4),
+                                Text(dateStr, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 12)),
                               ],
                             ),
                           ),

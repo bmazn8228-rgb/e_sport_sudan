@@ -66,7 +66,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   void _showComingSoon() {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
+      SnackBar(
         content: Text('هذه الميزة ستتوفر قريباً!', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
         backgroundColor: AppTheme.primaryBlue,
       ),
@@ -76,8 +76,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
-      return const Scaffold(
-        backgroundColor: AppTheme.backgroundDark,
+      return Scaffold(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         body: Center(child: CircularProgressIndicator(color: AppTheme.primaryBlue)),
       );
     }
@@ -86,11 +86,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: const Text('الإعدادات', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+        title: Text('الإعدادات', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -102,7 +102,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 subtitle: 'تغيير الاسم، الصورة، واسم اللاعب',
                 icon: Icons.edit,
                 onTap: () async {
-                  final res = await Navigator.push(context, MaterialPageRoute(builder: (_) => const EditProfileScreen()));
+                  final res = await Navigator.push(context, MaterialPageRoute(builder: (_) => EditProfileScreen()));
                   if (res == true && mounted) {
                     _loadSettings();
                   }
@@ -114,11 +114,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 subtitle: 'تغيير كلمة المرور، المصادقة الثنائية',
                 icon: Icons.security,
                 onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (_) => const SecuritySettingsScreen()));
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => SecuritySettingsScreen()));
                 },
               ),
             ]),
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
 
 
             // Notifications
@@ -169,7 +169,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 )),
               ),
             ]),
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
 
             // Wallet & Payments
             _buildSectionHeader('المحفظة والدفع', Icons.account_balance_wallet),
@@ -179,7 +179,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 subtitle: 'إدارة الحسابات البنكية (بنكك، فوري)',
                 icon: Icons.payment,
                 onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (_) => const BankAccountsScreen()));
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => BankAccountsScreen()));
                 },
               ),
               _buildDivider(),
@@ -188,11 +188,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 subtitle: 'عرض المبالغ المسحوبة والمودعة',
                 icon: Icons.history,
                 onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (_) => const FinancialTransactionsScreen()));
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => FinancialTransactionsScreen()));
                 },
               ),
             ]),
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
 
             // Privacy
             _buildSectionHeader('الخصوصية', Icons.lock),
@@ -212,7 +212,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 )),
               ),
             ]),
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
 
             // App Preferences
             _buildSectionHeader('تفضيلات التطبيق', Icons.settings_applications),
@@ -221,7 +221,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 title: 'الوضع الداكن (Dark Mode)',
                 subtitle: 'تغيير مظهر التطبيق',
                 value: _settings.isDarkMode,
-                onChanged: (val) => _updateSettings(UserSettings(
+                  onChanged: (val) => _updateSettings(UserSettings(
                   isDarkMode: val,
                   dataSaver: _settings.dataSaver,
                   tournamentNotifs: _settings.tournamentNotifs,
@@ -249,32 +249,34 @@ class _SettingsScreenState extends State<SettingsScreen> {
               _buildDivider(),
               ListTile(
                 leading: Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: EdgeInsets.all(8),
                   decoration: BoxDecoration(
                     color: AppTheme.primaryBlue.withOpacity(0.15),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Icon(Icons.language, color: AppTheme.primaryBlue, size: 22),
+                  child: Icon(Icons.language, color: AppTheme.primaryBlue, size: 22),
                 ),
-                title: const Text('لغة التطبيق', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                subtitle: Text(_settings.language, style: const TextStyle(color: Colors.white54, fontSize: 11)),
-                trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.white38),
+                title: Text('لغة التطبيق', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                subtitle: Text(_settings.language, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 11)),
+                trailing: Icon(Icons.arrow_forward_ios, size: 14, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38)),
                 onTap: () async {
-                  final String? selectedLanguage = await showDialog<String>(
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('قريباً في التحديث القادم')));
+                    return;
+                    final String? selectedLanguage = await showDialog<String>(
                     context: context,
                     builder: (BuildContext context) {
                       return AlertDialog(
                         backgroundColor: Theme.of(context).colorScheme.surface,
-                        title: const Text('اختر اللغة'),
+                        title: Text('اختر اللغة'),
                         content: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             ListTile(
-                              title: const Text('العربية'),
+                              title: Text('العربية'),
                               onTap: () => Navigator.pop(context, 'العربية'),
                             ),
                             ListTile(
-                              title: const Text('English'),
+                              title: Text('English'),
                               onTap: () => Navigator.pop(context, 'English'),
                             ),
                           ],
@@ -296,7 +298,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 },
               ),
             ]),
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
 
             // Support & About
             _buildSectionHeader('الدعم الفني والمعلومات', Icons.help_outline),
@@ -322,7 +324,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 onTap: _showComingSoon,
               ),
             ]),
-            const SizedBox(height: 24),
+            SizedBox(height: 24),
 
             // Logout Button
             OutlinedButton.icon(
@@ -331,20 +333,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 if (mounted) {
                   Navigator.pushAndRemoveUntil(
                     context,
-                    MaterialPageRoute(builder: (context) => const LoginScreen()),
+                    MaterialPageRoute(builder: (context) => LoginScreen()),
                     (route) => false,
                   );
                 }
               },
-              icon: const Icon(Icons.logout, color: Colors.red),
-              label: const Text('تسجيل الخروج', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+              icon: Icon(Icons.logout, color: Colors.red),
+              label: Text('تسجيل الخروج', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
               style: OutlinedButton.styleFrom(
-                side: const BorderSide(color: Colors.red),
-                minimumSize: const Size(double.infinity, 50),
+                side: BorderSide(color: Colors.red),
+                minimumSize: Size(double.infinity, 50),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
             ),
-            const SizedBox(height: 30),
+            SizedBox(height: 30),
           ],
         ),
       ),
@@ -353,12 +355,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Widget _buildSectionHeader(String title, IconData icon) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12, right: 4),
+      padding: EdgeInsets.only(bottom: 12, right: 4),
       child: Row(
         children: [
           Icon(icon, color: AppTheme.primaryBlue, size: 20),
-          const SizedBox(width: 8),
-          Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+          SizedBox(width: 8),
+          Text(title, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
         ],
       ),
     );
@@ -367,16 +369,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget _buildCardContainer(List<Widget> children) {
     return Container(
       decoration: BoxDecoration(
-        color: AppTheme.cardDark,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white10),
+        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.10)),
       ),
       child: Column(children: children),
     );
   }
 
   Widget _buildDivider() {
-    return const Divider(color: Colors.white10, height: 1, indent: 56);
+    return Divider(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.10), height: 1, indent: 56);
   }
 
   Widget _buildListTile({
@@ -386,18 +388,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
     required VoidCallback onTap,
   }) {
     return ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       leading: Container(
-        padding: const EdgeInsets.all(8),
+        padding: EdgeInsets.all(8),
         decoration: BoxDecoration(
           color: AppTheme.primaryBlue.withOpacity(0.15),
           borderRadius: BorderRadius.circular(10),
         ),
         child: Icon(icon, color: AppTheme.primaryBlue, size: 22),
       ),
-      title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-      subtitle: Text(subtitle, style: const TextStyle(color: Colors.white54, fontSize: 11)),
-      trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.white38),
+      title: Text(title, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+      subtitle: Text(subtitle, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 11)),
+      trailing: Icon(Icons.arrow_forward_ios, size: 14, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38)),
       onTap: onTap,
     );
   }
@@ -409,9 +411,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     required ValueChanged<bool> onChanged,
   }) {
     return SwitchListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-      subtitle: Text(subtitle, style: const TextStyle(color: Colors.white54, fontSize: 11)),
+      contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      title: Text(title, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+      subtitle: Text(subtitle, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 11)),
       value: value,
       activeThumbColor: AppTheme.primaryBlue,
       onChanged: onChanged,

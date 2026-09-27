@@ -12,18 +12,18 @@ class RefereeDashboardScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('لوحة تحكم الحكم', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text('لوحة تحكم الحكم', style: TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: Colors.transparent,
         elevation: 0,
         actions: [
           IconButton(
-            icon: const Icon(Icons.logout, color: Colors.red),
+            icon: Icon(Icons.logout, color: Colors.red),
             onPressed: () async {
               await AuthService().signOut();
               if (context.mounted) {
                 Navigator.pushAndRemoveUntil(
                   context,
-                  MaterialPageRoute(builder: (context) => const LoginScreen()),
+                  MaterialPageRoute(builder: (context) => LoginScreen()),
                   (route) => false,
                 );
               }
@@ -35,7 +35,7 @@ class RefereeDashboardScreen extends StatelessWidget {
         stream: FirestoreService().getAllMatchesStream(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return Center(child: CircularProgressIndicator());
           }
           if (snapshot.hasError) {
             return Center(child: Text('حدث خطأ: ${snapshot.error}'));
@@ -43,21 +43,21 @@ class RefereeDashboardScreen extends StatelessWidget {
 
           final matches = snapshot.data ?? [];
           if (matches.isEmpty) {
-            return const Center(child: Text('لا توجد مباريات حالياً'));
+            return Center(child: Text('لا توجد مباريات حالياً'));
           }
 
           return ListView.builder(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.all(16),
             itemCount: matches.length,
             itemBuilder: (context, index) {
               final match = matches[index];
               return Card(
-                color: AppTheme.cardDark,
-                margin: const EdgeInsets.only(bottom: 16),
+                color: Theme.of(context).colorScheme.surface,
+                margin: EdgeInsets.only(bottom: 16),
                 child: ListTile(
-                  title: Text(match['title'] ?? 'مباراة', style: const TextStyle(fontWeight: FontWeight.bold)),
+                  title: Text(match['title'] ?? 'مباراة', style: TextStyle(fontWeight: FontWeight.bold)),
                   subtitle: Text('${match['scoreA']} - ${match['scoreB']} | ${match['status']}'),
-                  trailing: const Icon(Icons.settings, color: AppTheme.primaryBlue),
+                  trailing: Icon(Icons.settings, color: AppTheme.primaryBlue),
                   onTap: () {
                     Navigator.push(
                       context,
@@ -119,11 +119,11 @@ class _MatchControlRoomState extends State<MatchControlRoom> {
         _timeController.text.trim(),
       );
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('تم تحديث النتيجة بنجاح', style: TextStyle(color: Colors.black)), backgroundColor: AppTheme.primaryBlue));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('تم تحديث النتيجة بنجاح', style: TextStyle(color: Colors.black)), backgroundColor: AppTheme.primaryBlue));
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('فشل تحديث النتيجة', style: TextStyle(color: Colors.white)), backgroundColor: Colors.red));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('فشل تحديث النتيجة', style: TextStyle(color: Theme.of(context).colorScheme.onSurface)), backgroundColor: Colors.red));
       }
     }
     setState(() => _isLoading = false);
@@ -133,7 +133,7 @@ class _MatchControlRoomState extends State<MatchControlRoom> {
     final rawInput = _youtubeController.text.trim();
     if (rawInput.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('يرجى إدخال رابط أو معرّف فيديو YouTube ⚠️'), backgroundColor: Colors.red),
+        SnackBar(content: Text('يرجى إدخال رابط أو معرّف فيديو YouTube ⚠️'), backgroundColor: Colors.red),
       );
       return;
     }
@@ -146,11 +146,11 @@ class _MatchControlRoomState extends State<MatchControlRoom> {
         videoId,
       );
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('تم تحديث رابط البث المباشر بنجاح ✅', style: TextStyle(color: Colors.black)), backgroundColor: AppTheme.primaryBlue));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('تم تحديث رابط البث المباشر بنجاح ✅', style: TextStyle(color: Colors.black)), backgroundColor: AppTheme.primaryBlue));
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('فشل تحديث رابط البث ❌', style: TextStyle(color: Colors.white)), backgroundColor: Colors.red));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('فشل تحديث رابط البث ❌', style: TextStyle(color: Theme.of(context).colorScheme.onSurface)), backgroundColor: Colors.red));
       }
     }
     setState(() => _isLoading = false);
@@ -164,39 +164,39 @@ class _MatchControlRoomState extends State<MatchControlRoom> {
         backgroundColor: Colors.transparent,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Score Controls
             Container(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: AppTheme.cardDark,
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Column(
                 children: [
-                  const Text('إدارة النتيجة', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.primaryBlue)),
-                  const SizedBox(height: 16),
+                  Text('إدارة النتيجة', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.primaryBlue)),
+                  SizedBox(height: 16),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       // Team A
                       Column(
                         children: [
-                          Text(widget.initialData['teamA'] ?? 'الفريق أ', style: const TextStyle(fontWeight: FontWeight.bold)),
+                          Text(widget.initialData['teamA'] ?? 'الفريق أ', style: TextStyle(fontWeight: FontWeight.bold)),
                           Row(
                             children: [
                               IconButton(
-                                icon: const Icon(Icons.remove_circle, color: Colors.red),
+                                icon: Icon(Icons.remove_circle, color: Colors.red),
                                 onPressed: () {
                                   if (_scoreA > 0) setState(() => _scoreA--);
                                 },
                               ),
-                              Text('$_scoreA', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                              Text('$_scoreA', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
                               IconButton(
-                                icon: const Icon(Icons.add_circle, color: Colors.green),
+                                icon: Icon(Icons.add_circle, color: Colors.green),
                                 onPressed: () {
                                   setState(() => _scoreA++);
                                 },
@@ -205,22 +205,22 @@ class _MatchControlRoomState extends State<MatchControlRoom> {
                           )
                         ],
                       ),
-                      const Text('VS', style: TextStyle(color: Colors.grey)),
+                      Text('VS', style: TextStyle(color: Colors.grey)),
                       // Team B
                       Column(
                         children: [
-                          Text(widget.initialData['teamB'] ?? 'الفريق ب', style: const TextStyle(fontWeight: FontWeight.bold)),
+                          Text(widget.initialData['teamB'] ?? 'الفريق ب', style: TextStyle(fontWeight: FontWeight.bold)),
                           Row(
                             children: [
                               IconButton(
-                                icon: const Icon(Icons.remove_circle, color: Colors.red),
+                                icon: Icon(Icons.remove_circle, color: Colors.red),
                                 onPressed: () {
                                   if (_scoreB > 0) setState(() => _scoreB--);
                                 },
                               ),
-                              Text('$_scoreB', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                              Text('$_scoreB', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
                               IconButton(
-                                icon: const Icon(Icons.add_circle, color: Colors.green),
+                                icon: Icon(Icons.add_circle, color: Colors.green),
                                 onPressed: () {
                                   setState(() => _scoreB++);
                                 },
@@ -231,56 +231,56 @@ class _MatchControlRoomState extends State<MatchControlRoom> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16),
                   TextField(
                     controller: _timeController,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: 'وقت المباراة (مثلاً 78\')',
                       border: OutlineInputBorder(),
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16),
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryBlue),
                       onPressed: _isLoading ? null : _updateScore,
-                      child: const Text('تحديث النتيجة والوقت', style: TextStyle(color: Colors.black)),
+                      child: Text('تحديث النتيجة والوقت', style: TextStyle(color: Colors.black)),
                     ),
                   ),
                 ],
               ),
             ),
 
-            const SizedBox(height: 24),
+            SizedBox(height: 24),
 
             // Video Controls
             Container(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: AppTheme.cardDark,
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('إدارة البث', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.primaryBlue)),
-                  const SizedBox(height: 16),
+                  Text('إدارة البث', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.primaryBlue)),
+                  SizedBox(height: 16),
                   TextField(
                     controller: _youtubeController,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: 'YouTube Video ID',
                       helperText: 'مثال: jfKfPfyJRdk',
                       border: OutlineInputBorder(),
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16),
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
                       onPressed: _isLoading ? null : _updateStreamUrl,
-                      child: const Text('تحديث رابط البث المباشر', style: TextStyle(color: Colors.white)),
+                      child: Text('تحديث رابط البث المباشر', style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
                     ),
                   ),
                 ],

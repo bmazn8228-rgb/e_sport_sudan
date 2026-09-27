@@ -34,14 +34,14 @@ class _BracketScreenState extends State<BracketScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
         ),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('شجرة المباريات والتصفيات', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-            Text(widget.tournamentTitle, style: const TextStyle(fontSize: 11, color: AppTheme.primaryBlue)),
+            Text('شجرة المباريات والتصفيات', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            Text(widget.tournamentTitle, style: TextStyle(fontSize: 11, color: AppTheme.primaryBlue)),
           ],
         ),
       ),
@@ -50,20 +50,20 @@ class _BracketScreenState extends State<BracketScreen> {
           // Stages Tab Selector
           Container(
             height: 50,
-            margin: const EdgeInsets.symmetric(vertical: 8),
+            margin: EdgeInsets.symmetric(vertical: 8),
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: EdgeInsets.symmetric(horizontal: 16),
               itemCount: _stages.length,
               itemBuilder: (context, index) {
                 final isSelected = _selectedStageIndex == index;
                 return Padding(
-                  padding: const EdgeInsets.only(left: 8),
+                  padding: EdgeInsets.only(left: 8),
                   child: ChoiceChip(
-                    label: Text(_stages[index], style: TextStyle(color: isSelected ? Colors.black : Colors.white, fontSize: 12)),
+                    label: Text(_stages[index], style: TextStyle(color: isSelected ? Colors.black : Theme.of(context).colorScheme.onSurface, fontSize: 12)),
                     selected: isSelected,
                     selectedColor: AppTheme.primaryBlue,
-                    backgroundColor: AppTheme.cardDark,
+                    backgroundColor: Theme.of(context).colorScheme.surface,
                     onSelected: (selected) {
                       if (selected) setState(() => _selectedStageIndex = index);
                     },
@@ -79,7 +79,7 @@ class _BracketScreenState extends State<BracketScreen> {
               stream: FirestoreService().getTournamentMatchesStream(widget.tournamentId),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator(color: AppTheme.primaryBlue));
+                  return Center(child: CircularProgressIndicator(color: AppTheme.primaryBlue));
                 }
                 
                 final matches = snapshot.data ?? [];
@@ -89,16 +89,16 @@ class _BracketScreenState extends State<BracketScreen> {
                 final stageMatches = matches.where((m) => m['stage'] == stageName).toList();
 
                 if (stageMatches.isEmpty) {
-                  return const Center(
+                  return Center(
                     child: Text(
                       'لا توجد مباريات في هذه المرحلة حالياً',
-                      style: TextStyle(color: Colors.white54, fontSize: 16),
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 16),
                     ),
                   );
                 }
 
                 return ListView.builder(
-                  padding: const EdgeInsets.all(16),
+                  padding: EdgeInsets.all(16),
                   itemCount: stageMatches.length,
                   itemBuilder: (context, index) {
                     return _buildMatchCard(stageMatches[index]);
@@ -127,12 +127,12 @@ class _BracketScreenState extends State<BracketScreen> {
     final String? winner = match['winner'];
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: AppTheme.cardDark,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isLive ? Colors.red.withOpacity(0.6) : Colors.white12,
+          color: isLive ? Colors.red.withOpacity(0.6) : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12),
           width: isLive ? 1.5 : 1,
         ),
       ),
@@ -140,24 +140,24 @@ class _BracketScreenState extends State<BracketScreen> {
         children: [
           // Match Top Info
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            padding: EdgeInsets.symmetric(horizontal: 14, vertical: 8),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
                   'مباراة #$matchId',
-                  style: const TextStyle(fontSize: 11, color: Colors.white54),
+                  style: TextStyle(fontSize: 11, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54)),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                   decoration: BoxDecoration(
-                    color: isLive ? Colors.red.withOpacity(0.2) : Colors.white10,
+                    color: isLive ? Colors.red.withOpacity(0.2) : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.10),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
                     status,
                     style: TextStyle(
-                      color: isLive ? Colors.red : Colors.white70,
+                      color: isLive ? Colors.red : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                       fontSize: 10,
                       fontWeight: FontWeight.bold,
                     ),
@@ -165,16 +165,16 @@ class _BracketScreenState extends State<BracketScreen> {
                 ),
                 Text(
                   time,
-                  style: const TextStyle(fontSize: 11, color: Colors.white54),
+                  style: TextStyle(fontSize: 11, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54)),
                 ),
               ],
             ),
           ),
-          const Divider(height: 1, color: Colors.white10),
+          Divider(height: 1, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.10)),
 
           // Teams
           Padding(
-            padding: const EdgeInsets.all(14),
+            padding: EdgeInsets.all(14),
             child: Column(
               children: [
                 _buildTeamRow(
@@ -182,7 +182,7 @@ class _BracketScreenState extends State<BracketScreen> {
                   scoreA,
                   isWinner: winner == 'teamA',
                 ),
-                const SizedBox(height: 10),
+                SizedBox(height: 10),
                 _buildTeamRow(
                   teamB,
                   scoreB,
@@ -210,26 +210,26 @@ class _BracketScreenState extends State<BracketScreen> {
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
-            const SizedBox(width: 8),
-            const Icon(Icons.shield_outlined, size: 20, color: Colors.white70),
-            const SizedBox(width: 8),
+            SizedBox(width: 8),
+            Icon(Icons.shield_outlined, size: 20, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
+            SizedBox(width: 8),
             Text(
               teamName,
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: isWinner ? FontWeight.bold : FontWeight.normal,
-                color: isWinner ? Colors.white : Colors.white70,
+                color: isWinner ? Theme.of(context).colorScheme.onSurface : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
               ),
             ),
           ],
         ),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
           decoration: BoxDecoration(
             color: isWinner ? AppTheme.primaryBlue.withOpacity(0.2) : Colors.black,
             borderRadius: BorderRadius.circular(6),
             border: Border.all(
-              color: isWinner ? AppTheme.primaryBlue : Colors.white10,
+              color: isWinner ? AppTheme.primaryBlue : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.10),
             ),
           ),
           child: Text(
@@ -237,7 +237,7 @@ class _BracketScreenState extends State<BracketScreen> {
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.bold,
-              color: isWinner ? AppTheme.primaryBlue : Colors.white,
+              color: isWinner ? AppTheme.primaryBlue : Theme.of(context).colorScheme.onSurface,
             ),
           ),
         ),

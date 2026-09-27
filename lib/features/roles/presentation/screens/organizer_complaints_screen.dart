@@ -1,36 +1,38 @@
+import 'package:e_sport_sudan/core/services/notification_service.dart';
+import 'package:e_sport_sudan/core/widgets/esport_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:e_sport_sudan/core/theme/app_theme.dart';
 import 'package:e_sport_sudan/core/services/firestore_service.dart';
 
 class OrganizerComplaintsScreen extends StatelessWidget {
-  const OrganizerComplaintsScreen({super.key});
+  OrganizerComplaintsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('الاعتراضات والشكاوى', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+        title: Text('الاعتراضات والشكاوى', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _addDummyComplaint(context),
         backgroundColor: Colors.red,
-        child: const Icon(Icons.add, color: Colors.white),
+        child: Icon(Icons.add, color: Theme.of(context).colorScheme.onSurface),
       ),
       body: StreamBuilder<List<Map<String, dynamic>>>(
         stream: FirestoreService().getComplaintsStream(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator(color: AppTheme.primaryBlue));
+            return Center(child: CircularProgressIndicator(color: AppTheme.primaryBlue));
           }
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text('لا توجد اعتراضات', style: TextStyle(color: Colors.white54, fontSize: 16)));
+            return Center(child: Text('لا توجد اعتراضات', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 16)));
           }
           
           final complaints = snapshot.data!;
           return ListView.builder(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.all(16),
             itemCount: complaints.length,
             itemBuilder: (context, index) {
               final complaint = complaints[index];
@@ -46,11 +48,11 @@ class OrganizerComplaintsScreen extends StatelessWidget {
               }
 
               return Card(
-                color: AppTheme.cardDark,
-                margin: const EdgeInsets.only(bottom: 12),
+                color: Theme.of(context).colorScheme.surface,
+                margin: EdgeInsets.only(bottom: 12),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 child: Padding(
-                  padding: const EdgeInsets.all(12),
+                  padding: EdgeInsets.all(12),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -65,23 +67,23 @@ class OrganizerComplaintsScreen extends StatelessWidget {
                                   backgroundColor: statusColor.withValues(alpha: 0.2),
                                   child: Icon(Icons.warning_amber, color: statusColor, size: 16),
                                 ),
-                                const SizedBox(width: 8),
+                                SizedBox(width: 8),
                                 Expanded(
-                                  child: Text(complaint['title'] ?? 'بدون عنوان', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                                  child: Text(complaint['title'] ?? 'بدون عنوان', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                                 ),
                               ],
                             ),
                           ),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                             decoration: BoxDecoration(color: statusColor.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(6)),
                             child: Text(statusLabel, style: TextStyle(color: statusColor, fontSize: 11, fontWeight: FontWeight.bold)),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 8),
-                      Text(complaint['description'] ?? 'لا يوجد تفاصيل', style: const TextStyle(color: Colors.white70, fontSize: 12)),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 8),
+                      Text(complaint['description'] ?? 'لا يوجد تفاصيل', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 12)),
+                      SizedBox(height: 10),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
@@ -91,17 +93,17 @@ class OrganizerComplaintsScreen extends StatelessWidget {
                                 await FirestoreService().updateComplaintStatus(complaint['id'], 'resolved');
                                 if (context.mounted) {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text('تم تعليم الشكوى كمحلولة بنجاح ✅', style: TextStyle(color: Colors.black)), backgroundColor: AppTheme.primaryBlue),
+                                    SnackBar(content: Text('تم تعليم الشكوى كمحلولة بنجاح ✅', style: TextStyle(color: Colors.black)), backgroundColor: AppTheme.primaryBlue),
                                   );
                                 }
                               },
-                              icon: const Icon(Icons.check_circle_outline, size: 16, color: Colors.green),
-                              label: const Text('حل الشكوى', style: TextStyle(color: Colors.green, fontSize: 12)),
+                              icon: Icon(Icons.check_circle_outline, size: 16, color: Colors.green),
+                              label: Text('حل الشكوى', style: TextStyle(color: Colors.green, fontSize: 12)),
                             ),
-                            const SizedBox(width: 4),
+                            SizedBox(width: 4),
                           ],
                           IconButton(
-                            icon: const Icon(Icons.delete_outline, color: Colors.redAccent, size: 18),
+                            icon: Icon(Icons.delete_outline, color: Colors.redAccent, size: 18),
                             tooltip: 'حذف الشكوى',
                             onPressed: () => _confirmDeleteComplaint(context, complaint['id'], complaint['title'] ?? 'الشكوى'),
                           ),
@@ -123,13 +125,13 @@ class OrganizerComplaintsScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: AppTheme.cardDark,
-        title: const Text('تأكيد الحذف', style: TextStyle(color: Colors.white)),
-        content: Text('هل أنت متأكد من رغبتك في حذف "$title"؟', style: const TextStyle(color: Colors.white70)),
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        title: Text('تأكيد الحذف', style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+        content: Text('هل أنت متأكد من رغبتك في حذف "$title"؟', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7))),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('إلغاء', style: TextStyle(color: Colors.white54)),
+            child: Text('إلغاء', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54))),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
@@ -139,7 +141,7 @@ class OrganizerComplaintsScreen extends StatelessWidget {
                 await FirestoreService().deleteComplaint(id);
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
+                    SnackBar(
                       content: Text('تم حذف الشكوى بنجاح ✅', style: TextStyle(color: Colors.black)),
                       backgroundColor: AppTheme.primaryBlue,
                     ),
@@ -148,15 +150,15 @@ class OrganizerComplaintsScreen extends StatelessWidget {
               } catch (e) {
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('فشل في حذف الشكوى ❌', style: TextStyle(color: Colors.white)),
+                    SnackBar(
+                      content: Text('فشل في حذف الشكوى ❌', style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
                       backgroundColor: Colors.red,
                     ),
                   );
                 }
               }
             },
-            child: const Text('حذف'),
+            child: Text('حذف'),
           ),
         ],
       ),
@@ -170,27 +172,27 @@ class OrganizerComplaintsScreen extends StatelessWidget {
         final titleController = TextEditingController();
         final descController = TextEditingController();
         return AlertDialog(
-          backgroundColor: AppTheme.cardDark,
-          title: const Text('إضافة شكوى تجريبية', style: TextStyle(color: Colors.white)),
+          backgroundColor: Theme.of(context).colorScheme.surface,
+          title: Text('إضافة شكوى تجريبية', style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: titleController,
-                decoration: const InputDecoration(labelText: 'العنوان', labelStyle: TextStyle(color: Colors.white54)),
-                style: const TextStyle(color: Colors.white),
+                decoration: InputDecoration(labelText: 'العنوان', labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54))),
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
               ),
               TextField(
                 controller: descController,
-                decoration: const InputDecoration(labelText: 'التفاصيل', labelStyle: TextStyle(color: Colors.white54)),
-                style: const TextStyle(color: Colors.white),
+                decoration: InputDecoration(labelText: 'التفاصيل', labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54))),
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
               ),
             ],
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('إلغاء', style: TextStyle(color: Colors.white54)),
+              child: Text('إلغاء', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54))),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -204,17 +206,17 @@ class OrganizerComplaintsScreen extends StatelessWidget {
                     });
                     if (context.mounted) {
                       Navigator.pop(context);
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('تم إضافة الشكوى بنجاح', style: TextStyle(color: Colors.black)), backgroundColor: AppTheme.primaryBlue));
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('تم إضافة الشكوى بنجاح', style: TextStyle(color: Colors.black)), backgroundColor: AppTheme.primaryBlue));
                     }
                   } catch (e) {
                     if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('فشل في إضافة الشكوى', style: TextStyle(color: Colors.white)), backgroundColor: Colors.red));
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('فشل في إضافة الشكوى', style: TextStyle(color: Theme.of(context).colorScheme.onSurface)), backgroundColor: Colors.red));
                     }
                   }
                 }
               },
               style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-              child: const Text('إرسال'),
+              child: Text('إرسال'),
             ),
           ],
         );

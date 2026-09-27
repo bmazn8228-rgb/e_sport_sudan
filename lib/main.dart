@@ -18,11 +18,11 @@ void main() async {
 
   // Configure Status bar and Navigation bar for all Android skins (One UI, HyperOS, HiOS, ColorOS, etc.)
   SystemChrome.setSystemUIOverlayStyle(
-    const SystemUiOverlayStyle(
+    SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
       statusBarIconBrightness: Brightness.light,
       statusBarBrightness: Brightness.dark,
-      systemNavigationBarColor: AppTheme.backgroundDark,
+      systemNavigationBarColor: const Color(0xFF0A0E17),
       systemNavigationBarIconBrightness: Brightness.light,
     ),
   );
@@ -37,7 +37,7 @@ void main() async {
     debugPrint('Firebase initialization notice: $e');
   }
 
-  runApp(const ESportSudanApp());
+  runApp(ESportSudanApp());
 }
 
 class ESportSudanApp extends StatelessWidget {
@@ -49,9 +49,9 @@ class ESportSudanApp extends StatelessWidget {
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, authSnapshot) {
         if (authSnapshot.connectionState == ConnectionState.waiting) {
-          return const MaterialApp(
+          return MaterialApp(
             home: Scaffold(
-              backgroundColor: AppTheme.backgroundDark,
+              backgroundColor: const Color(0xFF0A0E17),
               body: Center(child: CircularProgressIndicator(color: AppTheme.primaryBlue)),
             ),
           );
@@ -60,17 +60,17 @@ class ESportSudanApp extends StatelessWidget {
         final user = authSnapshot.data;
 
         return StreamBuilder<UserModel?>(
-          stream: user != null ? FirestoreService().getUserStream(user.uid) : const Stream.empty(),
+          stream: user != null ? FirestoreService().getUserStream(user.uid) : Stream.empty(),
           builder: (context, userSnapshot) {
             final userSettings = userSnapshot.data?.settings ?? UserSettings();
-            return _buildApp(userSettings);
+            return _buildApp(context, userSettings);
           },
         );
       },
     );
   }
 
-  Widget _buildApp(UserSettings settings) {
+  Widget _buildApp(BuildContext context, UserSettings settings) {
     return MaterialApp(
       title: 'E-Sport Sudan',
       navigatorKey: navigatorKey,
@@ -84,7 +84,8 @@ class ESportSudanApp extends StatelessWidget {
           ),
         );
       },
-      home: const SplashScreen(),
+      home: SplashScreen(),
     );
   }
 }
+

@@ -16,25 +16,25 @@ class FinancialTransactionsScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: const Text('سجل المعاملات المالي', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text('سجل المعاملات المالي', style: TextStyle(fontWeight: FontWeight.bold)),
         centerTitle: true,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(16.0),
         child: StreamBuilder<List<Map<String, dynamic>>>(
           stream: firestoreService.getTransactionsStream(userId),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator(color: AppTheme.primaryBlue));
+              return Center(child: CircularProgressIndicator(color: AppTheme.primaryBlue));
             }
             
             final txs = snapshot.data ?? [];
             
             if (txs.isEmpty) {
-              return const Center(
+              return Center(
                 child: Text(
                   'لا توجد عمليات سابقة',
-                  style: TextStyle(color: Colors.white54, fontSize: 16),
+                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 16),
                 ),
               );
             }
@@ -54,7 +54,7 @@ class FinancialTransactionsScreen extends StatelessWidget {
                 }
                 
                 String statusText = '';
-                Color statusColor = Colors.white54;
+                Color statusColor = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54);
                 if (tx['status'] == 'pending') {
                   statusText = ' (قيد المراجعة)';
                   statusColor = Colors.orangeAccent;
@@ -67,36 +67,36 @@ class FinancialTransactionsScreen extends StatelessWidget {
                 }
 
                 return Container(
-                  margin: const EdgeInsets.only(bottom: 12),
-                  padding: const EdgeInsets.all(16),
+                  margin: EdgeInsets.only(bottom: 12),
+                  padding: EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: AppTheme.cardDark,
+                    color: Theme.of(context).colorScheme.surface,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.all(10),
+                        padding: EdgeInsets.all(10),
                         decoration: BoxDecoration(
                           color: isPositive ? AppTheme.primaryBlue.withOpacity(0.2) : Colors.red.withOpacity(0.2),
                           shape: BoxShape.circle,
                         ),
                         child: Icon(isPositive ? Icons.arrow_downward : Icons.arrow_upward, color: isPositive ? AppTheme.primaryBlue : Colors.red, size: 20),
                       ),
-                      const SizedBox(width: 16),
+                      SizedBox(width: 16),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Row(
                               children: [
-                                Expanded(child: Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14))),
+                                Expanded(child: Text(title, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14))),
                                 if (statusText.isNotEmpty)
                                   Text(statusText, style: TextStyle(color: statusColor, fontSize: 11, fontWeight: FontWeight.bold)),
                               ],
                             ),
-                            const SizedBox(height: 4),
-                            Text(dateStr, style: const TextStyle(color: Colors.white54, fontSize: 12)),
+                            SizedBox(height: 4),
+                            Text(dateStr, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 12)),
                           ],
                         ),
                       ),

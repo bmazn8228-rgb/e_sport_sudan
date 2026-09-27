@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:e_sport_sudan/core/services/notification_service.dart';
+import 'package:e_sport_sudan/core/widgets/esport_toast.dart';
 import 'package:e_sport_sudan/core/theme/app_theme.dart';
 import 'package:e_sport_sudan/core/services/firestore_service.dart';
 
@@ -25,36 +27,15 @@ class _DepositRequestsScreenState extends State<DepositRequestsScreen> {
       }
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('خطأ: $e'), backgroundColor: Colors.red),
-        );
-      }
-    }
-  }
-
-  void _showImageDialog(BuildContext context, String imageUrl) {
-    showDialog(
-      context: context,
-      builder: (context) => Dialog(
-        backgroundColor: Colors.transparent,
-        child: Stack(
-          alignment: Alignment.topRight,
-          children: [
-            InteractiveViewer(
-              child: Image.network(
-                imageUrl,
-                fit: BoxFit.contain,
-                loadingBuilder: (context, child, loadingProgress) {
-                  if (loadingProgress == null) return child;
-                  return const Center(child: CircularProgressIndicator(color: AppTheme.primaryBlue));
+        NotificationService.showCustomToast(context, title: 'إشعار النظام', message: 'خطأ: $e', type: ToastType.success);
                 },
-                errorBuilder: (context, error, stackTrace) => const Center(
-                  child: Text('خطأ في تحميل صورة الإشعار', style: TextStyle(color: Colors.white)),
+                errorBuilder: (context, error, stackTrace) => Center(
+                  child: Text('خطأ في تحميل صورة الإشعار', style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
                 ),
               ),
             ),
             IconButton(
-              icon: const Icon(Icons.close, color: Colors.white, size: 30),
+              icon: Icon(Icons.close, color: Theme.of(context).colorScheme.onSurface, size: 30),
               onPressed: () => Navigator.pop(context),
             ),
           ],
@@ -66,10 +47,10 @@ class _DepositRequestsScreenState extends State<DepositRequestsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.backgroundDark,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text('مراجعة طلبات شحن الرصيد', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-        backgroundColor: AppTheme.cardDark,
+        title: Text('مراجعة طلبات شحن الرصيد', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+        backgroundColor: Theme.of(context).colorScheme.surface,
         elevation: 0,
       ),
       body: Column(
@@ -77,15 +58,15 @@ class _DepositRequestsScreenState extends State<DepositRequestsScreen> {
           // Filter Tabs
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             child: Row(
               children: [
                 _buildStatusChip('pending', 'قيد المراجعة ⏳'),
-                const SizedBox(width: 8),
+                SizedBox(width: 8),
                 _buildStatusChip('approved', 'المعتمدة ✅'),
-                const SizedBox(width: 8),
+                SizedBox(width: 8),
                 _buildStatusChip('rejected', 'المرفوضة ❌'),
-                const SizedBox(width: 8),
+                SizedBox(width: 8),
                 _buildStatusChip('all', 'كافة المعاملات'),
               ],
             ),
@@ -95,11 +76,11 @@ class _DepositRequestsScreenState extends State<DepositRequestsScreen> {
               stream: FirestoreService().getTransactionsByStatusStream(_selectedStatus == 'all' ? null : _selectedStatus),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator(color: AppTheme.primaryBlue));
+                  return Center(child: CircularProgressIndicator(color: AppTheme.primaryBlue));
                 }
 
                 if (snapshot.hasError) {
-                  return Center(child: Text('حدث خطأ: ${snapshot.error}', style: const TextStyle(color: Colors.red)));
+                  return Center(child: Text('حدث خطأ: ${snapshot.error}', style: TextStyle(color: Colors.red)));
                 }
 
                 final requests = snapshot.data ?? [];
@@ -112,14 +93,14 @@ class _DepositRequestsScreenState extends State<DepositRequestsScreen> {
                         Icon(
                           _selectedStatus == 'pending' ? Icons.done_all : Icons.receipt_long,
                           size: 48,
-                          color: Colors.white30,
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.30),
                         ),
-                        const SizedBox(height: 12),
+                        SizedBox(height: 12),
                         Text(
                           _selectedStatus == 'pending'
                               ? 'رائع! لا توجد طلبات إيداع معلقة حالياً'
                               : 'لا توجد طلبات مطابقة لهذا الفلتر',
-                          style: const TextStyle(color: Colors.white70, fontSize: 15),
+                          style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 15),
                         ),
                       ],
                     ),
@@ -127,7 +108,7 @@ class _DepositRequestsScreenState extends State<DepositRequestsScreen> {
                 }
 
                 return ListView.builder(
-                  padding: const EdgeInsets.all(16),
+                  padding: EdgeInsets.all(16),
                   itemCount: requests.length,
                   itemBuilder: (context, index) {
                     final data = requests[index];
@@ -150,32 +131,32 @@ class _DepositRequestsScreenState extends State<DepositRequestsScreen> {
                     }
 
                     return Card(
-                      color: AppTheme.cardDark,
-                      margin: const EdgeInsets.only(bottom: 16),
+                      color: Theme.of(context).colorScheme.surface,
+                      margin: EdgeInsets.only(bottom: 16),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                       child: Padding(
-                        padding: const EdgeInsets.all(16),
+                        padding: EdgeInsets.all(16),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text('$amount ج.س', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: AppTheme.primaryBlue)),
+                                Text('$amount ج.س', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: AppTheme.primaryBlue)),
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                                   decoration: BoxDecoration(color: statusColor.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(8)),
                                   child: Text(statusText, style: TextStyle(color: statusColor, fontSize: 12, fontWeight: FontWeight.bold)),
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 10),
-                            Text('طريقة الدفع: $bankName', style: const TextStyle(color: Colors.white70, fontSize: 13)),
-                            const SizedBox(height: 4),
-                            Text('رقم العملية / المرجع: $transactionRef', style: const TextStyle(color: Colors.white70, fontSize: 13)),
-                            const SizedBox(height: 4),
-                            Text('معرف اللاعب: $userId', style: const TextStyle(color: Colors.white38, fontSize: 11)),
-                            const SizedBox(height: 14),
+                            SizedBox(height: 10),
+                            Text('طريقة الدفع: $bankName', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 13)),
+                            SizedBox(height: 4),
+                            Text('رقم العملية / المرجع: $transactionRef', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 13)),
+                            SizedBox(height: 4),
+                            Text('معرف اللاعب: $userId', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 11)),
+                            SizedBox(height: 14),
                             if (receiptUrl.isNotEmpty && receiptUrl != 'dummy_url')
                               GestureDetector(
                                 onTap: () => _showImageDialog(context, receiptUrl),
@@ -184,45 +165,45 @@ class _DepositRequestsScreenState extends State<DepositRequestsScreen> {
                                   width: double.infinity,
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(10),
-                                    border: Border.all(color: Colors.white24),
+                                    border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.24)),
                                     image: DecorationImage(
                                       image: NetworkImage(receiptUrl),
                                       fit: BoxFit.cover,
                                     ),
                                   ),
-                                  child: const Center(
+                                  child: Center(
                                     child: CircleAvatar(
                                       backgroundColor: Colors.black54,
-                                      child: Icon(Icons.zoom_in, color: Colors.white, size: 24),
+                                      child: Icon(Icons.zoom_in, color: Theme.of(context).colorScheme.onSurface, size: 24),
                                     ),
                                   ),
                                 ),
                               ),
                             if (receiptUrl == 'dummy_url')
                               Container(
-                                padding: const EdgeInsets.all(8),
+                                padding: EdgeInsets.all(8),
                                 decoration: BoxDecoration(color: Colors.orange.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(6)),
-                                child: const Text('صورة إشعار تجريبية', style: TextStyle(color: Colors.orange, fontSize: 12)),
+                                child: Text('صورة إشعار تجريبية', style: TextStyle(color: Colors.orange, fontSize: 12)),
                               ),
                             if (status == 'pending') ...[
-                              const SizedBox(height: 16),
+                              SizedBox(height: 16),
                               Row(
                                 children: [
                                   Expanded(
                                     child: ElevatedButton.icon(
                                       onPressed: () => _updateRequestStatus(context, docId, 'approved', amount, userId),
-                                      style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryBlue, padding: const EdgeInsets.symmetric(vertical: 12)),
-                                      icon: const Icon(Icons.check, color: Colors.black, size: 18),
-                                      label: const Text('اعتماد وإيداع', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+                                      style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryBlue, padding: EdgeInsets.symmetric(vertical: 12)),
+                                      icon: Icon(Icons.check, color: Colors.black, size: 18),
+                                      label: Text('اعتماد وإيداع', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
                                     ),
                                   ),
-                                  const SizedBox(width: 12),
+                                  SizedBox(width: 12),
                                   Expanded(
                                     child: OutlinedButton.icon(
                                       onPressed: () => _updateRequestStatus(context, docId, 'rejected', amount, userId),
-                                      style: OutlinedButton.styleFrom(side: const BorderSide(color: Colors.red), padding: const EdgeInsets.symmetric(vertical: 12)),
-                                      icon: const Icon(Icons.close, color: Colors.red, size: 18),
-                                      label: const Text('رفض الطلب', style: TextStyle(color: Colors.red)),
+                                      style: OutlinedButton.styleFrom(side: BorderSide(color: Colors.red), padding: EdgeInsets.symmetric(vertical: 12)),
+                                      icon: Icon(Icons.close, color: Colors.red, size: 18),
+                                      label: Text('رفض الطلب', style: TextStyle(color: Colors.red)),
                                     ),
                                   ),
                                 ],
@@ -245,10 +226,10 @@ class _DepositRequestsScreenState extends State<DepositRequestsScreen> {
   Widget _buildStatusChip(String statusKey, String label) {
     final isSelected = _selectedStatus == statusKey;
     return ChoiceChip(
-      label: Text(label, style: TextStyle(color: isSelected ? Colors.black : Colors.white, fontSize: 12)),
+      label: Text(label, style: TextStyle(color: isSelected ? Colors.black : Theme.of(context).colorScheme.onSurface, fontSize: 12)),
       selected: isSelected,
       selectedColor: AppTheme.primaryBlue,
-      backgroundColor: AppTheme.cardDark,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       onSelected: (_) => setState(() => _selectedStatus = statusKey),
     );
   }

@@ -31,19 +31,19 @@ class _TournamentsScreenState extends State<TournamentsScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: const Text(
+        title: Text(
           'استكشف البطولات السودانية',
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
         ),
         actions: [
           Container(
-            margin: const EdgeInsets.only(left: 12),
+            margin: EdgeInsets.only(left: 12),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.06),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.06),
               borderRadius: BorderRadius.circular(12),
             ),
             child: IconButton(
-              icon: const Icon(Icons.tune_rounded, size: 20),
+              icon: Icon(Icons.tune_rounded, size: 20),
               onPressed: () {
                 HapticFeedback.lightImpact();
               },
@@ -55,17 +55,17 @@ class _TournamentsScreenState extends State<TournamentsScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            padding: EdgeInsets.symmetric(horizontal: 16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // iOS-Style Squircle Search Field
                 Container(
                   decoration: BoxDecoration(
-                    color: AppTheme.cardDark.withValues(alpha: 0.8),
+                    color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.8),
                     borderRadius: BorderRadius.circular(18),
                     border: Border.all(
-                      color: Colors.white.withValues(alpha: 0.08),
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08),
                     ),
                   ),
                   child: TextField(
@@ -77,11 +77,11 @@ class _TournamentsScreenState extends State<TournamentsScreen> {
                     },
                     decoration: InputDecoration(
                       hintText: 'ابحث عن بطولة أو تصفيات ولائية...',
-                      hintStyle: const TextStyle(color: Colors.white38, fontSize: 13),
-                      prefixIcon: const Icon(Icons.search_rounded, color: Colors.white54, size: 20),
+                      hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 13),
+                      prefixIcon: Icon(Icons.search_rounded, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), size: 20),
                       suffixIcon: _searchQuery.isNotEmpty
                           ? IconButton(
-                              icon: const Icon(Icons.close_rounded, size: 18, color: Colors.white54),
+                              icon: Icon(Icons.close_rounded, size: 18, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54)),
                               onPressed: () {
                                 _searchController.clear();
                                 setState(() => _searchQuery = '');
@@ -89,46 +89,46 @@ class _TournamentsScreenState extends State<TournamentsScreen> {
                             )
                           : null,
                       border: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                      contentPadding: EdgeInsets.symmetric(vertical: 14, horizontal: 16),
                     ),
                   ),
                 ),
-                const SizedBox(height: 14),
+                SizedBox(height: 14),
 
                 // iOS-Style Capsule Category Filter Chips
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
-                  physics: const BouncingScrollPhysics(),
+                  physics: BouncingScrollPhysics(),
                   child: Row(
                     children: ['الكل', 'PUBG Mobile', 'EA FC 25', 'Free Fire', 'Valorant'].map((game) {
                       final isSelected = _selectedGame == game;
                       return Padding(
-                        padding: const EdgeInsets.only(left: 8.0),
+                        padding: EdgeInsets.only(left: 8.0),
                         child: GestureDetector(
                           onTap: () {
                             HapticFeedback.lightImpact();
                             setState(() => _selectedGame = game);
                           },
                           child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 200),
+                            duration: Duration(milliseconds: 200),
                             curve: Curves.easeOutCubic,
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                             decoration: BoxDecoration(
                               color: isSelected
                                   ? AppTheme.primaryBlue
-                                  : AppTheme.cardDark.withValues(alpha: 0.7),
+                                  : Theme.of(context).colorScheme.surface.withValues(alpha: 0.7),
                               borderRadius: BorderRadius.circular(20),
                               border: Border.all(
                                 color: isSelected
                                     ? AppTheme.primaryBlue
-                                    : Colors.white.withValues(alpha: 0.08),
+                                    : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08),
                               ),
                               boxShadow: isSelected
                                   ? [
                                       BoxShadow(
                                         color: AppTheme.primaryBlue.withValues(alpha: 0.3),
                                         blurRadius: 10,
-                                        offset: const Offset(0, 2),
+                                        offset: Offset(0, 2),
                                       ),
                                     ]
                                   : null,
@@ -136,7 +136,7 @@ class _TournamentsScreenState extends State<TournamentsScreen> {
                             child: Text(
                               game,
                               style: TextStyle(
-                                color: isSelected ? Colors.black : Colors.white70,
+                                color: isSelected ? Colors.black : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                                 fontSize: 12,
                                 fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
                               ),
@@ -147,7 +147,7 @@ class _TournamentsScreenState extends State<TournamentsScreen> {
                     }).toList(),
                   ),
                 ),
-                const SizedBox(height: 18),
+                SizedBox(height: 18),
               ],
             ),
           ),
@@ -159,7 +159,7 @@ class _TournamentsScreenState extends State<TournamentsScreen> {
               ),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(
+                  return Center(
                     child: CircularProgressIndicator(color: AppTheme.primaryBlue),
                   );
                 }
@@ -169,14 +169,14 @@ class _TournamentsScreenState extends State<TournamentsScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text('حدث خطأ في تحميل البطولات.', style: TextStyle(color: Colors.white54)),
-                        const SizedBox(height: 16),
+                        Text('حدث خطأ في تحميل البطولات.', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54))),
+                        SizedBox(height: 16),
                         ElevatedButton.icon(
                           onPressed: () {
                             setState(() {}); // Trigger a rebuild to retry the stream
                           },
-                          icon: const Icon(Icons.refresh),
-                          label: const Text('إعادة المحاولة'),
+                          icon: Icon(Icons.refresh),
+                          label: Text('إعادة المحاولة'),
                         ),
                       ],
                     ),
@@ -199,22 +199,22 @@ class _TournamentsScreenState extends State<TournamentsScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Container(
-                          padding: const EdgeInsets.all(20),
+                          padding: EdgeInsets.all(20),
                           decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.04),
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.04),
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(Icons.emoji_events_outlined, size: 54, color: Colors.white38),
+                          child: Icon(Icons.emoji_events_outlined, size: 54, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38)),
                         ),
-                        const SizedBox(height: 16),
-                        const Text(
+                        SizedBox(height: 16),
+                        Text(
                           'لا توجد بطولات حالياً',
-                          style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Colors.white70),
+                          style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
                         ),
-                        const SizedBox(height: 6),
-                        const Text(
+                        SizedBox(height: 6),
+                        Text(
                           'سيتم عرض البطولات هنا بمجرد أن يعلن عنها المشرفون.',
-                          style: TextStyle(fontSize: 13, color: Colors.white38),
+                          style: TextStyle(fontSize: 13, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38)),
                           textAlign: TextAlign.center,
                         ),
                       ],
@@ -223,8 +223,8 @@ class _TournamentsScreenState extends State<TournamentsScreen> {
                 }
 
                 return ListView.builder(
-                  physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
-                  padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 120),
+                  physics: BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+                  padding: EdgeInsets.only(left: 16.0, right: 16.0, bottom: 120),
                   itemCount: tournaments.length,
                   itemBuilder: (context, index) {
                     final t = tournaments[index];
@@ -255,7 +255,7 @@ class _TournamentsScreenState extends State<TournamentsScreen> {
       isLive = true;
     } else if (status == 'finished') {
       statusText = 'مكتملة';
-      statusColor = Colors.white54;
+      statusColor = Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54);
     }
 
     final title = t['title'] ?? 'بطولة';
@@ -275,27 +275,27 @@ class _TournamentsScreenState extends State<TournamentsScreen> {
         ));
       },
       child: Container(
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           colors: [Color(0xFF161D2B), Color(0xFF101520)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(22),
         border: Border.all(
-          color: isLive ? Colors.redAccent.withValues(alpha: 0.4) : Colors.white.withValues(alpha: 0.08),
+          color: isLive ? Colors.redAccent.withValues(alpha: 0.4) : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08),
           width: 1.2,
         ),
         boxShadow: [
           BoxShadow(
             color: (isLive ? Colors.red : AppTheme.primaryBlue).withValues(alpha: 0.06),
             blurRadius: 16,
-            offset: const Offset(0, 6),
+            offset: Offset(0, 6),
           ),
         ],
       ),
-      padding: const EdgeInsets.all(18),
+      padding: EdgeInsets.all(18),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -304,7 +304,7 @@ class _TournamentsScreenState extends State<TournamentsScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 decoration: BoxDecoration(
                   color: statusColor.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(12),
@@ -314,8 +314,8 @@ class _TournamentsScreenState extends State<TournamentsScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     if (isLive) ...[
-                      const Icon(Icons.circle, color: Colors.redAccent, size: 7),
-                      const SizedBox(width: 5),
+                      Icon(Icons.circle, color: Colors.redAccent, size: 7),
+                      SizedBox(width: 5),
                     ],
                     Text(
                       statusText,
@@ -325,7 +325,7 @@ class _TournamentsScreenState extends State<TournamentsScreen> {
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 decoration: BoxDecoration(
                   color: Colors.orange.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(12),
@@ -334,64 +334,64 @@ class _TournamentsScreenState extends State<TournamentsScreen> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.emoji_events_rounded, color: Colors.orange, size: 14),
-                    const SizedBox(width: 4),
+                    Icon(Icons.emoji_events_rounded, color: Colors.orange, size: 14),
+                    SizedBox(width: 4),
                     Text(
                       '$prize',
-                      style: const TextStyle(color: Colors.orange, fontSize: 12, fontWeight: FontWeight.bold),
+                      style: TextStyle(color: Colors.orange, fontSize: 12, fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 14),
+          SizedBox(height: 14),
 
           // Title
           Text(
             title,
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, height: 1.2),
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, height: 1.2),
           ),
-          const SizedBox(height: 10),
+          SizedBox(height: 10),
 
           // Metadata Chips Row
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.06),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.06),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.sports_esports_rounded, size: 14, color: AppTheme.primaryBlue),
-                    const SizedBox(width: 4),
-                    Text(game, style: const TextStyle(color: Colors.white70, fontSize: 12)),
+                    Icon(Icons.sports_esports_rounded, size: 14, color: AppTheme.primaryBlue),
+                    SizedBox(width: 4),
+                    Text(game, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 12)),
                   ],
                 ),
               ),
-              const SizedBox(width: 10),
+              SizedBox(width: 10),
               if (date.isNotEmpty)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.06),
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.06),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.calendar_today_rounded, size: 12, color: Colors.white54),
-                      const SizedBox(width: 4),
-                      Text(date, style: const TextStyle(color: Colors.white60, fontSize: 11)),
+                      Icon(Icons.calendar_today_rounded, size: 12, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54)),
+                      SizedBox(width: 4),
+                      Text(date, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.60), fontSize: 11)),
                     ],
                   ),
                 ),
             ],
           ),
-          const SizedBox(height: 14),
+          SizedBox(height: 14),
 
           // Registration Progress Bar
           Column(
@@ -402,7 +402,7 @@ class _TournamentsScreenState extends State<TournamentsScreen> {
                 children: [
                   Text(
                     'الفرق المسجلة: $registered من $maxTeams',
-                    style: const TextStyle(color: Colors.white60, fontSize: 11),
+                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.60), fontSize: 11),
                   ),
                   Text(
                     '${(fillPercentage * 100).toInt()}%',
@@ -414,12 +414,12 @@ class _TournamentsScreenState extends State<TournamentsScreen> {
                   ),
                 ],
               ),
-              const SizedBox(height: 6),
+              SizedBox(height: 6),
               ClipRRect(
                 borderRadius: BorderRadius.circular(6),
                 child: LinearProgressIndicator(
                   value: fillPercentage,
-                  backgroundColor: Colors.white.withValues(alpha: 0.08),
+                  backgroundColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08),
                   valueColor: AlwaysStoppedAnimation<Color>(
                     fillPercentage >= 1.0 ? Colors.redAccent : AppTheme.primaryBlue,
                   ),
@@ -428,7 +428,7 @@ class _TournamentsScreenState extends State<TournamentsScreen> {
               ),
             ],
           ),
-          const SizedBox(height: 18),
+          SizedBox(height: 18),
 
           // Action Buttons (iOS Rounded Squircles)
           Row(
@@ -445,16 +445,16 @@ class _TournamentsScreenState extends State<TournamentsScreen> {
                         ),
                       );
                     },
-                    icon: const Icon(Icons.app_registration_rounded, size: 18),
-                    label: const Text('تسجيل الفريق', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                    icon: Icon(Icons.app_registration_rounded, size: 18),
+                    label: Text('تسجيل الفريق', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppTheme.primaryBlue,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      padding: EdgeInsets.symmetric(vertical: 12),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                     ),
                   ),
                 ),
-                const SizedBox(width: 10),
+                SizedBox(width: 10),
               ],
               Expanded(
                 child: OutlinedButton.icon(
@@ -470,12 +470,12 @@ class _TournamentsScreenState extends State<TournamentsScreen> {
                       ),
                     );
                   },
-                  icon: const Icon(Icons.account_tree_rounded, size: 18, color: Colors.white70),
-                  label: const Text('شجرة المباريات', style: TextStyle(color: Colors.white, fontSize: 13)),
+                  icon: Icon(Icons.account_tree_rounded, size: 18, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
+                  label: Text('شجرة المباريات', style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 13)),
                   style: OutlinedButton.styleFrom(
-                    side: BorderSide(color: Colors.white.withValues(alpha: 0.15)),
-                    backgroundColor: Colors.white.withValues(alpha: 0.03),
-                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    side: BorderSide(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.15)),
+                    backgroundColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.03),
+                    padding: EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                   ),
                 ),
@@ -487,3 +487,4 @@ class _TournamentsScreenState extends State<TournamentsScreen> {
     ));
   }
 }
+

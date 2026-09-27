@@ -24,7 +24,7 @@ class _TournamentAdminDashboardScreenState extends State<TournamentAdminDashboar
     if (context.mounted) {
       Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (context) => const LoginScreen()),
+        MaterialPageRoute(builder: (context) => LoginScreen()),
         (route) => false,
       );
     }
@@ -67,8 +67,8 @@ class _TournamentAdminDashboardScreenState extends State<TournamentAdminDashboar
       builder: (context) => StatefulBuilder(
         builder: (context, setState) {
           return AlertDialog(
-            backgroundColor: AppTheme.cardDark,
-            title: const Text('إضافة بطولة جديدة'),
+            backgroundColor: Theme.of(context).colorScheme.surface,
+            title: Text('إضافة بطولة جديدة'),
             content: SingleChildScrollView(
               child: Form(
                 key: formKey,
@@ -83,76 +83,76 @@ class _TournamentAdminDashboardScreenState extends State<TournamentAdminDashboar
                             child: Container(
                               height: 100,
                               decoration: BoxDecoration(
-                                color: Colors.white10,
+                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.10),
                                 borderRadius: BorderRadius.circular(8),
                                 image: posterFile != null ? DecorationImage(image: FileImage(posterFile!), fit: BoxFit.cover) : null,
                               ),
-                              child: posterFile == null ? const Center(child: Text('اختر بوستر\nالبطولة', textAlign: TextAlign.center, style: TextStyle(fontSize: 12))) : null,
+                              child: posterFile == null ? Center(child: Text('اختر بوستر\nالبطولة', textAlign: TextAlign.center, style: TextStyle(fontSize: 12))) : null,
                             ),
                           ),
                         ),
-                        const SizedBox(width: 8),
+                        SizedBox(width: 8),
                         Expanded(
                           child: GestureDetector(
                             onTap: () => pickImage(false, setState),
                             child: Container(
                               height: 100,
                               decoration: BoxDecoration(
-                                color: Colors.white10,
+                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.10),
                                 borderRadius: BorderRadius.circular(8),
                                 image: logoFile != null ? DecorationImage(image: FileImage(logoFile!), fit: BoxFit.contain) : null,
                               ),
-                              child: logoFile == null ? const Center(child: Text('اختر شعار\nاللعبة', textAlign: TextAlign.center, style: TextStyle(fontSize: 12))) : null,
+                              child: logoFile == null ? Center(child: Text('اختر شعار\nاللعبة', textAlign: TextAlign.center, style: TextStyle(fontSize: 12))) : null,
                             ),
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: 16),
                     TextFormField(
                       controller: titleController,
                       validator: (v) => Validators.validateRequired(v, fieldName: 'اسم البطولة'),
-                      decoration: const InputDecoration(labelText: 'اسم البطولة'),
+                      decoration: InputDecoration(labelText: 'اسم البطولة'),
                     ),
-                    const SizedBox(height: 8),
+                    SizedBox(height: 8),
                     DropdownButtonFormField<String>(
                       initialValue: selectedGame,
                       items: games.map((game) => DropdownMenuItem(value: game, child: Text(game))).toList(),
                       onChanged: (val) => selectedGame = val!,
-                      decoration: const InputDecoration(labelText: 'اللعبة'),
+                      decoration: InputDecoration(labelText: 'اللعبة'),
                     ),
-                    const SizedBox(height: 8),
+                    SizedBox(height: 8),
                     TextFormField(
                       controller: prizeController,
                       validator: (v) => Validators.validateRequired(v, fieldName: 'مجموع الجوائز'),
-                      decoration: const InputDecoration(labelText: 'مجموع الجوائز (مثال: 500,000 ج.س)'),
+                      decoration: InputDecoration(labelText: 'مجموع الجوائز (مثال: 500,000 ج.س)'),
                     ),
-                    const SizedBox(height: 8),
+                    SizedBox(height: 8),
                     TextFormField(
                       controller: feeController,
                       keyboardType: TextInputType.number,
                       validator: (v) => Validators.validatePositiveNumber(v, fieldName: 'رسوم الدخول'),
-                      decoration: const InputDecoration(labelText: 'رسوم الدخول (رقم)'),
+                      decoration: InputDecoration(labelText: 'رسوم الدخول (رقم)'),
                     ),
-                    const SizedBox(height: 8),
+                    SizedBox(height: 8),
                     TextFormField(
                       controller: maxTeamsController,
                       keyboardType: TextInputType.number,
                       validator: (v) => Validators.validatePositiveNumber(v, fieldName: 'أقصى عدد للفرق'),
-                      decoration: const InputDecoration(labelText: 'أقصى عدد للفرق'),
+                      decoration: InputDecoration(labelText: 'أقصى عدد للفرق'),
                     ),
-                    const SizedBox(height: 8),
+                    SizedBox(height: 8),
                     TextFormField(
                       controller: playersPerTeamController,
                       keyboardType: TextInputType.number,
                       validator: (v) => Validators.validatePositiveNumber(v, fieldName: 'عدد اللاعبين لكل فريق'),
-                      decoration: const InputDecoration(labelText: 'عدد اللاعبين لكل فريق'),
+                      decoration: InputDecoration(labelText: 'عدد اللاعبين لكل فريق'),
                     ),
-                    const SizedBox(height: 8),
+                    SizedBox(height: 8),
                     TextFormField(
                       controller: dateController,
                       validator: (v) => Validators.validateRequired(v, fieldName: 'تاريخ البداية'),
-                      decoration: const InputDecoration(labelText: 'تاريخ البداية (مثال: 2025-10-15)'),
+                      decoration: InputDecoration(labelText: 'تاريخ البداية (مثال: 2025-10-15)'),
                     ),
                   ],
                 ),
@@ -162,10 +162,10 @@ class _TournamentAdminDashboardScreenState extends State<TournamentAdminDashboar
           if (!isUploading)
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('إلغاء', style: TextStyle(color: Colors.white54)),
+              child: Text('إلغاء', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54))),
             ),
           isUploading
-              ? const Padding(
+              ? Padding(
                   padding: EdgeInsets.all(8.0),
                   child: CircularProgressIndicator(color: AppTheme.primaryBlue),
                 )
@@ -178,7 +178,7 @@ class _TournamentAdminDashboardScreenState extends State<TournamentAdminDashboar
                     if (!await ConnectivityHelper.hasInternetConnection()) {
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('يرجى التحقق من اتصالك بالإنترنت والمحاولة مجدداً.'), backgroundColor: Colors.red),
+                          SnackBar(content: Text('يرجى التحقق من اتصالك بالإنترنت والمحاولة مجدداً.'), backgroundColor: Colors.red),
                         );
                       }
                       return;
@@ -217,7 +217,7 @@ class _TournamentAdminDashboardScreenState extends State<TournamentAdminDashboar
                       if (context.mounted) {
                         Navigator.pop(context);
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
+                          SnackBar(
                             content: Text('تمت إضافة البطولة بنجاح ✅', style: TextStyle(color: Colors.black)),
                             backgroundColor: AppTheme.primaryBlue,
                           ),
@@ -227,8 +227,8 @@ class _TournamentAdminDashboardScreenState extends State<TournamentAdminDashboar
                       if (context.mounted) {
                         setState(() => isUploading = false);
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('فشل في إضافة البطولة ❌', style: TextStyle(color: Colors.white)),
+                          SnackBar(
+                            content: Text('فشل في إضافة البطولة ❌', style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
                             backgroundColor: Colors.red,
                           ),
                         );
@@ -236,7 +236,7 @@ class _TournamentAdminDashboardScreenState extends State<TournamentAdminDashboar
                     }
                   },
                   style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryBlue),
-                  child: const Text('إضافة'),
+                  child: Text('إضافة'),
                 ),
         ],
       );
@@ -247,28 +247,28 @@ class _TournamentAdminDashboardScreenState extends State<TournamentAdminDashboar
   void _updateStatus(String tournamentId, String currentStatus) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: AppTheme.cardDark,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       builder: (ctx) => Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(16.0),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('تغيير حالة البطولة', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 16),
+            Text('تغيير حالة البطولة', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            SizedBox(height: 16),
             ListTile(
-              leading: const Icon(Icons.event_available, color: AppTheme.primaryBlue),
-              title: const Text('التسجيل مفتوح (Upcoming)'),
+              leading: Icon(Icons.event_available, color: AppTheme.primaryBlue),
+              title: Text('التسجيل مفتوح (Upcoming)'),
               onTap: () => _applyStatusChange(ctx, tournamentId, 'upcoming'),
             ),
             ListTile(
-              leading: const Icon(Icons.play_circle_filled, color: Colors.red),
-              title: const Text('جارية الآن (Live)'),
+              leading: Icon(Icons.play_circle_filled, color: Colors.red),
+              title: Text('جارية الآن (Live)'),
               onTap: () => _applyStatusChange(ctx, tournamentId, 'live'),
             ),
             ListTile(
-              leading: const Icon(Icons.check_circle, color: Colors.grey),
-              title: const Text('مكتملة (Finished)'),
+              leading: Icon(Icons.check_circle, color: Colors.grey),
+              title: Text('مكتملة (Finished)'),
               onTap: () => _applyStatusChange(ctx, tournamentId, 'finished'),
             ),
           ],
@@ -283,7 +283,7 @@ class _TournamentAdminDashboardScreenState extends State<TournamentAdminDashboar
       await _firestoreService.updateTournamentStatus(tournamentId, newStatus);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text('تم تحديث حالة البطولة بنجاح ✅', style: TextStyle(color: Colors.black)),
             backgroundColor: AppTheme.primaryBlue,
           ),
@@ -292,8 +292,8 @@ class _TournamentAdminDashboardScreenState extends State<TournamentAdminDashboar
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('فشل في تحديث حالة البطولة ❌', style: TextStyle(color: Colors.white)),
+          SnackBar(
+            content: Text('فشل في تحديث حالة البطولة ❌', style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
             backgroundColor: Colors.red,
           ),
         );
@@ -305,13 +305,13 @@ class _TournamentAdminDashboardScreenState extends State<TournamentAdminDashboar
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: AppTheme.cardDark,
-        title: const Text('تأكيد حذف البطولة', style: TextStyle(color: Colors.white)),
-        content: Text('هل أنت متأكد من رغبتك في حذف بطولة "$title"؟ سيتم حذف جميع بياناتها نهائياً.', style: const TextStyle(color: Colors.white70)),
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        title: Text('تأكيد حذف البطولة', style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+        content: Text('هل أنت متأكد من رغبتك في حذف بطولة "$title"؟ سيتم حذف جميع بياناتها نهائياً.', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7))),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('إلغاء', style: TextStyle(color: Colors.white54)),
+            child: Text('إلغاء', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54))),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
@@ -321,7 +321,7 @@ class _TournamentAdminDashboardScreenState extends State<TournamentAdminDashboar
                 await _firestoreService.deleteTournament(tournamentId);
                 if (mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
+                    SnackBar(
                       content: Text('تم حذف البطولة بنجاح ✅', style: TextStyle(color: Colors.black)),
                       backgroundColor: AppTheme.primaryBlue,
                     ),
@@ -330,15 +330,15 @@ class _TournamentAdminDashboardScreenState extends State<TournamentAdminDashboar
               } catch (e) {
                 if (mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('فشل في حذف البطولة ❌', style: TextStyle(color: Colors.white)),
+                    SnackBar(
+                      content: Text('فشل في حذف البطولة ❌', style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
                       backgroundColor: Colors.red,
                     ),
                   );
                 }
               }
             },
-            child: const Text('حذف'),
+            child: Text('حذف'),
           ),
         ],
       ),
@@ -348,36 +348,36 @@ class _TournamentAdminDashboardScreenState extends State<TournamentAdminDashboar
   void _showRegistrationsDialog(BuildContext context, String tournamentId, String title) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: AppTheme.cardDark,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (ctx) => Padding(
-        padding: const EdgeInsets.all(20),
+        padding: EdgeInsets.all(20),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
-                const Icon(Icons.groups, color: AppTheme.primaryBlue),
-                const SizedBox(width: 8),
+                Icon(Icons.groups, color: AppTheme.primaryBlue),
+                SizedBox(width: 8),
                 Expanded(
-                  child: Text('الفرق المسجلة في: $title', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                  child: Text('الفرق المسجلة في: $title', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             SizedBox(
               height: 300,
               child: StreamBuilder<List<Map<String, dynamic>>>(
                 stream: _firestoreService.getTournamentRegistrationsStream(tournamentId),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator(color: AppTheme.primaryBlue));
+                    return Center(child: CircularProgressIndicator(color: AppTheme.primaryBlue));
                   }
                   final registrations = snapshot.data ?? [];
                   if (registrations.isEmpty) {
-                    return const Center(
-                      child: Text('لا توجد فرق مسجلة في هذه البطولة بعد', style: TextStyle(color: Colors.white54)),
+                    return Center(
+                      child: Text('لا توجد فرق مسجلة في هذه البطولة بعد', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54))),
                     );
                   }
                   return ListView.builder(
@@ -387,11 +387,11 @@ class _TournamentAdminDashboardScreenState extends State<TournamentAdminDashboar
                       return ListTile(
                         leading: CircleAvatar(
                           backgroundColor: AppTheme.primaryBlue.withValues(alpha: 0.2),
-                          child: Text('${index + 1}', style: const TextStyle(color: AppTheme.primaryBlue, fontWeight: FontWeight.bold)),
+                          child: Text('${index + 1}', style: TextStyle(color: AppTheme.primaryBlue, fontWeight: FontWeight.bold)),
                         ),
-                        title: Text(reg['teamName'] ?? 'فريق', style: const TextStyle(fontWeight: FontWeight.bold)),
-                        subtitle: Text('القائد: ${reg['leaderName'] ?? 'كابتن'} • الهاتف: ${reg['contactPhone'] ?? 'غير متوفر'}', style: const TextStyle(color: Colors.white54, fontSize: 12)),
-                        trailing: const Text('مسجل ✅', style: TextStyle(color: Colors.greenAccent, fontSize: 11)),
+                        title: Text(reg['teamName'] ?? 'فريق', style: TextStyle(fontWeight: FontWeight.bold)),
+                        subtitle: Text('القائد: ${reg['leaderName'] ?? 'كابتن'} • الهاتف: ${reg['contactPhone'] ?? 'غير متوفر'}', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 12)),
+                        trailing: Text('مسجل ✅', style: TextStyle(color: Colors.greenAccent, fontSize: 11)),
                       );
                     },
                   );
@@ -408,12 +408,12 @@ class _TournamentAdminDashboardScreenState extends State<TournamentAdminDashboar
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('لوحة إدارة البطولات', style: TextStyle(color: AppTheme.primaryBlue, fontWeight: FontWeight.bold)),
-        backgroundColor: AppTheme.backgroundDark,
+        title: Text('لوحة إدارة البطولات', style: TextStyle(color: AppTheme.primaryBlue, fontWeight: FontWeight.bold)),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         actions: [
           IconButton(
-            icon: const Icon(Icons.logout, color: Colors.red),
+            icon: Icon(Icons.logout, color: Colors.red),
             onPressed: () => _logout(context),
           ),
         ],
@@ -421,26 +421,26 @@ class _TournamentAdminDashboardScreenState extends State<TournamentAdminDashboar
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showAddTournamentDialog(context),
         backgroundColor: AppTheme.primaryBlue,
-        child: const Icon(Icons.add, color: Colors.black),
+        child: Icon(Icons.add, color: Colors.black),
       ),
       body: StreamBuilder<List<Map<String, dynamic>>>(
         stream: _firestoreService.getTournamentsStream(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return Center(child: CircularProgressIndicator());
           }
           if (snapshot.hasError) {
-            return const Center(child: Text('حدث خطأ في تحميل البطولات'));
+            return Center(child: Text('حدث خطأ في تحميل البطولات'));
           }
 
           final tournaments = snapshot.data ?? [];
 
           if (tournaments.isEmpty) {
-            return const Center(child: Text('لا توجد بطولات. اضغط على + للإضافة.'));
+            return Center(child: Text('لا توجد بطولات. اضغط على + للإضافة.'));
           }
 
           return ListView.builder(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.all(16),
             itemCount: tournaments.length,
             itemBuilder: (context, index) {
               final t = tournaments[index];
@@ -459,10 +459,10 @@ class _TournamentAdminDashboardScreenState extends State<TournamentAdminDashboar
               }
 
               return Card(
-                color: AppTheme.cardDark,
-                margin: const EdgeInsets.only(bottom: 12),
+                color: Theme.of(context).colorScheme.surface,
+                margin: EdgeInsets.only(bottom: 12),
                 child: Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: EdgeInsets.all(16.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -470,39 +470,39 @@ class _TournamentAdminDashboardScreenState extends State<TournamentAdminDashboar
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Expanded(
-                            child: Text(t['title'] ?? 'بدون اسم', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                            child: Text(t['title'] ?? 'بدون اسم', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                           ),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                             decoration: BoxDecoration(color: statusColor.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(8)),
                             child: Text(statusText, style: TextStyle(color: statusColor, fontSize: 12, fontWeight: FontWeight.bold)),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 8),
-                      Text('اللعبة: ${t['game']}', style: const TextStyle(color: Colors.white70)),
-                      Text('الجوائز: ${t['prizePool']} | الرسوم: ${t['entryFee']}', style: const TextStyle(color: Colors.white70)),
-                      Text('الفرق: ${t['registeredTeamsCount']} / ${t['maxTeams']} (اللاعبين لكل فريق: ${t['playersPerTeam'] ?? 1})', style: const TextStyle(color: Colors.white70)),
-                      const SizedBox(height: 12),
+                      SizedBox(height: 8),
+                      Text('اللعبة: ${t['game']}', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7))),
+                      Text('الجوائز: ${t['prizePool']} | الرسوم: ${t['entryFee']}', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7))),
+                      Text('الفرق: ${t['registeredTeamsCount']} / ${t['maxTeams']} (اللاعبين لكل فريق: ${t['playersPerTeam'] ?? 1})', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7))),
+                      SizedBox(height: 12),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           TextButton.icon(
                             onPressed: () => _showRegistrationsDialog(context, t['id'], t['title'] ?? 'البطولة'),
-                            icon: const Icon(Icons.people_outline, size: 18, color: AppTheme.primaryBlue),
-                            label: const Text('المسجلين', style: TextStyle(color: AppTheme.primaryBlue)),
+                            icon: Icon(Icons.people_outline, size: 18, color: AppTheme.primaryBlue),
+                            label: Text('المسجلين', style: TextStyle(color: AppTheme.primaryBlue)),
                           ),
-                          const SizedBox(width: 6),
+                          SizedBox(width: 6),
                           TextButton.icon(
                             onPressed: () => _confirmDeleteTournament(t['id'], t['title'] ?? 'البطولة'),
-                            icon: const Icon(Icons.delete_outline, size: 18, color: Colors.redAccent),
-                            label: const Text('حذف', style: TextStyle(color: Colors.redAccent)),
+                            icon: Icon(Icons.delete_outline, size: 18, color: Colors.redAccent),
+                            label: Text('حذف', style: TextStyle(color: Colors.redAccent)),
                           ),
-                          const SizedBox(width: 6),
+                          SizedBox(width: 6),
                           TextButton.icon(
                             onPressed: () => _updateStatus(t['id'], status),
-                            icon: const Icon(Icons.edit, size: 18),
-                            label: const Text('تغيير الحالة'),
+                            icon: Icon(Icons.edit, size: 18),
+                            label: Text('تغيير الحالة'),
                             style: TextButton.styleFrom(foregroundColor: Colors.orange),
                           ),
                         ],

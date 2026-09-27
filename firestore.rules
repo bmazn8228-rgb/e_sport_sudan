@@ -67,6 +67,13 @@ service cloud.firestore {
       );
       
       allow delete: if isSuperAdmin();
+
+      // User Notifications Subcollection
+      match /notifications/{notificationId} {
+        allow read, update, delete: if isOwner(userId);
+        allow create: if isAuthenticated();
+      }
+
     }
 
     // =========================================================================
@@ -156,5 +163,19 @@ service cloud.firestore {
       allow read, update, delete: if isTournamentAdmin();
       allow create: if isAuthenticated();
     }
+
+    // =========================================================================
+    // 8. Settings
+    // =========================================================================
+    match /settings/{document} {
+      allow read: if true;
+      allow write: if isTournamentAdmin();
+      
+      match /bank_accounts/{accountId} {
+        allow read: if isAuthenticated();
+        allow write: if isSuperAdmin();
+      }
+    }
   }
 }
+

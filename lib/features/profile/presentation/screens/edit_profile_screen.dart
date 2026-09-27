@@ -38,7 +38,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         try {
           userModel = await FirestoreService()
               .getUser(user.uid)
-              .timeout(const Duration(seconds: 4), onTimeout: () => null);
+              .timeout(Duration(seconds: 4), onTimeout: () => null);
         } catch (e) {
           debugPrint('Error getting user from firestore: $e');
         }
@@ -84,7 +84,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     final user = AuthService().currentUser;
     if (user == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text('يرجى تسجيل الدخول أولاً'),
           backgroundColor: Colors.redAccent,
         ),
@@ -119,7 +119,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Row(
               children: [
                 Icon(Icons.check_circle, color: Colors.black),
@@ -161,26 +161,26 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.backgroundDark,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text('تعديل الملف الشخصي', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        title: Text('تعديل الملف الشخصي', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
       ),
       body: _isLoading
-          ? const Center(
+          ? Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   CircularProgressIndicator(color: AppTheme.primaryBlue),
                   SizedBox(height: 16),
-                  Text('جاري تحميل البيانات...', style: TextStyle(color: Colors.white70, fontSize: 13)),
+                  Text('جاري تحميل البيانات...', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 13)),
                 ],
               ),
             )
           : SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
+              padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
               child: Form(
                 key: _formKey,
                 child: Column(
@@ -198,32 +198,32 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                               gradient: LinearGradient(
                                 colors: [
                                   AppTheme.primaryBlue.withValues(alpha: 0.3),
-                                  const Color(0xFF00E5FF).withValues(alpha: 0.1),
+                                  Color(0xFF00E5FF).withValues(alpha: 0.1),
                                 ],
                               ),
                               border: Border.all(color: AppTheme.primaryBlue.withValues(alpha: 0.6), width: 2),
                             ),
-                            child: const Center(
+                            child: Center(
                               child: Icon(Icons.person_outline, size: 48, color: AppTheme.primaryBlue),
                             ),
                           ),
                           Container(
-                            padding: const EdgeInsets.all(6),
-                            decoration: const BoxDecoration(
+                            padding: EdgeInsets.all(6),
+                            decoration: BoxDecoration(
                               color: AppTheme.primaryBlue,
                               shape: BoxShape.circle,
                             ),
-                            child: const Icon(Icons.edit, size: 14, color: Colors.black),
+                            child: Icon(Icons.edit, size: 14, color: Colors.black),
                           ),
                         ],
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    SizedBox(height: 8),
                     Text(
                       _userEmail.isNotEmpty ? _userEmail : 'لاعب الرياضات الإلكترونية',
-                      style: const TextStyle(color: Colors.white54, fontSize: 13),
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 13),
                     ),
-                    const SizedBox(height: 24),
+                    SizedBox(height: 24),
 
                     // Full Name
                     _buildTextField(
@@ -232,7 +232,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       icon: Icons.person,
                       validator: (v) => (v == null || v.trim().isEmpty) ? 'يرجى إدخال الاسم الكامل' : null,
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: 16),
 
                     // In-Game Name (IGN)
                     _buildTextField(
@@ -242,7 +242,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       icon: Icons.sports_esports,
                       validator: (v) => null,
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: 16),
 
                     // Game / Platform
                     _buildTextField(
@@ -252,7 +252,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       icon: Icons.gamepad,
                       validator: (v) => null,
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: 16),
 
                     // Phone Number
                     _buildTextField(
@@ -263,30 +263,30 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       keyboardType: TextInputType.phone,
                       validator: (v) => null,
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: 16),
 
                     // Read-only email notice
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.04),
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.04),
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+                        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)),
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.lock_outline, size: 18, color: Colors.white38),
-                          const SizedBox(width: 10),
+                          Icon(Icons.lock_outline, size: 18, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38)),
+                          SizedBox(width: 10),
                           Expanded(
                             child: Text(
                               'البريد الإلكتروني المرتبط: $_userEmail',
-                              style: const TextStyle(color: Colors.white38, fontSize: 12),
+                              style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 12),
                             ),
                           ),
                         ],
                       ),
                     ),
-                    const SizedBox(height: 32),
+                    SizedBox(height: 32),
 
                     // Save Button
                     SizedBox(
@@ -302,12 +302,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           shadowColor: AppTheme.primaryBlue.withValues(alpha: 0.4),
                         ),
                         child: _isSaving
-                            ? const SizedBox(
+                            ? SizedBox(
                                 width: 22,
                                 height: 22,
                                 child: CircularProgressIndicator(color: Colors.black, strokeWidth: 2.5),
                               )
-                            : const Text(
+                            : Text(
                                 'حفظ التغييرات',
                                 style: TextStyle(
                                   color: Colors.black,
@@ -335,34 +335,35 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     return TextFormField(
       controller: controller,
       keyboardType: keyboardType,
-      style: const TextStyle(color: Colors.white, fontSize: 14),
+      style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14),
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
-        hintStyle: const TextStyle(color: Colors.white24, fontSize: 13),
-        labelStyle: const TextStyle(color: Colors.white60, fontSize: 14),
+        hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.24), fontSize: 13),
+        labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.60), fontSize: 14),
         prefixIcon: Icon(icon, color: AppTheme.primaryBlue, size: 20),
         filled: true,
-        fillColor: AppTheme.cardDark,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        fillColor: Theme.of(context).colorScheme.surface,
+        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
+          borderSide: BorderSide(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: AppTheme.primaryBlue, width: 1.5),
+          borderSide: BorderSide(color: AppTheme.primaryBlue, width: 1.5),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: Colors.redAccent),
+          borderSide: BorderSide(color: Colors.redAccent),
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: Colors.redAccent, width: 1.5),
+          borderSide: BorderSide(color: Colors.redAccent, width: 1.5),
         ),
       ),
       validator: validator,
     );
   }
 }
+

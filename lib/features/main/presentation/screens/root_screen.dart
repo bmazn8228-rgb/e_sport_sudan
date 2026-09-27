@@ -29,16 +29,16 @@ class _RootScreenState extends State<RootScreen> {
       stream: _authService.authStateChanges,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Scaffold(
+          return Scaffold(
             body: Center(
-              child: CircularProgressIndicator(color: Colors.white),
+              child: CircularProgressIndicator(color: Theme.of(context).colorScheme.onSurface),
             ),
           );
         }
 
         final user = snapshot.data;
         if (user == null) {
-          return const LoginScreen();
+          return LoginScreen();
         }
 
         // Fast-path: Immediately route authoritative admin emails without network wait
@@ -46,13 +46,13 @@ class _RootScreenState extends State<RootScreen> {
         if (emailRole != UserRole.player) {
           switch (emailRole) {
             case UserRole.referee:
-              return const RefereeDashboard();
+              return RefereeDashboard();
             case UserRole.tournamentAdmin:
-              return const OrganizerDashboard();
+              return OrganizerDashboard();
             case UserRole.financeAdmin:
-              return const DepositRequestsScreen();
+              return DepositRequestsScreen();
             case UserRole.superAdmin:
-              return const SuperAdminDashboard();
+              return SuperAdminDashboard();
             case UserRole.player:
               break;
           }
@@ -63,9 +63,9 @@ class _RootScreenState extends State<RootScreen> {
           future: _firestoreService.getUser(user.uid),
           builder: (context, userSnapshot) {
             if (userSnapshot.connectionState == ConnectionState.waiting) {
-              return const Scaffold(
+              return Scaffold(
                 body: Center(
-                  child: CircularProgressIndicator(color: Colors.white),
+                  child: CircularProgressIndicator(color: Theme.of(context).colorScheme.onSurface),
                 ),
               );
             }
@@ -76,15 +76,15 @@ class _RootScreenState extends State<RootScreen> {
             // Route each role to its dedicated dashboard
             switch (effectiveRole) {
               case UserRole.player:
-                return const MainScreen();
+                return MainScreen();
               case UserRole.referee:
-                return const RefereeDashboard();
+                return RefereeDashboard();
               case UserRole.tournamentAdmin:
-                return const OrganizerDashboard();
+                return OrganizerDashboard();
               case UserRole.financeAdmin:
-                return const DepositRequestsScreen();
+                return DepositRequestsScreen();
               case UserRole.superAdmin:
-                return const SuperAdminDashboard();
+                return SuperAdminDashboard();
             }
           },
         );

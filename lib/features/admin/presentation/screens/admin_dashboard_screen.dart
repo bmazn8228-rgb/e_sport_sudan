@@ -1,4 +1,8 @@
+import 'package:e_sport_sudan/core/services/notification_service.dart';
+import 'package:e_sport_sudan/core/widgets/esport_toast.dart';
 import 'package:flutter/material.dart';
+import 'package:e_sport_sudan/core/services/notification_service.dart';
+import 'package:e_sport_sudan/core/widgets/esport_toast.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import '../../../../core/theme/app_theme.dart';
@@ -49,60 +53,60 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: const Text('لوحة تحكم الإدارة والصلاحيات', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+        title: Text('لوحة تحكم الإدارة والصلاحيات', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Current Role Badge Card
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: AppTheme.cardDark,
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: AppTheme.primaryBlue.withOpacity(0.4)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('الدور الحالي المُحدد للتجربة:', style: TextStyle(color: Colors.white54, fontSize: 12)),
-                  const SizedBox(height: 6),
+                  Text('الدور الحالي المُحدد للتجربة:', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 12)),
+                  SizedBox(height: 6),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
                         _activeRole.displayNameArabic,
-                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.primaryBlue),
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.primaryBlue),
                       ),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
                           color: AppTheme.primaryBlue.withOpacity(0.2),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
                           _activeRole.toValue().toUpperCase(),
-                          style: const TextStyle(color: AppTheme.primaryBlue, fontSize: 11, fontWeight: FontWeight.bold),
+                          style: TextStyle(color: AppTheme.primaryBlue, fontSize: 11, fontWeight: FontWeight.bold),
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
-                  const Text('اختر دوراً لمعاينة صلاحياته والعمليات المسموحة له:', style: TextStyle(color: Colors.white70, fontSize: 11)),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 12),
+                  Text('اختر دوراً لمعاينة صلاحياته والعمليات المسموحة له:', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 11)),
+                  SizedBox(height: 8),
                   Wrap(
                     spacing: 8,
                     runSpacing: 8,
                     children: UserRole.values.map((role) {
                       final isSelected = role == _activeRole;
                       return ChoiceChip(
-                        label: Text(role.displayNameArabic, style: TextStyle(color: isSelected ? Colors.black : Colors.white, fontSize: 11)),
+                        label: Text(role.displayNameArabic, style: TextStyle(color: isSelected ? Colors.black : Theme.of(context).colorScheme.onSurface, fontSize: 11)),
                         selected: isSelected,
                         selectedColor: AppTheme.primaryBlue,
-                        backgroundColor: Colors.white10,
+                        backgroundColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.10),
                         onSelected: (_) => setState(() => _activeRole = role),
                       );
                     }).toList(),
@@ -110,12 +114,12 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
 
             // One-Click Database Seeding
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: Colors.amber.withOpacity(0.08),
                 borderRadius: BorderRadius.circular(16),
@@ -125,40 +129,40 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
-                    children: const [
+                    children: [
                       Icon(Icons.cloud_upload_outlined, color: Colors.amber),
                       SizedBox(width: 8),
                       Text('تهيئة الجداول السحابية (One-Click Seed)', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.amber, fontSize: 14)),
                     ],
                   ),
-                  const SizedBox(height: 8),
-                  const Text(
+                  SizedBox(height: 8),
+                  Text(
                     'زر بنقرة واحدة لإنشاء وتعبئة جميع الجداول تلقائياً في Firebase (البطولات، الفرق، إحصائيات PUBG و EA FC، وحسابات الأدمن).',
-                    style: TextStyle(color: Colors.white70, fontSize: 12),
+                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 12),
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12),
                   if (_statusMessage != null) ...[
                     Container(
-                      padding: const EdgeInsets.all(10),
+                      padding: EdgeInsets.all(10),
                       decoration: BoxDecoration(color: Colors.black45, borderRadius: BorderRadius.circular(8)),
-                      child: Text(_statusMessage!, style: const TextStyle(fontSize: 12, color: Colors.amberAccent)),
+                      child: Text(_statusMessage!, style: TextStyle(fontSize: 12, color: Colors.amberAccent)),
                     ),
-                    const SizedBox(height: 12),
+                    SizedBox(height: 12),
                   ],
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton.icon(
                       onPressed: _isSeeding ? null : _seedDatabase,
                       icon: _isSeeding
-                          ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black))
-                          : const Icon(Icons.flash_on, color: Colors.black),
+                          ? SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black))
+                          : Icon(Icons.flash_on, color: Colors.black),
                       label: Text(
                         _isSeeding ? 'جاري تهيئة الجداول...' : 'إنشاء وتعبئة الجداول الآن 🚀',
-                        style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                        style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
                       ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.amber,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        padding: EdgeInsets.symmetric(vertical: 12),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                       ),
                     ),
@@ -166,15 +170,15 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
 
             // Live Stream Broadcast Management Card
             _buildLiveStreamManagementCard(context),
-            const SizedBox(height: 24),
+            SizedBox(height: 24),
 
             // Role-Specific Action Cards
-            const Text('العمليات والصلاحيات المتاحة لهذا الدور:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-            const SizedBox(height: 12),
+            Text('العمليات والصلاحيات المتاحة لهذا الدور:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+            SizedBox(height: 12),
 
             ..._buildRoleActions(),
           ],
@@ -192,21 +196,21 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             'تحديد وتغيير رتب المستخدمين ومنح صلاحيات الأدمن في Firebase',
             Icons.admin_panel_settings,
             Colors.purple,
-            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const SuperAdminDashboard())),
+            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => SuperAdminDashboard())),
           ),
           _buildActionCard(
             'مراجعة طلبات شحن الرصيد',
             'اعتماد إشعارات الدفع والتحويلات المالية للمحافظ',
             Icons.account_balance,
             Colors.greenAccent,
-            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const DepositRequestsScreen())),
+            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => DepositRequestsScreen())),
           ),
           _buildActionCard(
             'الوصول الشامل للبطولات والمواجهات',
             'إنشاء وتعديل وحذف البطولات وجداول المباريات',
             Icons.emoji_events,
             Colors.amber,
-            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const TournamentAdminDashboardScreen())),
+            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => TournamentAdminDashboardScreen())),
           ),
         ];
 
@@ -217,21 +221,21 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             'تحديد رسوم الاشتراك، الجوائز، والتواريخ في جدول tournaments',
             Icons.emoji_events,
             Colors.amber,
-            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const TournamentAdminDashboardScreen())),
+            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => TournamentAdminDashboardScreen())),
           ),
           _buildActionCard(
             'لوحة تحكم منظم البطولة والقرعة',
             'توليد القرعة التلقائية وتوزيع المجموعات وجدولة المباريات',
             Icons.dashboard_customize,
             Colors.teal,
-            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const OrganizerDashboard())),
+            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => OrganizerDashboard())),
           ),
           _buildActionCard(
             'إدارة الفرق والتشكيلات',
             'مراجعة الفرق المعتمدة وحذف أو تعديل بيانات الفرق',
             Icons.groups,
             Colors.orange,
-            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const OrganizerDashboard())),
+            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => OrganizerDashboard())),
           ),
         ];
 
@@ -242,14 +246,14 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             'توثيق نتائج المباريات ورفع لقطات الشاشة المعتمدة',
             Icons.sports_score,
             Colors.lightBlue,
-            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const RefereeDashboard())),
+            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => RefereeDashboard())),
           ),
           _buildActionCard(
             'غرفة التحكم المباشر (كافة المباريات)',
             'تعديل النتيجة الحية وتوقيت المباراة أثناء اللعب',
             Icons.tune,
             Colors.blueAccent,
-            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const RefereeDashboardScreen())),
+            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => RefereeDashboardScreen())),
           ),
           _buildActionCard(
             'إدارة رابط البث المباشر (YouTube)',
@@ -267,14 +271,14 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             'فحص صور الإشعارات في جدول transactions وقبولها',
             Icons.receipt_long,
             Colors.green,
-            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const DepositRequestsScreen())),
+            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => DepositRequestsScreen())),
           ),
           _buildActionCard(
             'إيداع الأرصدة في محافظ اللاعبين',
             'تحديث رصيد جدول wallets عند نجاح التحويل',
             Icons.account_balance_wallet,
             Colors.teal,
-            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const DepositRequestsScreen())),
+            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => DepositRequestsScreen())),
           ),
         ];
 
@@ -298,39 +302,39 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
 
   Widget _buildActionCard(String title, String subtitle, IconData icon, Color color, {VoidCallback? onTap}) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 10),
+      margin: EdgeInsets.only(bottom: 10),
       child: Material(
-        color: AppTheme.cardDark,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(12),
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(12),
           child: Container(
-            padding: const EdgeInsets.all(14),
+            padding: EdgeInsets.all(14),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.white10),
+              border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.10)),
             ),
             child: Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(10),
+                  padding: EdgeInsets.all(10),
                   decoration: BoxDecoration(color: color.withValues(alpha: 0.15), shape: BoxShape.circle),
                   child: Icon(icon, color: color, size: 22),
                 ),
-                const SizedBox(width: 14),
+                SizedBox(width: 14),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                      const SizedBox(height: 3),
-                      Text(subtitle, style: const TextStyle(color: Colors.white54, fontSize: 11)),
+                      Text(title, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                      SizedBox(height: 3),
+                      Text(subtitle, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 11)),
                     ],
                   ),
                 ),
                 if (onTap != null)
-                  const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.white30),
+                  Icon(Icons.arrow_forward_ios, size: 14, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.30)),
               ],
             ),
           ),
@@ -350,12 +354,12 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
 
         return Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: AppTheme.cardDark,
+            color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: isLive ? Colors.redAccent.withOpacity(0.6) : Colors.white12,
+              color: isLive ? Colors.redAccent.withOpacity(0.6) : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12),
               width: isLive ? 1.5 : 1,
             ),
           ),
@@ -367,26 +371,26 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.live_tv, color: isLive ? Colors.redAccent : Colors.white70, size: 22),
-                      const SizedBox(width: 8),
-                      const Text('إدارة ونقل البث المباشر للمستخدمين', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                      Icon(Icons.live_tv, color: isLive ? Colors.redAccent : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), size: 22),
+                      SizedBox(width: 8),
+                      Text('إدارة ونقل البث المباشر للمستخدمين', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                     ],
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
-                      color: isLive ? Colors.red : Colors.white10,
+                      color: isLive ? Colors.red : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.10),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.circle, color: isLive ? Colors.white : Colors.white54, size: 8),
-                        const SizedBox(width: 4),
+                        Icon(Icons.circle, color: isLive ? Theme.of(context).colorScheme.onSurface : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), size: 8),
+                        SizedBox(width: 4),
                         Text(
                           isLive ? 'نشط الآن 🔴' : 'متوقف',
                           style: TextStyle(
-                            color: isLive ? Colors.white : Colors.white70,
+                            color: isLive ? Theme.of(context).colorScheme.onSurface : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
                           ),
@@ -396,18 +400,18 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                   ),
                 ],
               ),
-              const SizedBox(height: 10),
+              SizedBox(height: 10),
               if (isLive && currentTitle.isNotEmpty) ...[
-                Text('عنوان البث: $currentTitle', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.white)),
-                const SizedBox(height: 4),
-                Text('معرف الفيديو: $currentVideoId', style: const TextStyle(fontSize: 11, color: Colors.white54)),
-                const SizedBox(height: 12),
+                Text('عنوان البث: $currentTitle', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Theme.of(context).colorScheme.onSurface)),
+                SizedBox(height: 4),
+                Text('معرف الفيديو: $currentVideoId', style: TextStyle(fontSize: 11, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54))),
+                SizedBox(height: 12),
               ] else ...[
-                const Text(
+                Text(
                   'أدخل رابط أو كود بث YouTube Live ليتم عرضه فوراً لكافة مستخدمي التطبيق في الشاشة الرئيسية وتبويب المباريات.',
-                  style: TextStyle(color: Colors.white70, fontSize: 12),
+                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 12),
                 ),
-                const SizedBox(height: 14),
+                SizedBox(height: 14),
               ],
               Row(
                 children: [
@@ -419,26 +423,26 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                         currentTitle: currentTitle.isNotEmpty ? currentTitle : 'البث المباشر لمنافسات اليوم',
                         currentIsLive: isLive,
                       ),
-                      icon: const Icon(Icons.settings, color: Colors.black, size: 18),
+                      icon: Icon(Icons.settings, color: Colors.black, size: 18),
                       label: Text(
                         isLive ? 'تعديل رابط البث 🎥' : 'بدء بث مباشر جديد 🎥',
-                        style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 12),
+                        style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 12),
                       ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppTheme.primaryBlue,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        padding: EdgeInsets.symmetric(vertical: 12),
                       ),
                     ),
                   ),
                   if (isLive) ...[
-                    const SizedBox(width: 8),
+                    SizedBox(width: 8),
                     OutlinedButton.icon(
                       onPressed: () => _confirmStopLiveStream(context),
-                      icon: const Icon(Icons.stop_circle_outlined, color: Colors.redAccent, size: 18),
-                      label: const Text('إيقاف', style: TextStyle(color: Colors.redAccent, fontSize: 12)),
+                      icon: Icon(Icons.stop_circle_outlined, color: Colors.redAccent, size: 18),
+                      label: Text('إيقاف', style: TextStyle(color: Colors.redAccent, fontSize: 12)),
                       style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: Colors.redAccent),
-                        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+                        side: BorderSide(color: Colors.redAccent),
+                        padding: EdgeInsets.symmetric(vertical: 12, horizontal: 12),
                       ),
                     ),
                   ],
@@ -460,8 +464,8 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: AppTheme.cardDark,
-      shape: const RoundedRectangleBorder(
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (ctx) => StatefulBuilder(
@@ -480,7 +484,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Row(
+                    Row(
                       children: [
                         Icon(Icons.live_tv, color: Colors.redAccent),
                         SizedBox(width: 8),
@@ -488,41 +492,41 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                       ],
                     ),
                     IconButton(
-                      icon: const Icon(Icons.close, color: Colors.white54),
+                      icon: Icon(Icons.close, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54)),
                       onPressed: () => Navigator.pop(ctx),
                     ),
                   ],
                 ),
-                const SizedBox(height: 16),
-                const Text('رابط البث من YouTube أو معرف الفيديو:', style: TextStyle(fontSize: 12, color: Colors.white70)),
-                const SizedBox(height: 6),
+                SizedBox(height: 16),
+                Text('رابط البث من YouTube أو معرف الفيديو:', style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7))),
+                SizedBox(height: 6),
                 TextField(
                   controller: urlController,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     hintText: 'مثال: https://www.youtube.com/watch?v=xxxx أو xxxx',
                     prefixIcon: Icon(Icons.link, color: Colors.redAccent),
                   ),
                 ),
-                const SizedBox(height: 14),
-                const Text('عنوان البث المباشر:', style: TextStyle(fontSize: 12, color: Colors.white70)),
-                const SizedBox(height: 6),
+                SizedBox(height: 14),
+                Text('عنوان البث المباشر:', style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7))),
+                SizedBox(height: 6),
                 TextField(
                   controller: titleController,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     hintText: 'مثال: نهائي بطولة السودان - الهلال ضد المريخ',
                     prefixIcon: Icon(Icons.title, color: AppTheme.primaryBlue),
                   ),
                 ),
-                const SizedBox(height: 14),
+                SizedBox(height: 14),
                 SwitchListTile(
                   contentPadding: EdgeInsets.zero,
                   activeThumbColor: AppTheme.primaryBlue,
-                  title: const Text('تفعيل البث وإظهاره للمستخدمين الآن', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
-                  subtitle: const Text('عند التفعيل سيظهر البث فوراً في الواجهة الرئيسية وتبويب المباريات', style: TextStyle(fontSize: 11, color: Colors.white54)),
+                  title: Text('تفعيل البث وإظهاره للمستخدمين الآن', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+                  subtitle: Text('عند التفعيل سيظهر البث فوراً في الواجهة الرئيسية وتبويب المباريات', style: TextStyle(fontSize: 11, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54))),
                   value: isLive,
                   onChanged: (val) => setModalState(() => isLive = val),
                 ),
-                const SizedBox(height: 20),
+                SizedBox(height: 20),
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton.icon(
@@ -531,9 +535,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                         : () async {
                             final rawInput = urlController.text.trim();
                             if (rawInput.isEmpty) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('يرجى إدخال رابط أو معرف البث أولاً ⚠️'), backgroundColor: Colors.red),
-                              );
+                              NotificationService.showCustomToast(context, title: 'تنبيه النظام', message: 'يرجى إدخال رابط أو معرف البث أولاً ⚠️', type: ToastType.urgent);
                               return;
                             }
 
@@ -549,7 +551,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                               if (ctx.mounted) Navigator.pop(ctx);
                               if (context.mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
+                                  SnackBar(
                                     content: Text('تم تحديث ونشر رابط البث المباشر للمستخدمين بنجاح ✅', style: TextStyle(color: Colors.black)),
                                     backgroundColor: AppTheme.primaryBlue,
                                   ),
@@ -558,19 +560,17 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                             } catch (e) {
                               setModalState(() => isSaving = false);
                               if (context.mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('فشل تحديث رابط البث ❌'), backgroundColor: Colors.red),
-                                );
+                                NotificationService.showCustomToast(context, title: 'تنبيه النظام', message: 'فشل تحديث رابط البث ❌', type: ToastType.urgent);
                               }
                             }
                           },
                     icon: isSaving
-                        ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black))
-                        : const Icon(Icons.cloud_upload, color: Colors.black),
-                    label: Text(isSaving ? 'جاري الحفظ...' : 'نشر وتحديث البث المباشر للمستخدمين 🚀', style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+                        ? SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black))
+                        : Icon(Icons.cloud_upload, color: Colors.black),
+                    label: Text(isSaving ? 'جاري الحفظ...' : 'نشر وتحديث البث المباشر للمستخدمين 🚀', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppTheme.primaryBlue,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      padding: EdgeInsets.symmetric(vertical: 14),
                     ),
                   ),
                 ),
@@ -586,13 +586,13 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: AppTheme.cardDark,
-        title: const Text('إيقاف البث المباشر', style: TextStyle(color: Colors.white)),
-        content: const Text('هل أنت متأكد من رغبتك في إيقاف البث المباشر الحالي؟ سيظهر للمستخدمين أن البث متوقف.', style: TextStyle(color: Colors.white70)),
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        title: Text('إيقاف البث المباشر', style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+        content: Text('هل أنت متأكد من رغبتك في إيقاف البث المباشر الحالي؟ سيظهر للمستخدمين أن البث متوقف.', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7))),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('إلغاء', style: TextStyle(color: Colors.white54)),
+            child: Text('إلغاء', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54))),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
@@ -602,21 +602,19 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 await FirestoreService().stopLiveStream();
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('تم إيقاف البث المباشر بنجاح 🛑', style: TextStyle(color: Colors.white)),
+                    SnackBar(
+                      content: Text('تم إيقاف البث المباشر بنجاح 🛑', style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
                       backgroundColor: Colors.red,
                     ),
                   );
                 }
               } catch (e) {
                 if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('فشل في إيقاف البث ❌'), backgroundColor: Colors.red),
-                  );
+                  NotificationService.showCustomToast(context, title: 'تنبيه النظام', message: 'فشل في إيقاف البث ❌', type: ToastType.urgent);
                 }
               }
             },
-            child: const Text('إيقاف البث'),
+            child: Text('إيقاف البث'),
           ),
         ],
       ),

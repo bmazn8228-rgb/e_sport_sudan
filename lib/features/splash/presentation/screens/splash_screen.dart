@@ -22,7 +22,7 @@ class _SplashScreenState extends State<SplashScreen>
     super.initState();
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1500),
+      duration: Duration(milliseconds: 1500),
     );
 
     _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
@@ -35,19 +35,19 @@ class _SplashScreenState extends State<SplashScreen>
 
     _animationController.forward();
 
-    Future.delayed(const Duration(seconds: 3), () async {
+    Future.delayed(Duration(milliseconds: 1500), () async {
       if (!mounted) return;
       final prefs = await SharedPreferences.getInstance();
       final bool hasSeenOnboarding = prefs.getBool('seen_onboarding') ?? false;
 
       if (!mounted) return;
       final Widget nextScreen = hasSeenOnboarding
-          ? const RootScreen()
-          : const OnboardingScreen();
+          ? RootScreen()
+          : OnboardingScreen();
 
       Navigator.of(context).pushReplacement(
         PageRouteBuilder(
-          transitionDuration: const Duration(milliseconds: 800),
+          transitionDuration: Duration(milliseconds: 800),
           pageBuilder: (_, __, ___) => nextScreen,
           transitionsBuilder: (_, animation, __, child) {
             return FadeTransition(opacity: animation, child: child);
@@ -66,7 +66,7 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppTheme.backgroundDark,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Center(
         child: AnimatedBuilder(
           animation: _animationController,
@@ -90,13 +90,13 @@ class _SplashScreenState extends State<SplashScreen>
                           color: Colors.blueAccent.withValues(alpha: 0.2),
                           blurRadius: 40,
                           spreadRadius: 10,
-                          offset: const Offset(-10, -10),
+                          offset: Offset(-10, -10),
                         ),
                         BoxShadow(
                           color: Colors.redAccent.withValues(alpha: 0.2),
                           blurRadius: 40,
                           spreadRadius: 10,
-                          offset: const Offset(10, 10),
+                          offset: Offset(10, 10),
                         ),
                       ],
                     ),
@@ -119,3 +119,4 @@ class _SplashScreenState extends State<SplashScreen>
     );
   }
 }
+

@@ -39,7 +39,7 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
 
     if (newPass != confirmPass) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text('كلمات المرور الجديدة غير متطابقة.'),
           backgroundColor: Colors.redAccent,
         ),
@@ -49,7 +49,7 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
 
     if (currentPass.trim() == newPass.trim()) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text('كلمة المرور الجديدة يجب أن تكون مختلفة عن كلمة المرور الحالية.'),
           backgroundColor: Colors.orangeAccent,
         ),
@@ -64,7 +64,7 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Row(
               children: [
                 Icon(Icons.check_circle, color: Colors.black),
@@ -112,7 +112,7 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
           SnackBar(
             content: Text(errorMessage),
             backgroundColor: Colors.redAccent,
-            duration: const Duration(seconds: 5),
+            duration: Duration(seconds: 5),
           ),
         );
       }
@@ -122,7 +122,7 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
           SnackBar(
             content: Text('حدث خطأ غير متوقع: ${e.toString()}'),
             backgroundColor: Colors.redAccent,
-            duration: const Duration(seconds: 4),
+            duration: Duration(seconds: 4),
           ),
         );
       }
@@ -137,7 +137,7 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
     final email = AuthService().currentUser?.email?.trim();
     if (email == null || email.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text('لا يمكن العثور على بريد إلكتروني مرتبط بالحساب.'),
           backgroundColor: Colors.redAccent,
         ),
@@ -154,18 +154,18 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
           SnackBar(
             content: Row(
               children: [
-                const Icon(Icons.mark_email_read, color: Colors.black),
-                const SizedBox(width: 8),
+                Icon(Icons.mark_email_read, color: Colors.black),
+                SizedBox(width: 8),
                 Expanded(
                   child: Text(
                     'تم إرسال رابط إعادة تعيين كلمة المرور إلى $email. تفقد بريدك الوارد.',
-                    style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                    style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
                   ),
                 ),
               ],
             ),
             backgroundColor: AppTheme.primaryBlue,
-            duration: const Duration(seconds: 5),
+            duration: Duration(seconds: 5),
           ),
         );
       }
@@ -199,49 +199,49 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
     final userEmail = AuthService().currentUser?.email ?? '';
 
     return Scaffold(
-      backgroundColor: AppTheme.backgroundDark,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text('الأمان وكلمة المرور', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        title: Text('الأمان وكلمة المرور', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
+        padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Account info card
             Container(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: AppTheme.cardDark,
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+                border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)),
               ),
               child: Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(10),
+                    padding: EdgeInsets.all(10),
                     decoration: BoxDecoration(
                       color: AppTheme.primaryBlue.withValues(alpha: 0.15),
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(Icons.shield_outlined, color: AppTheme.primaryBlue, size: 24),
+                    child: Icon(Icons.shield_outlined, color: AppTheme.primaryBlue, size: 24),
                   ),
-                  const SizedBox(width: 14),
+                  SizedBox(width: 14),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           'أمان الحساب الإلكتروني',
-                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                          style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold, fontSize: 14),
                         ),
-                        const SizedBox(height: 4),
+                        SizedBox(height: 4),
                         Text(
                           userEmail.isNotEmpty ? userEmail : 'الحساب الحالي',
-                          style: const TextStyle(color: Colors.white54, fontSize: 12),
+                          style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 12),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ],
@@ -250,84 +250,84 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: 24),
 
             // Form container
             Container(
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: AppTheme.cardDark,
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+                border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)),
               ),
               child: Form(
                 key: _formKey,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'تغيير كلمة المرور',
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Colors.white),
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Theme.of(context).colorScheme.onSurface),
                     ),
-                    const SizedBox(height: 6),
-                    const Text(
+                    SizedBox(height: 6),
+                    Text(
                       'أدخل كلمة المرور الحالية لتأكيد هويتك، ثم اختر كلمة مرور جديدة وقوية.',
-                      style: TextStyle(color: Colors.white54, fontSize: 12, height: 1.4),
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 12, height: 1.4),
                     ),
-                    const SizedBox(height: 20),
+                    SizedBox(height: 20),
 
                     // Current Password
                     TextFormField(
                       controller: _currentPasswordController,
                       obscureText: _obscureCurrent,
-                      style: const TextStyle(color: Colors.white, fontSize: 14),
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14),
                       decoration: InputDecoration(
                         labelText: 'كلمة المرور الحالية',
-                        labelStyle: const TextStyle(color: Colors.white60, fontSize: 13),
-                        prefixIcon: const Icon(Icons.lock_outline, color: AppTheme.primaryBlue, size: 20),
+                        labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.60), fontSize: 13),
+                        prefixIcon: Icon(Icons.lock_outline, color: AppTheme.primaryBlue, size: 20),
                         suffixIcon: IconButton(
                           icon: Icon(
                             _obscureCurrent ? Icons.visibility_off : Icons.visibility,
-                            color: Colors.white38,
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38),
                             size: 20,
                           ),
                           onPressed: () => setState(() => _obscureCurrent = !_obscureCurrent),
                         ),
                         filled: true,
-                        fillColor: AppTheme.backgroundDark,
+                        fillColor: Theme.of(context).scaffoldBackgroundColor,
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: AppTheme.primaryBlue, width: 1.5),
+                          borderSide: BorderSide(color: AppTheme.primaryBlue, width: 1.5),
                         ),
                       ),
                       validator: (v) => (v == null || v.isEmpty) ? 'يرجى إدخال كلمة المرور الحالية' : null,
                     ),
-                    const SizedBox(height: 14),
+                    SizedBox(height: 14),
 
                     // New Password
                     TextFormField(
                       controller: _newPasswordController,
                       obscureText: _obscureNew,
-                      style: const TextStyle(color: Colors.white, fontSize: 14),
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14),
                       decoration: InputDecoration(
                         labelText: 'كلمة المرور الجديدة (6 أحرف أو أرقام على الأقل)',
-                        labelStyle: const TextStyle(color: Colors.white60, fontSize: 13),
-                        prefixIcon: const Icon(Icons.lock_reset, color: AppTheme.primaryBlue, size: 20),
+                        labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.60), fontSize: 13),
+                        prefixIcon: Icon(Icons.lock_reset, color: AppTheme.primaryBlue, size: 20),
                         suffixIcon: IconButton(
                           icon: Icon(
                             _obscureNew ? Icons.visibility_off : Icons.visibility,
-                            color: Colors.white38,
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38),
                             size: 20,
                           ),
                           onPressed: () => setState(() => _obscureNew = !_obscureNew),
                         ),
                         filled: true,
-                        fillColor: AppTheme.backgroundDark,
+                        fillColor: Theme.of(context).scaffoldBackgroundColor,
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: AppTheme.primaryBlue, width: 1.5),
+                          borderSide: BorderSide(color: AppTheme.primaryBlue, width: 1.5),
                         ),
                       ),
                       validator: (v) {
@@ -336,31 +336,31 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
                         return null;
                       },
                     ),
-                    const SizedBox(height: 14),
+                    SizedBox(height: 14),
 
                     // Confirm Password
                     TextFormField(
                       controller: _confirmPasswordController,
                       obscureText: _obscureConfirm,
-                      style: const TextStyle(color: Colors.white, fontSize: 14),
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14),
                       decoration: InputDecoration(
                         labelText: 'تأكيد كلمة المرور الجديدة',
-                        labelStyle: const TextStyle(color: Colors.white60, fontSize: 13),
-                        prefixIcon: const Icon(Icons.check_circle_outline, color: AppTheme.primaryBlue, size: 20),
+                        labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.60), fontSize: 13),
+                        prefixIcon: Icon(Icons.check_circle_outline, color: AppTheme.primaryBlue, size: 20),
                         suffixIcon: IconButton(
                           icon: Icon(
                             _obscureConfirm ? Icons.visibility_off : Icons.visibility,
-                            color: Colors.white38,
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38),
                             size: 20,
                           ),
                           onPressed: () => setState(() => _obscureConfirm = !_obscureConfirm),
                         ),
                         filled: true,
-                        fillColor: AppTheme.backgroundDark,
+                        fillColor: Theme.of(context).scaffoldBackgroundColor,
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(color: AppTheme.primaryBlue, width: 1.5),
+                          borderSide: BorderSide(color: AppTheme.primaryBlue, width: 1.5),
                         ),
                       ),
                       validator: (v) {
@@ -369,7 +369,7 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
                         return null;
                       },
                     ),
-                    const SizedBox(height: 24),
+                    SizedBox(height: 24),
 
                     // Submit Button
                     SizedBox(
@@ -383,46 +383,46 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
                           elevation: 2,
                         ),
                         child: _isChangingPassword
-                            ? const SizedBox(
+                            ? SizedBox(
                                 width: 22,
                                 height: 22,
                                 child: CircularProgressIndicator(color: Colors.black, strokeWidth: 2.5),
                               )
-                            : const Text(
+                            : Text(
                                 'حفظ كلمة المرور الجديدة',
                                 style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 15),
                               ),
                       ),
                     ),
 
-                    const SizedBox(height: 24),
-                    const Divider(color: Colors.white10),
-                    const SizedBox(height: 16),
+                    SizedBox(height: 24),
+                    Divider(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.10)),
+                    SizedBox(height: 16),
 
                     // Forgot Password option
-                    const Text(
+                    Text(
                       'نسيت كلمة المرور الحالية؟',
-                      style: TextStyle(color: Colors.white70, fontWeight: FontWeight.w600, fontSize: 13),
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontWeight: FontWeight.w600, fontSize: 13),
                     ),
-                    const SizedBox(height: 6),
-                    const Text(
+                    SizedBox(height: 6),
+                    Text(
                       'يمكنك إرسال رابط لإعادة تعيين كلمة المرور مباشرة إلى بريدك الإلكتروني المسجل دون الحاجة لكلمة المرور الحالية.',
-                      style: TextStyle(color: Colors.white38, fontSize: 12, height: 1.4),
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 12, height: 1.4),
                     ),
-                    const SizedBox(height: 12),
+                    SizedBox(height: 12),
                     SizedBox(
                       width: double.infinity,
                       height: 46,
                       child: OutlinedButton.icon(
                         onPressed: _isResetting ? null : _resetPassword,
                         icon: _isResetting
-                            ? const SizedBox(
+                            ? SizedBox(
                                 width: 16,
                                 height: 16,
                                 child: CircularProgressIndicator(color: AppTheme.primaryBlue, strokeWidth: 2),
                               )
-                            : const Icon(Icons.email_outlined, color: AppTheme.primaryBlue, size: 18),
-                        label: const Text(
+                            : Icon(Icons.email_outlined, color: AppTheme.primaryBlue, size: 18),
+                        label: Text(
                           'إرسال رابط استعادة كلمة المرور للبريد',
                           style: TextStyle(color: AppTheme.primaryBlue, fontWeight: FontWeight.bold, fontSize: 13),
                         ),
@@ -442,3 +442,4 @@ class _SecuritySettingsScreenState extends State<SecuritySettingsScreen> {
     );
   }
 }
+

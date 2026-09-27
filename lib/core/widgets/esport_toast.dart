@@ -49,16 +49,16 @@ class ESportToast extends StatelessWidget {
     }
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: const Color(0xFF0F172A), // Dark slate
+        color: Color(0xFF0F172A), // Dark slate
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: accentColor.withOpacity(0.5), width: 1.5),
         boxShadow: [
           BoxShadow(
             color: accentColor.withOpacity(0.2),
             blurRadius: 12,
-            offset: const Offset(0, 4),
+            offset: Offset(0, 4),
           ),
         ],
       ),
@@ -68,20 +68,20 @@ class ESportToast extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           onTap: onAction,
           child: Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: EdgeInsets.all(16.0),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Icon
                 Container(
-                  padding: const EdgeInsets.all(10),
+                  padding: EdgeInsets.all(10),
                   decoration: BoxDecoration(
                     color: accentColor.withOpacity(0.15),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(icon, color: accentColor, size: 24),
                 ),
-                const SizedBox(width: 16),
+                SizedBox(width: 16),
                 
                 // Text Content
                 Expanded(
@@ -97,20 +97,20 @@ class ESportToast extends StatelessWidget {
                           fontSize: 14,
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      SizedBox(height: 4),
                       Text(
                         message,
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface,
                           fontSize: 12,
                         ),
                       ),
                       if (onAction != null && actionLabel != null) ...[
-                        const SizedBox(height: 8),
+                        SizedBox(height: 8),
                         Align(
                           alignment: Alignment.centerLeft,
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                             decoration: BoxDecoration(
                               color: accentColor.withOpacity(0.2),
                               borderRadius: BorderRadius.circular(8),

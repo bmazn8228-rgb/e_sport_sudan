@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:e_sport_sudan/features/profile/presentation/screens/player_search_screen.dart';
+import 'package:e_sport_sudan/features/team/presentation/screens/team_search_screen.dart';
+import 'package:e_sport_sudan/features/main/presentation/screens/news_screen.dart';
 import 'dart:ui';
 import 'package:flutter/services.dart';
 import 'package:e_sport_sudan/core/theme/app_theme.dart';
@@ -49,9 +52,9 @@ class _MainScreenState extends State<MainScreen> {
         },
       ),
       TournamentsScreen(isGuest: widget.isGuest),
-      const LiveMatchScreen(matchId: 'sample_live_match'),
-      const RankingsScreen(),
-      const ProfileScreen(),
+      LiveMatchScreen(matchId: 'sample_live_match'),
+      RankingsScreen(),
+      ProfileScreen(),
     ];
 
     return Scaffold(
@@ -71,7 +74,7 @@ class _MainScreenState extends State<MainScreen> {
     ];
 
     return Container(
-      margin: const EdgeInsets.only(left: 16, right: 16, bottom: 20),
+      margin: EdgeInsets.only(left: 16, right: 16, bottom: 20),
       height: 68,
       child: ClipRRect(
         borderRadius: BorderRadius.circular(34),
@@ -79,17 +82,17 @@ class _MainScreenState extends State<MainScreen> {
           filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
           child: Container(
             decoration: BoxDecoration(
-              color: const Color(0xE6121722),
+              color: Color(0xE6121722),
               borderRadius: BorderRadius.circular(34),
               border: Border.all(
-                color: Colors.white.withValues(alpha: 0.12),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12),
                 width: 1.2,
               ),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: 0.35),
                   blurRadius: 20,
-                  offset: const Offset(0, 10),
+                  offset: Offset(0, 10),
                 ),
               ],
             ),
@@ -106,7 +109,7 @@ class _MainScreenState extends State<MainScreen> {
                   },
                   behavior: HitTestBehavior.opaque,
                   child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 250),
+                    duration: Duration(milliseconds: 250),
                     curve: Curves.easeOutCubic,
                     padding: EdgeInsets.symmetric(
                       horizontal: isSelected ? 14 : 10,
@@ -133,16 +136,16 @@ class _MainScreenState extends State<MainScreen> {
                           item['icon'] as IconData,
                           color: isSelected
                               ? AppTheme.primaryBlue
-                              : Colors.white54,
+                              : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54),
                           size: 22,
                         ),
-                        const SizedBox(height: 3),
+                        SizedBox(height: 3),
                         Text(
                           item['label'] as String,
                           style: TextStyle(
                             color: isSelected
                                 ? AppTheme.primaryBlue
-                                : Colors.white54,
+                                : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54),
                             fontSize: 10,
                             fontWeight: isSelected
                                 ? FontWeight.bold
@@ -183,31 +186,31 @@ class HomeScreen extends StatelessWidget {
                 border: Border.all(
                   color: AppTheme.primaryBlue.withValues(alpha: 0.4),
                 ),
-                image: const DecorationImage(
+                image: DecorationImage(
                   image: AssetImage('assets/images/app_logo.jpg'),
                   fit: BoxFit.cover,
                 ),
               ),
             ),
-            const SizedBox(width: 12),
+            SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     'مرحباً، ${FirebaseAuth.instance.currentUser?.displayName ?? 'يا كابتن'} 👋',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w800,
                       letterSpacing: -0.5,
                     ),
                   ),
-                  const SizedBox(height: 2),
+                  SizedBox(height: 2),
                   Text(
                     'جاهز لمنافسات اليوم؟',
                     style: TextStyle(
                       fontSize: 12,
-                      color: Colors.white.withValues(alpha: 0.6),
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                     ),
                   ),
                 ],
@@ -217,17 +220,17 @@ class HomeScreen extends StatelessWidget {
             GestureDetector(
               onTap: () => HapticFeedback.lightImpact(),
               child: Container(
-                padding: const EdgeInsets.all(10),
+                padding: EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.05),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: Colors.white.withValues(alpha: 0.1),
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
                   ),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.notifications_none_rounded,
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.onSurface,
                   size: 22,
                 ),
               ),
@@ -236,8 +239,8 @@ class HomeScreen extends StatelessWidget {
         ),
       ),
       body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        padding: const EdgeInsets.only(
+        physics: BouncingScrollPhysics(),
+        padding: EdgeInsets.only(
           left: 16,
           right: 16,
           top: 12,
@@ -247,54 +250,15 @@ class HomeScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // iOS Style Search Bar
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.06),
-                borderRadius: BorderRadius.circular(18),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
-              ),
-              child: TextField(
-                style: const TextStyle(color: Colors.white, fontSize: 14),
-                decoration: InputDecoration(
-                  hintText: 'ابحث عن بطولة، فريق، لاعب...',
-                  hintStyle: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.4),
-                    fontSize: 14,
-                  ),
-                  prefixIcon: Icon(
-                    Icons.search_rounded,
-                    color: Colors.white.withValues(alpha: 0.5),
-                    size: 22,
-                  ),
-                  suffixIcon: Container(
-                    margin: const EdgeInsets.all(6),
-                    padding: const EdgeInsets.all(6),
-                    decoration: BoxDecoration(
-                      color: AppTheme.primaryBlue.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Icon(
-                      Icons.tune_rounded,
-                      color: AppTheme.primaryBlue,
-                      size: 18,
-                    ),
-                  ),
-                  border: InputBorder.none,
-                  contentPadding: const EdgeInsets.symmetric(
-                    vertical: 14,
-                    horizontal: 16,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
+            HomeSearchBar(),
+            SizedBox(height: 20),
 
             // Featured Tournament Banner
             StreamBuilder<List<Map<String, dynamic>>>(
               stream: FirestoreService().getTournamentsStream(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(
+                  return Center(
                     child: CircularProgressIndicator(
                       color: AppTheme.primaryBlue,
                     ),
@@ -303,7 +267,7 @@ class HomeScreen extends StatelessWidget {
 
                 final tournaments = snapshot.data ?? [];
                 if (tournaments.isEmpty) {
-                  return const SizedBox();
+                  return SizedBox();
                 }
 
                 final featured = tournaments.first;
@@ -334,7 +298,7 @@ class HomeScreen extends StatelessWidget {
                               alpha: 0.18,
                             ),
                             blurRadius: 24,
-                            offset: const Offset(0, 8),
+                            offset: Offset(0, 8),
                           ),
                         ],
                         image: (posterUrl != null && posterUrl.isNotEmpty)
@@ -354,7 +318,7 @@ class HomeScreen extends StatelessWidget {
                             top: 14,
                             right: 14,
                             child: Container(
-                              padding: const EdgeInsets.symmetric(
+                              padding: EdgeInsets.symmetric(
                                 horizontal: 12,
                                 vertical: 5,
                               ),
@@ -362,7 +326,7 @@ class HomeScreen extends StatelessWidget {
                                 color: AppTheme.primaryBlue,
                                 borderRadius: BorderRadius.circular(20),
                               ),
-                              child: const Text(
+                              child: Text(
                                 'أحدث بطولة',
                                 style: TextStyle(
                                   color: Colors.black,
@@ -376,7 +340,7 @@ class HomeScreen extends StatelessWidget {
                             top: 14,
                             left: 14,
                             child: Container(
-                              padding: const EdgeInsets.symmetric(
+                              padding: EdgeInsets.symmetric(
                                 horizontal: 12,
                                 vertical: 5,
                               ),
@@ -386,7 +350,7 @@ class HomeScreen extends StatelessWidget {
                               ),
                               child: Text(
                                 '🏆 $prize',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   color: Colors.black,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 11,
@@ -403,7 +367,7 @@ class HomeScreen extends StatelessWidget {
                               children: [
                                 if (logoUrl != null && logoUrl.isNotEmpty)
                                   Padding(
-                                    padding: const EdgeInsets.only(left: 12),
+                                    padding: EdgeInsets.only(left: 12),
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.circular(12),
                                       child: CachedNetworkImage(
@@ -420,28 +384,28 @@ class HomeScreen extends StatelessWidget {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Container(
-                                        padding: const EdgeInsets.symmetric(
+                                        padding: EdgeInsets.symmetric(
                                           horizontal: 8,
                                           vertical: 2,
                                         ),
                                         decoration: BoxDecoration(
-                                          color: Colors.white12,
+                                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12),
                                           borderRadius: BorderRadius.circular(
                                             6,
                                           ),
                                         ),
                                         child: Text(
                                           game,
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                             fontSize: 10,
-                                            color: Colors.white70,
+                                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                                           ),
                                         ),
                                       ),
-                                      const SizedBox(height: 4),
+                                      SizedBox(height: 4),
                                       Text(
                                         title,
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontSize: 20,
                                           fontWeight: FontWeight.bold,
                                         ),
@@ -457,7 +421,7 @@ class HomeScreen extends StatelessWidget {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    SizedBox(height: 12),
                     if (!isGuest)
                       SizedBox(
                         width: double.infinity,
@@ -474,30 +438,30 @@ class HomeScreen extends StatelessWidget {
                               ),
                             );
                           },
-                          icon: const Icon(Icons.flag_rounded),
-                          label: const Text(
+                          icon: Icon(Icons.flag_rounded),
+                          label: Text(
                             'عرض تفاصيل البطولة والتسجيل',
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppTheme.primaryBlue,
-                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            padding: EdgeInsets.symmetric(vertical: 14),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),
                             ),
                           ),
                         ),
                       ),
-                    const SizedBox(height: 24),
+                    SizedBox(height: 24),
                   ],
                 );
               },
             ),
 
             // Quick Actions
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
             _buildQuickActions(context),
-            const SizedBox(height: 24),
+            SizedBox(height: 24),
 
             // My Upcoming Matches
             _buildSectionHeader(
@@ -505,9 +469,9 @@ class HomeScreen extends StatelessWidget {
               Icons.timer,
               AppTheme.primaryBlue,
             ),
-            const SizedBox(height: 12),
-            _buildUpcomingMatchCard(),
-            const SizedBox(height: 24),
+            SizedBox(height: 12),
+            _buildUpcomingMatchCard(context),
+            SizedBox(height: 24),
 
             // Live Matches Header
             Row(
@@ -523,14 +487,14 @@ class HomeScreen extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const BracketScreen(
+                        builder: (context) => BracketScreen(
                           tournamentTitle: 'بطولة السودان الكبرى 2025',
                           tournamentId: '',
                         ),
                       ),
                     );
                   },
-                  child: const Text(
+                  child: Text(
                     'شجرة المباريات',
                     style: TextStyle(
                       color: AppTheme.primaryBlue,
@@ -540,11 +504,11 @@ class HomeScreen extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
 
             // Live Match Card
             _buildLiveMatchCard(context),
-            const SizedBox(height: 24),
+            SizedBox(height: 24),
 
             // Top 3 Leaderboard
             Row(
@@ -559,7 +523,7 @@ class HomeScreen extends StatelessWidget {
                   onPressed: () {
                     // Navigate to Rankings Tab
                   },
-                  child: const Text(
+                  child: Text(
                     'عرض الكل',
                     style: TextStyle(
                       color: AppTheme.primaryBlue,
@@ -569,9 +533,9 @@ class HomeScreen extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 12),
-            _buildTopLeaderboard(),
-            const SizedBox(height: 24),
+            SizedBox(height: 12),
+            _buildTopLeaderboard(context),
+            SizedBox(height: 24),
 
             // Recent News
             _buildSectionHeader(
@@ -579,9 +543,9 @@ class HomeScreen extends StatelessWidget {
               Icons.article,
               Colors.blue,
             ),
-            const SizedBox(height: 12),
-            _buildNewsSection(),
-            const SizedBox(height: 20),
+            SizedBox(height: 12),
+            _buildNewsSection(context),
+            SizedBox(height: 20),
           ],
         ),
       ),
@@ -592,10 +556,10 @@ class HomeScreen extends StatelessWidget {
     return Row(
       children: [
         Icon(icon, color: color, size: 14),
-        const SizedBox(width: 8),
+        SizedBox(width: 8),
         Text(
           title,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
       ],
     );
@@ -623,7 +587,7 @@ class HomeScreen extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => const TeamManagementScreen(),
+                builder: (context) => TeamManagementScreen(),
               ),
             );
           },
@@ -645,7 +609,7 @@ class HomeScreen extends StatelessWidget {
           () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const WalletScreen()),
+              MaterialPageRoute(builder: (context) => WalletScreen()),
             );
           },
         ),
@@ -668,7 +632,7 @@ class HomeScreen extends StatelessWidget {
       child: Column(
         children: [
           Container(
-            padding: const EdgeInsets.all(14),
+            padding: EdgeInsets.all(14),
             decoration: BoxDecoration(
               color: color.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(18),
@@ -680,42 +644,42 @@ class HomeScreen extends StatelessWidget {
                 BoxShadow(
                   color: color.withValues(alpha: 0.15),
                   blurRadius: 14,
-                  offset: const Offset(0, 4),
+                  offset: Offset(0, 4),
                 ),
               ],
             ),
             child: Icon(icon, color: color, size: 24),
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: 8),
           Text(
             label,
-            style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildUpcomingMatchCard() {
+  Widget _buildUpcomingMatchCard(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppTheme.cardDark.withValues(alpha: 0.9),
+        color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.9),
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.2),
             blurRadius: 14,
-            offset: const Offset(0, 4),
+            offset: Offset(0, 4),
           ),
         ],
       ),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(14),
+            padding: EdgeInsets.all(14),
             decoration: BoxDecoration(
               color: AppTheme.primaryBlue.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(16),
@@ -723,14 +687,14 @@ class HomeScreen extends StatelessWidget {
                 color: AppTheme.primaryBlue.withValues(alpha: 0.25),
               ),
             ),
-            child: const Icon(
+            child: Icon(
               Icons.schedule_rounded,
               color: AppTheme.primaryBlue,
               size: 24,
             ),
           ),
-          const SizedBox(width: 16),
-          const Expanded(
+          SizedBox(width: 16),
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -741,7 +705,7 @@ class HomeScreen extends StatelessWidget {
                 SizedBox(height: 3),
                 Text(
                   'ستظهر مباريات فريقك القادمة فور إعلان جدول التصفيات.',
-                  style: TextStyle(color: Colors.white38, fontSize: 11),
+                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 11),
                 ),
               ],
             ),
@@ -759,11 +723,11 @@ class HomeScreen extends StatelessWidget {
           return Container(
             height: 120,
             decoration: BoxDecoration(
-              color: AppTheme.cardDark.withValues(alpha: 0.9),
+              color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.9),
               borderRadius: BorderRadius.circular(22),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+              border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)),
             ),
-            child: const Center(
+            child: Center(
               child: CircularProgressIndicator(color: AppTheme.primaryBlue),
             ),
           );
@@ -778,35 +742,35 @@ class HomeScreen extends StatelessWidget {
         if (!isLive) {
           return Container(
             width: double.infinity,
-            padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
+            padding: EdgeInsets.symmetric(vertical: 24, horizontal: 20),
             decoration: BoxDecoration(
-              color: AppTheme.cardDark.withValues(alpha: 0.9),
+              color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.9),
               borderRadius: BorderRadius.circular(22),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+              border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)),
             ),
             child: Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(14),
+                  padding: EdgeInsets.all(14),
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.05),
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
                     borderRadius: BorderRadius.circular(16),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.tv_off_rounded,
-                    color: Colors.white38,
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38),
                     size: 24,
                   ),
                 ),
-                const SizedBox(width: 16),
-                const Expanded(
+                SizedBox(width: 16),
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         'لا يوجد بث مباشر نشط حالياً',
                         style: TextStyle(
-                          color: Colors.white,
+                          color: Theme.of(context).colorScheme.onSurface,
                           fontWeight: FontWeight.bold,
                           fontSize: 14,
                         ),
@@ -814,7 +778,7 @@ class HomeScreen extends StatelessWidget {
                       SizedBox(height: 3),
                       Text(
                         'سيظهر البث هنا فور قيام إدارة البطولة بنقل مجريات المباريات.',
-                        style: TextStyle(color: Colors.white38, fontSize: 11),
+                        style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 11),
                       ),
                     ],
                   ),
@@ -828,7 +792,7 @@ class HomeScreen extends StatelessWidget {
 
         return Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(18),
+          padding: EdgeInsets.all(18),
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [Color(0xFF261217), Color(0xFF131822)],
@@ -844,7 +808,7 @@ class HomeScreen extends StatelessWidget {
               BoxShadow(
                 color: Colors.redAccent.withValues(alpha: 0.15),
                 blurRadius: 18,
-                offset: const Offset(0, 6),
+                offset: Offset(0, 6),
               ),
             ],
           ),
@@ -855,7 +819,7 @@ class HomeScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(
+                    padding: EdgeInsets.symmetric(
                       horizontal: 10,
                       vertical: 5,
                     ),
@@ -866,19 +830,19 @@ class HomeScreen extends StatelessWidget {
                         BoxShadow(
                           color: Colors.redAccent.withValues(alpha: 0.4),
                           blurRadius: 8,
-                          offset: const Offset(0, 2),
+                          offset: Offset(0, 2),
                         ),
                       ],
                     ),
-                    child: const Row(
+                    child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.circle, color: Colors.white, size: 7),
+                        Icon(Icons.circle, color: Theme.of(context).colorScheme.onSurface, size: 7),
                         SizedBox(width: 5),
                         Text(
                           'مباشر الآن',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 11,
                             fontWeight: FontWeight.bold,
                           ),
@@ -887,15 +851,15 @@ class HomeScreen extends StatelessWidget {
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(
+                    padding: EdgeInsets.symmetric(
                       horizontal: 8,
                       vertical: 3,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.08),
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Row(
+                    child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
@@ -907,7 +871,7 @@ class HomeScreen extends StatelessWidget {
                         Text(
                           'YouTube Live',
                           style: TextStyle(
-                            color: Colors.white70,
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
                           ),
@@ -917,20 +881,20 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 14),
+              SizedBox(height: 14),
               Text(
                 title,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(height: 4),
-              const Text(
+              SizedBox(height: 4),
+              Text(
                 'البث المباشر الرسمي المعتمد من الاتحاد السوداني للرياضات الإلكترونية',
-                style: TextStyle(color: Colors.white60, fontSize: 12),
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.60), fontSize: 12),
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton.icon(
@@ -940,16 +904,16 @@ class HomeScreen extends StatelessWidget {
                       context,
                       MaterialPageRoute(
                         builder: (context) =>
-                            const LiveMatchScreen(matchId: 'sample_live_match'),
+                            LiveMatchScreen(matchId: 'sample_live_match'),
                       ),
                     );
                   },
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.play_arrow_rounded,
                     color: Colors.black,
                     size: 20,
                   ),
-                  label: const Text(
+                  label: Text(
                     'مشاهدة البث والدردشة الحية الآن',
                     style: TextStyle(
                       color: Colors.black,
@@ -958,7 +922,7 @@ class HomeScreen extends StatelessWidget {
                   ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppTheme.primaryBlue,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    padding: EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
@@ -972,43 +936,43 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTopLeaderboard() {
+  Widget _buildTopLeaderboard(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppTheme.cardDark.withValues(alpha: 0.9),
+        color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.9),
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)),
       ),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(14),
+            padding: EdgeInsets.all(14),
             decoration: BoxDecoration(
               color: Colors.amber.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: Colors.amber.withValues(alpha: 0.3)),
             ),
-            child: const Icon(
+            child: Icon(
               Icons.leaderboard_rounded,
               color: Colors.amber,
               size: 24,
             ),
           ),
-          const SizedBox(width: 16),
+          SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'المتصدرون في الموسم الأول',
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                 ),
-                const SizedBox(height: 3),
-                const Text(
+                SizedBox(height: 3),
+                Text(
                   'شاهد أداء نخبة اللاعبين والفرق في السودان.',
-                  style: TextStyle(color: Colors.white38, fontSize: 11),
+                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 11),
                 ),
               ],
             ),
@@ -1025,9 +989,9 @@ class HomeScreen extends StatelessWidget {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             ),
-            child: const Text(
+            child: Text(
               'عرض',
               style: TextStyle(
                 color: AppTheme.primaryBlue,
@@ -1041,50 +1005,177 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildNewsSection() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: AppTheme.cardDark.withValues(alpha: 0.9),
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: Colors.blueAccent.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: Colors.blueAccent.withValues(alpha: 0.3),
+  Widget _buildNewsSection(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(context, MaterialPageRoute(builder: (_) => NewsListScreen()));
+      },
+      child: Container(
+        width: double.infinity,
+        padding: EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.9),
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: Colors.blueAccent.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: Colors.blueAccent.withValues(alpha: 0.3),
+                ),
+              ),
+              child: Icon(
+                Icons.newspaper_rounded,
+                color: Colors.blueAccent,
+                size: 24,
               ),
             ),
-            child: const Icon(
-              Icons.newspaper_rounded,
-              color: Colors.blueAccent,
-              size: 24,
+            SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'أخبار وبلاغات الاتحاد',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                  ),
+                  SizedBox(height: 3),
+                  Text(
+                    'إعلانات فتح باب التسجيل وتحديثات القوانين التحكيمية.',
+                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 11),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+
+
+
+
+class HomeSearchBar extends StatefulWidget {
+  const HomeSearchBar({Key? key}) : super(key: key);
+  @override
+  _HomeSearchBarState createState() => _HomeSearchBarState();
+}
+
+class _HomeSearchBarState extends State<HomeSearchBar> {
+  String _searchType = 'team'; // 'team' or 'player'
+  final TextEditingController _controller = TextEditingController();
+
+  void _showSearchOptions() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (context, setStateSheet) {
+            return Container(
+              padding: EdgeInsets.all(20),
+              height: 250,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('حدد نوع البحث', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  SizedBox(height: 20),
+                  RadioListTile<String>(
+                    title: Text('بحث عن فريق 🛡️'),
+                    value: 'team',
+                    groupValue: _searchType,
+                    activeColor: AppTheme.primaryBlue,
+                    onChanged: (val) {
+                      setState(() => _searchType = val!);
+                      setStateSheet(() => _searchType = val!);
+                      Navigator.pop(ctx);
+                    },
+                  ),
+                  RadioListTile<String>(
+                    title: Text('بحث عن لاعب 🎮'),
+                    value: 'player',
+                    groupValue: _searchType,
+                    activeColor: AppTheme.primaryBlue,
+                    onChanged: (val) {
+                      setState(() => _searchType = val!);
+                      setStateSheet(() => _searchType = val!);
+                      Navigator.pop(ctx);
+                    },
+                  ),
+                ],
+              ),
+            );
+          }
+        );
+      },
+    );
+  }
+
+  void _executeSearch(String query) {
+    if (query.trim().isEmpty) return;
+    
+    if (_searchType == 'player') {
+      Navigator.push(context, MaterialPageRoute(builder: (_) => PlayerSearchScreen(initialQuery: query.trim())));
+    } else if (_searchType == 'team') {
+      Navigator.push(context, MaterialPageRoute(builder: (_) => TeamSearchScreen(initialQuery: query.trim())));
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.06),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1)),
+      ),
+      child: TextField(
+        controller: _controller,
+        onSubmitted: _executeSearch,
+        style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14),
+        decoration: InputDecoration(
+          hintText: _searchType == 'team' ? 'ابحث عن فريق...' : 'ابحث عن لاعب...',
+          hintStyle: TextStyle(
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
+            fontSize: 14,
+          ),
+          prefixIcon: IconButton(
+            icon: Icon(Icons.search_rounded),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+            iconSize: 22,
+            onPressed: () => _executeSearch(_controller.text),
+          ),
+          suffixIcon: GestureDetector(
+            onTap: _showSearchOptions,
+            child: Container(
+              margin: EdgeInsets.all(6),
+              padding: EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: AppTheme.primaryBlue.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                Icons.tune_rounded,
+                color: AppTheme.primaryBlue,
+                size: 18,
+              ),
             ),
           ),
-          const SizedBox(width: 16),
-          const Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'أخبار وبلاغات الاتحاد',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-                ),
-                SizedBox(height: 3),
-                Text(
-                  'إعلانات فتح باب التسجيل وتحديثات القوانين التحكيمية.',
-                  style: TextStyle(color: Colors.white38, fontSize: 11),
-                ),
-              ],
-            ),
+          border: InputBorder.none,
+          contentPadding: EdgeInsets.symmetric(
+            vertical: 14,
+            horizontal: 16,
           ),
-        ],
+        ),
       ),
     );
   }

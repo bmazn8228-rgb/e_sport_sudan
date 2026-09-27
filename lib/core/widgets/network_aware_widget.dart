@@ -59,16 +59,16 @@ class _NetworkAwareWidgetState extends State<NetworkAwareWidget> {
                 bottom: false,
                 child: Container(
                   color: Colors.red,
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: const Row(
+                  padding: EdgeInsets.symmetric(vertical: 8),
+                  child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.wifi_off, color: Colors.white, size: 16),
+                      Icon(Icons.wifi_off, color: Theme.of(context).colorScheme.onSurface, size: 16),
                       SizedBox(width: 8),
                       Text(
                         'لا يوجد اتصال بالإنترنت',
                         style: TextStyle(
-                          color: Colors.white,
+                          color: Theme.of(context).colorScheme.onSurface,
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
                         ),

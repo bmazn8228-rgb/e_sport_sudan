@@ -65,7 +65,7 @@ class _LoginScreenState extends State<LoginScreen> {
         if (!hasInternet) {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
+              SnackBar(
                 content: Text(
                   'لا يوجد اتصال بالإنترنت. يرجى التحقق من الشبكة.',
                 ),
@@ -87,12 +87,12 @@ class _LoginScreenState extends State<LoginScreen> {
             if (user != null) {
               Navigator.pushAndRemoveUntil(
                 context,
-                MaterialPageRoute(builder: (context) => const RootScreen()),
+                MaterialPageRoute(builder: (context) => RootScreen()),
                 (route) => false,
               );
             } else {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
+                SnackBar(
                   content: Text(
                     'فشل تسجيل الدخول. قد تكون بياناتك قديمة، يرجى الدخول بكلمة المرور مجدداً.',
                   ),
@@ -121,7 +121,7 @@ class _LoginScreenState extends State<LoginScreen> {
     if (!hasInternet) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text('لا يوجد اتصال بالإنترنت. يرجى التحقق من الشبكة.'),
           ),
         );
@@ -151,12 +151,12 @@ class _LoginScreenState extends State<LoginScreen> {
           if (!mounted) return;
           Navigator.pushAndRemoveUntil(
             context,
-            MaterialPageRoute(builder: (context) => const RootScreen()),
+            MaterialPageRoute(builder: (context) => RootScreen()),
             (route) => false,
           );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
+            SnackBar(
               content: Text('فشل تسجيل الدخول. تأكد من صحة البيانات.'),
             ),
           );
@@ -179,7 +179,7 @@ class _LoginScreenState extends State<LoginScreen> {
         children: [
           // Dynamic Background
           Container(
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [Color(0xFF0F172A), Color(0xFF000000)],
                 begin: Alignment.topLeft,
@@ -230,7 +230,7 @@ class _LoginScreenState extends State<LoginScreen> {
           SafeArea(
             child: Center(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(24.0),
+                padding: EdgeInsets.all(24.0),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -240,7 +240,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: Column(
                         children: [
                           Container(
-                            padding: const EdgeInsets.all(16),
+                            padding: EdgeInsets.all(16),
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               color: Colors.black.withValues(alpha: 0.5),
@@ -259,23 +259,23 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                               ],
                             ),
-                            child: const Icon(
+                            child: Icon(
                               Icons.sports_esports,
                               size: 48,
                               color: AppTheme.primaryBlue,
                             ),
                           ),
-                          const SizedBox(height: 24),
-                          const Text(
+                          SizedBox(height: 24),
+                          Text(
                             'سودان إي سبورت',
                             style: TextStyle(
                               fontSize: 28,
                               fontWeight: FontWeight.bold,
                               letterSpacing: 1.2,
-                              color: Colors.white,
+                              color: Theme.of(context).colorScheme.onSurface,
                             ),
                           ),
-                          const SizedBox(height: 8),
+                          SizedBox(height: 8),
                           Text(
                             'بوابتك للبطولات الوطنية',
                             style: TextStyle(
@@ -288,19 +288,19 @@ class _LoginScreenState extends State<LoginScreen> {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 40),
+                    SizedBox(height: 40),
                     // Glassmorphism Form Container
                     ClipRRect(
                       borderRadius: BorderRadius.circular(24),
                       child: BackdropFilter(
                         filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
                         child: Container(
-                          padding: const EdgeInsets.all(32),
+                          padding: EdgeInsets.all(32),
                           decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.05),
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
                             borderRadius: BorderRadius.circular(24),
                             border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.1),
+                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
                               width: 1.5,
                             ),
                             boxShadow: [
@@ -316,14 +316,14 @@ class _LoginScreenState extends State<LoginScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
-                                const Text(
+                                Text(
                                   'تسجيل الدخول',
                                   style: TextStyle(
                                     fontSize: 22,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                const SizedBox(height: 24),
+                                SizedBox(height: 24),
                                 _buildModernTextField(
                                   controller: _identifierController,
                                   label: 'البريد الإلكتروني',
@@ -332,7 +332,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   keyboardType: TextInputType.emailAddress,
                                   validator: Validators.validateEmail,
                                 ),
-                                const SizedBox(height: 20),
+                                SizedBox(height: 20),
                                 _buildModernTextField(
                                   controller: _passwordController,
                                   label: 'كلمة المرور',
@@ -341,28 +341,28 @@ class _LoginScreenState extends State<LoginScreen> {
                                   isPassword: true,
                                   validator: Validators.validatePassword,
                                 ),
-                                const SizedBox(height: 16),
+                                SizedBox(height: 16),
                                 Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     TextButton(
                                       onPressed: _showForgotPasswordDialog,
-                                      child: const Text(
+                                      child: Text(
                                         'نسيت كلمة المرور؟',
                                         style: TextStyle(
-                                          color: Colors.white70,
+                                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                                           fontSize: 13,
                                         ),
                                       ),
                                     ),
                                     Row(
                                       children: [
-                                        const Text(
+                                        Text(
                                           'تذكرني',
                                           style: TextStyle(
                                             fontSize: 13,
-                                            color: Colors.white70,
+                                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                                           ),
                                         ),
                                         Checkbox(
@@ -372,8 +372,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                           ),
                                           activeColor: AppTheme.primaryBlue,
                                           checkColor: Colors.black,
-                                          side: const BorderSide(
-                                            color: Colors.white54,
+                                          side: BorderSide(
+                                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54),
                                           ),
                                           shape: RoundedRectangleBorder(
                                             borderRadius: BorderRadius.circular(
@@ -389,11 +389,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.end,
                                     children: [
-                                      const Text(
+                                      Text(
                                         'الدخول بالبصمة مستقبلاً',
                                         style: TextStyle(
                                           fontSize: 13,
-                                          color: Colors.white70,
+                                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                                         ),
                                       ),
                                       Checkbox(
@@ -404,8 +404,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                         ),
                                         activeColor: AppTheme.primaryBlue,
                                         checkColor: Colors.black,
-                                        side: const BorderSide(
-                                          color: Colors.white54,
+                                        side: BorderSide(
+                                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54),
                                         ),
                                         shape: RoundedRectangleBorder(
                                           borderRadius: BorderRadius.circular(
@@ -415,7 +415,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       ),
                                     ],
                                   ),
-                                const SizedBox(height: 24),
+                                SizedBox(height: 24),
                                 Row(
                                   children: [
                                     Expanded(
@@ -430,7 +430,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       ),
                                     ),
                                     if (_canUseBiometric) ...[
-                                      const SizedBox(width: 16),
+                                      SizedBox(width: 16),
                                       Container(
                                         height:
                                             56, // matches button height roughly
@@ -439,7 +439,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                           borderRadius: BorderRadius.circular(
                                             16,
                                           ),
-                                          color: Colors.white.withValues(
+                                          color: Theme.of(context).colorScheme.onSurface.withValues(
                                             alpha: 0.1,
                                           ),
                                           border: Border.all(
@@ -448,7 +448,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                           ),
                                         ),
                                         child: IconButton(
-                                          icon: const Icon(
+                                          icon: Icon(
                                             Icons.fingerprint,
                                             color: AppTheme.primaryBlue,
                                             size: 32,
@@ -461,12 +461,12 @@ class _LoginScreenState extends State<LoginScreen> {
                                     ],
                                   ],
                                 ),
-                                const SizedBox(height: 24),
-                                const Row(
+                                SizedBox(height: 24),
+                                Row(
                                   children: [
                                     Expanded(
                                       child: Divider(
-                                        color: Colors.white12,
+                                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12),
                                         thickness: 1,
                                       ),
                                     ),
@@ -477,20 +477,20 @@ class _LoginScreenState extends State<LoginScreen> {
                                       child: Text(
                                         'أو سجل بواسطة',
                                         style: TextStyle(
-                                          color: Colors.white54,
+                                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54),
                                           fontSize: 12,
                                         ),
                                       ),
                                     ),
                                     Expanded(
                                       child: Divider(
-                                        color: Colors.white12,
+                                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12),
                                         thickness: 1,
                                       ),
                                     ),
                                   ],
                                 ),
-                                const SizedBox(height: 24),
+                                SizedBox(height: 24),
                                 _buildModernButton(
                                   onPressed: _isLoading
                                       ? null
@@ -508,48 +508,48 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 24),
+                    SizedBox(height: 24),
                     TextButton.icon(
                       onPressed: () {
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
                             builder: (context) =>
-                                const MainScreen(isGuest: true),
+                                MainScreen(isGuest: true),
                           ),
                         );
                       },
-                      icon: const Icon(
+                      icon: Icon(
                         Icons.explore,
-                        color: Colors.white70,
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                         size: 20,
                       ),
-                      label: const Text(
+                      label: Text(
                         'استكشف البطولات كزائر',
-                        style: TextStyle(color: Colors.white70),
+                        style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
                       ),
                       style: TextButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        padding: EdgeInsets.symmetric(vertical: 16),
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: 16),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text(
+                        Text(
                           'ليس لديك حساب؟ ',
-                          style: TextStyle(color: Colors.white70),
+                          style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
                         ),
                         GestureDetector(
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const RegisterScreen(),
+                                builder: (context) => RegisterScreen(),
                               ),
                             );
                           },
-                          child: const Text(
+                          child: Text(
                             'سجل الآن كلاعب رسمي',
                             style: TextStyle(
                               color: AppTheme.primaryBlue,
@@ -559,7 +559,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 24),
+                    SizedBox(height: 24),
                   ],
                 ),
               ),
@@ -584,19 +584,19 @@ class _LoginScreenState extends State<LoginScreen> {
       children: [
         Text(
           label,
-          style: const TextStyle(
-            color: Colors.white70,
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
             fontSize: 13,
             fontWeight: FontWeight.w600,
           ),
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
         TextFormField(
           controller: controller,
           keyboardType: keyboardType,
           obscureText: isPassword && _obscurePassword,
           validator: validator,
-          style: const TextStyle(color: Colors.white),
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
           textDirection: isPassword ||
                   keyboardType == TextInputType.emailAddress ||
                   keyboardType == TextInputType.phone
@@ -605,7 +605,7 @@ class _LoginScreenState extends State<LoginScreen> {
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: TextStyle(
-              color: Colors.white.withValues(alpha: 0.3),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
               fontSize: 14,
             ),
             prefixIcon: Icon(icon, color: AppTheme.primaryBlue),
@@ -615,7 +615,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       _obscurePassword
                           ? Icons.visibility_off
                           : Icons.visibility,
-                      color: Colors.white54,
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54),
                     ),
                     onPressed: () =>
                         setState(() => _obscurePassword = !_obscurePassword),
@@ -626,12 +626,12 @@ class _LoginScreenState extends State<LoginScreen> {
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
               borderSide: BorderSide(
-                color: Colors.white.withValues(alpha: 0.1),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
               ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide: const BorderSide(
+              borderSide: BorderSide(
                 color: AppTheme.primaryBlue,
                 width: 1.5,
               ),
@@ -642,9 +642,9 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             focusedErrorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide: const BorderSide(color: Colors.red, width: 1.5),
+              borderSide: BorderSide(color: Colors.red, width: 1.5),
             ),
-            contentPadding: const EdgeInsets.symmetric(
+            contentPadding: EdgeInsets.symmetric(
               vertical: 18,
               horizontal: 16,
             ),
@@ -666,14 +666,14 @@ class _LoginScreenState extends State<LoginScreen> {
       decoration: isPrimary
           ? BoxDecoration(
               borderRadius: BorderRadius.circular(16),
-              gradient: const LinearGradient(
+              gradient: LinearGradient(
                 colors: [AppTheme.primaryBlue, AppTheme.primaryRed],
               ), // A bright green gradient
               boxShadow: [
                 BoxShadow(
                   color: AppTheme.primaryBlue.withValues(alpha: 0.4),
                   blurRadius: 15,
-                  offset: const Offset(0, 5),
+                  offset: Offset(0, 5),
                 ),
               ],
             )
@@ -687,10 +687,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
-                padding: const EdgeInsets.symmetric(vertical: 18),
+                padding: EdgeInsets.symmetric(vertical: 18),
               ),
               child: isLoading
-                  ? const SizedBox(
+                  ? SizedBox(
                       height: 24,
                       width: 24,
                       child: CircularProgressIndicator(
@@ -703,13 +703,13 @@ class _LoginScreenState extends State<LoginScreen> {
                       children: [
                         Text(
                           label,
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: Colors.black,
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const SizedBox(width: 8),
+                        SizedBox(width: 8),
                         Icon(icon, color: Colors.black, size: iconSize),
                       ],
                     ),
@@ -717,26 +717,26 @@ class _LoginScreenState extends State<LoginScreen> {
           : OutlinedButton(
               onPressed: onPressed,
               style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                side: BorderSide(color: Colors.white.withValues(alpha: 0.2)),
+                padding: EdgeInsets.symmetric(vertical: 16),
+                side: BorderSide(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2)),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
-                backgroundColor: Colors.white.withValues(alpha: 0.05),
+                backgroundColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
                     label,
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(width: 8),
-                  Icon(icon, color: Colors.white, size: iconSize),
+                  SizedBox(width: 8),
+                  Icon(icon, color: Theme.of(context).colorScheme.onSurface, size: iconSize),
                 ],
               ),
             ),
@@ -749,22 +749,22 @@ class _LoginScreenState extends State<LoginScreen> {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          backgroundColor: AppTheme.cardDark,
-          title: const Text(
+          backgroundColor: Theme.of(context).colorScheme.surface,
+          title: Text(
             'استعادة كلمة المرور',
-            style: TextStyle(color: Colors.white),
+            style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
           ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text(
+              Text(
                 'أدخل بريدك الإلكتروني لإرسال رابط الاستعادة:',
-                style: TextStyle(color: Colors.white70),
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16),
               TextField(
                 controller: emailController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   hintText: 'البريد الإلكتروني',
                   prefixIcon: Icon(Icons.email),
                 ),
@@ -774,9 +774,9 @@ class _LoginScreenState extends State<LoginScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext),
-              child: const Text(
+              child: Text(
                 'إلغاء',
-                style: TextStyle(color: Colors.white54),
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54)),
               ),
             ),
             ElevatedButton(
@@ -788,7 +788,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   try {
                     await AuthService().sendPasswordResetEmail(email);
                     messenger.showSnackBar(
-                      const SnackBar(
+                      SnackBar(
                         content: Text(
                           'تم إرسال رابط الاستعادة إلى بريدك الإلكتروني.',
                         ),
@@ -801,7 +801,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   }
                 }
               },
-              child: const Text('إرسال'),
+              child: Text('إرسال'),
             ),
           ],
         );
@@ -818,7 +818,7 @@ class _LoginScreenState extends State<LoginScreen> {
         if (user != null) {
           Navigator.pushAndRemoveUntil(
             context,
-            MaterialPageRoute(builder: (context) => const RootScreen()),
+            MaterialPageRoute(builder: (context) => RootScreen()),
             (route) => false,
           );
         } else {

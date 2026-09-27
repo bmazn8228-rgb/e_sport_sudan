@@ -66,7 +66,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (!hasNet) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('يرجى التأكد من توفر اتصال بالإنترنت لإتمام التسجيل')),
+          SnackBar(content: Text('يرجى التأكد من توفر اتصال بالإنترنت لإتمام التسجيل')),
         );
       }
       setState(() => _isLoading = false);
@@ -94,7 +94,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           if (!mounted) return;
 
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
+            SnackBar(
               content: Text('تم إنشاء الحساب بنجاح! يرجى تسجيل الدخول ببياناتك الجديدة 🎉'),
               backgroundColor: AppTheme.primaryBlue,
               duration: Duration(seconds: 4),
@@ -115,11 +115,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
           showDialog(
             context: context,
             builder: (context) => AlertDialog(
-              backgroundColor: AppTheme.cardDark,
-              title: const Text('فشل التسجيل', style: TextStyle(color: Colors.red)),
-              content: const Text('حدث خطأ ولم يتم إنشاء الحساب. يرجى المحاولة مرة أخرى.', style: TextStyle(color: Colors.white)),
+              backgroundColor: Theme.of(context).colorScheme.surface,
+              title: Text('فشل التسجيل', style: TextStyle(color: Colors.red)),
+              content: Text('حدث خطأ ولم يتم إنشاء الحساب. يرجى المحاولة مرة أخرى.', style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
               actions: [
-                TextButton(onPressed: () => Navigator.pop(context), child: const Text('حسناً', style: TextStyle(color: AppTheme.primaryBlue))),
+                TextButton(onPressed: () => Navigator.pop(context), child: Text('حسناً', style: TextStyle(color: AppTheme.primaryBlue))),
               ],
             ),
           );
@@ -137,7 +137,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           if (!mounted) return;
 
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
+            SnackBar(
               content: Text('تم إنشاء الحساب بنجاح! يرجى تسجيل الدخول ببياناتك الجديدة 🎉'),
               backgroundColor: AppTheme.primaryBlue,
               duration: Duration(seconds: 4),
@@ -178,11 +178,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            backgroundColor: AppTheme.cardDark,
-            title: const Text('تنبيه التسجيل', style: TextStyle(color: Colors.redAccent)),
-            content: Text(errorMessage, style: const TextStyle(color: Colors.white)),
+            backgroundColor: Theme.of(context).colorScheme.surface,
+            title: Text('تنبيه التسجيل', style: TextStyle(color: Colors.redAccent)),
+            content: Text(errorMessage, style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
             actions: [
-              TextButton(onPressed: () => Navigator.pop(context), child: const Text('حسناً', style: TextStyle(color: AppTheme.primaryBlue))),
+              TextButton(onPressed: () => Navigator.pop(context), child: Text('حسناً', style: TextStyle(color: AppTheme.primaryBlue))),
             ],
           ),
         );
@@ -198,7 +198,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -206,7 +206,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         children: [
           // Dynamic Background
           Container(
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [Color(0xFF0F172A), Color(0xFF000000)],
                 begin: Alignment.topLeft,
@@ -248,20 +248,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
           // Main Content
           SafeArea(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+              padding: EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Text(
+                  Text(
                     'تسجيل حساب جديد',
-                    style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white),
+                    style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
                   ),
-                  const SizedBox(height: 8),
-                  const Text(
+                  SizedBox(height: 8),
+                  Text(
                     'أنشئ حسابك الرسمي المعتمد للحصول على رخصتك التنافسية لتمثيل السودان.',
-                    style: TextStyle(color: Colors.white70, fontSize: 14),
+                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 14),
                   ),
-                  const SizedBox(height: 32),
+                  SizedBox(height: 32),
 
                   // Glassmorphism Form Container
                   ClipRRect(
@@ -269,11 +269,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     child: BackdropFilter(
                       filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
                       child: Container(
-                        padding: const EdgeInsets.all(24),
+                        padding: EdgeInsets.all(24),
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.05),
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
                           borderRadius: BorderRadius.circular(24),
-                          border: Border.all(color: Colors.white.withValues(alpha: 0.1), width: 1.5),
+                          border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1), width: 1.5),
                           boxShadow: [
                             BoxShadow(color: Colors.black.withValues(alpha: 0.2), blurRadius: 20, spreadRadius: -5),
                           ],
@@ -284,18 +284,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
                               // Role Selector
-                              const Text('المسار التنافسي', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 16)),
-                              const SizedBox(height: 16),
+                              Text('المسار التنافسي', style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface, fontSize: 16)),
+                              SizedBox(height: 16),
                               Row(
                                 children: [
                                   Expanded(child: _buildRoleSelector('player', 'لاعب منافس', Icons.sports_esports)),
-                                  const SizedBox(width: 12),
+                                  SizedBox(width: 12),
                                   Expanded(child: _buildRoleSelector('spectator', 'مشاهد ومتابع', Icons.visibility)),
                                 ],
                               ),
-                              const SizedBox(height: 16),
+                              SizedBox(height: 16),
                               Container(
-                                padding: const EdgeInsets.all(12),
+                                padding: EdgeInsets.all(12),
                                 decoration: BoxDecoration(
                                   color: AppTheme.primaryBlue.withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(12),
@@ -303,18 +303,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 ),
                                 child: Row(
                                   children: [
-                                    const Icon(Icons.info_outline, size: 18, color: AppTheme.primaryBlue),
-                                    const SizedBox(width: 8),
+                                    Icon(Icons.info_outline, size: 18, color: AppTheme.primaryBlue),
+                                    SizedBox(width: 8),
                                     Expanded(
-                                      child: const Text(
+                                      child: Text(
                                         'صلاحيات التنظيم، التحكيم، وإدارة الفرق تعتمد بعد التحقق من الهوية.',
-                                        style: TextStyle(fontSize: 12, color: Colors.white70),
+                                        style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
                                       ),
                                     ),
                                   ],
                                 ),
                               ),
-                              const SizedBox(height: 32),
+                              SizedBox(height: 32),
 
                               // Form Fields
                               _buildModernTextField(
@@ -324,7 +324,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 icon: Icons.badge_outlined,
                                 validator: (v) => Validators.validateName(v, fieldName: 'الاسم بالكامل'),
                               ),
-                              const SizedBox(height: 20),
+                              SizedBox(height: 20),
 
                               _buildModernTextField(
                                 controller: _phoneController,
@@ -334,7 +334,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 keyboardType: TextInputType.phone,
                                 validator: Validators.validateSudanPhone,
                               ),
-                              const SizedBox(height: 20),
+                              SizedBox(height: 20),
 
                               _buildModernTextField(
                                 controller: _emailController,
@@ -344,7 +344,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 keyboardType: TextInputType.emailAddress,
                                 validator: Validators.validateEmail,
                               ),
-                              const SizedBox(height: 20),
+                              SizedBox(height: 20),
 
                               if (_selectedRole == 'player') ...[
                                 _buildModernTextField(
@@ -354,9 +354,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   icon: Icons.gamepad_outlined,
                                   validator: (v) => Validators.validateName(v, fieldName: 'الاسم داخل اللعبة'),
                                 ),
-                                const SizedBox(height: 20),
-                                const Text('اللعبة المفضلة / الأساسية', style: TextStyle(color: Colors.white70, fontSize: 13, fontWeight: FontWeight.w600)),
-                                const SizedBox(height: 8),
+                                SizedBox(height: 20),
+                                Text('اللعبة المفضلة / الأساسية', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 13, fontWeight: FontWeight.w600)),
+                                SizedBox(height: 8),
                                 _buildModernDropdown(
                                   value: _selectedGame,
                                   hint: 'اختر اللعبة',
@@ -364,11 +364,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   items: _popularGames,
                                   onChanged: (val) => setState(() => _selectedGame = val),
                                 ),
-                                const SizedBox(height: 20),
+                                SizedBox(height: 20),
                               ],
 
-                              const Text('الولاية / المدينة', style: TextStyle(color: Colors.white70, fontSize: 13, fontWeight: FontWeight.w600)),
-                              const SizedBox(height: 8),
+                              Text('الولاية / المدينة', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 13, fontWeight: FontWeight.w600)),
+                              SizedBox(height: 8),
                               _buildModernDropdown(
                                 value: _selectedState,
                                 hint: 'اختر الولاية',
@@ -376,7 +376,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 items: _sudanStates,
                                 onChanged: (val) => setState(() => _selectedState = val),
                               ),
-                              const SizedBox(height: 20),
+                              SizedBox(height: 20),
 
                               _buildModernTextField(
                                 controller: _passwordController,
@@ -386,7 +386,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 isPassword: true,
                                 validator: Validators.validatePassword,
                               ),
-                              const SizedBox(height: 32),
+                              SizedBox(height: 32),
 
                               _buildModernButton(
                                 onPressed: _isLoading ? null : _handleRegister,
@@ -399,21 +399,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  SizedBox(height: 24),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text('لديك حساب لاعب مسجل بالفعل؟ ', style: TextStyle(color: Colors.white70)),
+                      Text('لديك حساب لاعب مسجل بالفعل؟ ', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7))),
                       GestureDetector(
                         onTap: () => Navigator.pop(context),
-                        child: const Text(
+                        child: Text(
                           'تسجيل الدخول',
                           style: TextStyle(color: AppTheme.primaryBlue, fontWeight: FontWeight.bold, fontSize: 15),
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 40),
+                  SizedBox(height: 40),
                 ],
               ),
             ),
@@ -433,21 +433,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
         });
       },
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
-        padding: const EdgeInsets.symmetric(vertical: 16),
+        duration: Duration(milliseconds: 300),
+        padding: EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(
-          color: isSelected ? AppTheme.primaryBlue : Colors.white.withValues(alpha: 0.05),
+          color: isSelected ? AppTheme.primaryBlue : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: isSelected ? AppTheme.primaryBlue : Colors.white.withValues(alpha: 0.1)),
+          border: Border.all(color: isSelected ? AppTheme.primaryBlue : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1)),
           boxShadow: isSelected
-              ? [BoxShadow(color: AppTheme.primaryBlue.withValues(alpha: 0.3), blurRadius: 12, offset: const Offset(0, 4))]
+              ? [BoxShadow(color: AppTheme.primaryBlue.withValues(alpha: 0.3), blurRadius: 12, offset: Offset(0, 4))]
               : [],
         ),
         child: Column(
           children: [
-            Icon(icon, color: isSelected ? Colors.black : Colors.white70, size: 28),
-            const SizedBox(height: 8),
-            Text(title, style: TextStyle(color: isSelected ? Colors.black : Colors.white70, fontWeight: FontWeight.bold, fontSize: 13)),
+            Icon(icon, color: isSelected ? Colors.black : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), size: 28),
+            SizedBox(height: 8),
+            Text(title, style: TextStyle(color: isSelected ? Colors.black : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontWeight: FontWeight.bold, fontSize: 13)),
           ],
         ),
       ),
@@ -466,24 +466,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(color: Colors.white70, fontSize: 13, fontWeight: FontWeight.w600)),
-        const SizedBox(height: 8),
+        Text(label, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 13, fontWeight: FontWeight.w600)),
+        SizedBox(height: 8),
         TextFormField(
           controller: controller,
           keyboardType: keyboardType,
           obscureText: isPassword && _obscurePassword,
           validator: validator,
-          style: const TextStyle(color: Colors.white),
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
           textDirection: isPassword || keyboardType == TextInputType.phone || keyboardType == TextInputType.emailAddress 
               ? TextDirection.ltr 
               : null,
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.3), fontSize: 14),
+            hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3), fontSize: 14),
             prefixIcon: Icon(icon, color: AppTheme.primaryBlue),
             suffixIcon: isPassword
                 ? IconButton(
-                    icon: Icon(_obscurePassword ? Icons.visibility_off : Icons.visibility, color: Colors.white54),
+                    icon: Icon(_obscurePassword ? Icons.visibility_off : Icons.visibility, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54)),
                     onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
                   )
                 : null,
@@ -491,11 +491,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
             fillColor: Colors.black.withValues(alpha: 0.3),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+              borderSide: BorderSide(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1)),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide: const BorderSide(color: AppTheme.primaryBlue, width: 1.5),
+              borderSide: BorderSide(color: AppTheme.primaryBlue, width: 1.5),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
@@ -503,9 +503,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
             focusedErrorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide: const BorderSide(color: Colors.red, width: 1.5),
+              borderSide: BorderSide(color: Colors.red, width: 1.5),
             ),
-            contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
+            contentPadding: EdgeInsets.symmetric(vertical: 18, horizontal: 16),
           ),
         ),
       ],
@@ -521,11 +521,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }) {
     return DropdownButtonFormField<String>(
       initialValue: value,
-      hint: Text(hint, style: TextStyle(color: Colors.white.withValues(alpha: 0.3), fontSize: 14)),
-      dropdownColor: const Color(0xFF1E293B), // Dark slate
-      icon: const Icon(Icons.arrow_drop_down, color: Colors.white70),
+      hint: Text(hint, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3), fontSize: 14)),
+      dropdownColor: Color(0xFF1E293B), // Dark slate
+      icon: Icon(Icons.arrow_drop_down, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
       validator: (v) => v == null ? 'الرجاء اختيار خيار' : null,
-      items: items.map((item) => DropdownMenuItem(value: item, child: Text(item, style: const TextStyle(color: Colors.white)))).toList(),
+      items: items.map((item) => DropdownMenuItem(value: item, child: Text(item, style: TextStyle(color: Theme.of(context).colorScheme.onSurface)))).toList(),
       onChanged: onChanged,
       decoration: InputDecoration(
         prefixIcon: Icon(icon, color: AppTheme.primaryBlue),
@@ -533,11 +533,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
         fillColor: Colors.black.withValues(alpha: 0.3),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+          borderSide: BorderSide(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: AppTheme.primaryBlue, width: 1.5),
+          borderSide: BorderSide(color: AppTheme.primaryBlue, width: 1.5),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
@@ -545,9 +545,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ),
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: Colors.red, width: 1.5),
+          borderSide: BorderSide(color: Colors.red, width: 1.5),
         ),
-        contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
+        contentPadding: EdgeInsets.symmetric(vertical: 18, horizontal: 16),
       ),
     );
   }
@@ -560,8 +560,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
-        gradient: const LinearGradient(colors: [AppTheme.primaryBlue, AppTheme.primaryRed]),
-        boxShadow: [BoxShadow(color: AppTheme.primaryBlue.withValues(alpha: 0.4), blurRadius: 15, offset: const Offset(0, 5))],
+        gradient: LinearGradient(colors: [AppTheme.primaryBlue, AppTheme.primaryRed]),
+        boxShadow: [BoxShadow(color: AppTheme.primaryBlue.withValues(alpha: 0.4), blurRadius: 15, offset: Offset(0, 5))],
       ),
       child: ElevatedButton(
         onPressed: onPressed,
@@ -569,11 +569,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
           backgroundColor: Colors.transparent,
           shadowColor: Colors.transparent,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          padding: const EdgeInsets.symmetric(vertical: 18),
+          padding: EdgeInsets.symmetric(vertical: 18),
         ),
         child: isLoading
-            ? const SizedBox(height: 24, width: 24, child: CircularProgressIndicator(color: Colors.black, strokeWidth: 2))
-            : Text(label, style: const TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold)),
+            ? SizedBox(height: 24, width: 24, child: CircularProgressIndicator(color: Colors.black, strokeWidth: 2))
+            : Text(label, style: TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold)),
       ),
     );
   }

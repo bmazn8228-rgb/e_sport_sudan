@@ -1,10 +1,12 @@
+import 'package:e_sport_sudan/core/services/notification_service.dart';
+import 'package:e_sport_sudan/core/widgets/esport_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:e_sport_sudan/core/theme/app_theme.dart';
 import 'package:e_sport_sudan/core/services/firestore_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class OrganizerMatchesScreen extends StatefulWidget {
-  const OrganizerMatchesScreen({super.key});
+  OrganizerMatchesScreen({super.key});
 
   @override
   State<OrganizerMatchesScreen> createState() => _OrganizerMatchesScreenState();
@@ -17,13 +19,13 @@ class _OrganizerMatchesScreenState extends State<OrganizerMatchesScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: AppTheme.cardDark,
-        title: const Text('تأكيد حذف المباراة', style: TextStyle(color: Colors.white)),
-        content: Text('هل أنت متأكد من رغبتك في حذف "$matchTitle"؟', style: const TextStyle(color: Colors.white70)),
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        title: Text('تأكيد حذف المباراة', style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+        content: Text('هل أنت متأكد من رغبتك في حذف "$matchTitle"؟', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7))),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('إلغاء', style: TextStyle(color: Colors.white54)),
+            child: Text('إلغاء', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54))),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
@@ -33,7 +35,7 @@ class _OrganizerMatchesScreenState extends State<OrganizerMatchesScreen> {
                 await FirestoreService().deleteMatch(matchId);
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
+                    SnackBar(
                       content: Text('تم حذف المباراة بنجاح ✅', style: TextStyle(color: Colors.black)),
                       backgroundColor: AppTheme.primaryBlue,
                     ),
@@ -47,7 +49,7 @@ class _OrganizerMatchesScreenState extends State<OrganizerMatchesScreen> {
                 }
               }
             },
-            child: const Text('حذف'),
+            child: Text('حذف'),
           ),
         ],
       ),
@@ -64,8 +66,8 @@ class _OrganizerMatchesScreenState extends State<OrganizerMatchesScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: AppTheme.cardDark,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setSheetState) => Padding(
           padding: EdgeInsets.only(
@@ -78,36 +80,36 @@ class _OrganizerMatchesScreenState extends State<OrganizerMatchesScreen> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('إضافة مباراة يدوياً', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 14),
+              Text('إضافة مباراة يدوياً', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              SizedBox(height: 14),
               TextField(
                 controller: teamAController,
-                decoration: const InputDecoration(labelText: 'اسم الفريق أ', border: OutlineInputBorder()),
+                decoration: InputDecoration(labelText: 'اسم الفريق أ', border: OutlineInputBorder()),
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: 12),
               TextField(
                 controller: teamBController,
-                decoration: const InputDecoration(labelText: 'اسم الفريق ب', border: OutlineInputBorder()),
+                decoration: InputDecoration(labelText: 'اسم الفريق ب', border: OutlineInputBorder()),
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: 12),
               TextField(
                 controller: roundController,
-                decoration: const InputDecoration(labelText: 'الدور / الجولة', border: OutlineInputBorder()),
+                decoration: InputDecoration(labelText: 'الدور / الجولة', border: OutlineInputBorder()),
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: 12),
               TextField(
                 controller: timeController,
-                decoration: const InputDecoration(labelText: 'الوقت والتاريخ', border: OutlineInputBorder()),
+                decoration: InputDecoration(labelText: 'الوقت والتاريخ', border: OutlineInputBorder()),
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 20),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryBlue, padding: const EdgeInsets.symmetric(vertical: 14)),
+                  style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryBlue, padding: EdgeInsets.symmetric(vertical: 14)),
                   onPressed: isSaving ? null : () async {
                     if (teamAController.text.trim().isEmpty || teamBController.text.trim().isEmpty) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('يرجى كتابة أسماء الفريقين'), backgroundColor: Colors.orange),
+                        SnackBar(content: Text('يرجى كتابة أسماء الفريقين'), backgroundColor: Colors.orange),
                       );
                       return;
                     }
@@ -126,7 +128,7 @@ class _OrganizerMatchesScreenState extends State<OrganizerMatchesScreen> {
                       if (ctx.mounted) Navigator.pop(ctx);
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('تمت إضافة المباراة بنجاح ✅', style: TextStyle(color: Colors.black)), backgroundColor: AppTheme.primaryBlue),
+                          SnackBar(content: Text('تمت إضافة المباراة بنجاح ✅', style: TextStyle(color: Colors.black)), backgroundColor: AppTheme.primaryBlue),
                         );
                       }
                     } catch (e) {
@@ -136,7 +138,7 @@ class _OrganizerMatchesScreenState extends State<OrganizerMatchesScreen> {
                       }
                     }
                   },
-                  child: Text(isSaving ? 'جاري الحفظ...' : 'إضافة المباراة 🚀', style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+                  child: Text(isSaving ? 'جاري الحفظ...' : 'إضافة المباراة 🚀', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
                 ),
               ),
             ],
@@ -150,29 +152,29 @@ class _OrganizerMatchesScreenState extends State<OrganizerMatchesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('جدول ومباريات البطولة', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+        title: Text('جدول ومباريات البطولة', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showAddMatchDialog(context),
         backgroundColor: AppTheme.primaryBlue,
-        child: const Icon(Icons.add, color: Colors.black),
+        child: Icon(Icons.add, color: Colors.black),
       ),
       body: Column(
         children: [
           // Filter Chips
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Row(
               children: [
                 _buildFilterChip('all', 'كافة المباريات'),
-                const SizedBox(width: 8),
+                SizedBox(width: 8),
                 _buildFilterChip('scheduled', 'المجدولة'),
-                const SizedBox(width: 8),
+                SizedBox(width: 8),
                 _buildFilterChip('live', 'جارية الآن 🔴'),
-                const SizedBox(width: 8),
+                SizedBox(width: 8),
                 _buildFilterChip('completed', 'المكتملة ✅'),
               ],
             ),
@@ -182,7 +184,7 @@ class _OrganizerMatchesScreenState extends State<OrganizerMatchesScreen> {
               stream: FirestoreService().getAllMatchesStream(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator(color: AppTheme.primaryBlue));
+                  return Center(child: CircularProgressIndicator(color: AppTheme.primaryBlue));
                 }
 
                 var matches = snapshot.data ?? [];
@@ -191,11 +193,11 @@ class _OrganizerMatchesScreenState extends State<OrganizerMatchesScreen> {
                 }
 
                 if (matches.isEmpty) {
-                  return const Center(child: Text('لا توجد مباريات مطابقة للفلتر', style: TextStyle(color: Colors.white54, fontSize: 16)));
+                  return Center(child: Text('لا توجد مباريات مطابقة للفلتر', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 16)));
                 }
 
                 return ListView.builder(
-                  padding: const EdgeInsets.all(16),
+                  padding: EdgeInsets.all(16),
                   itemCount: matches.length,
                   itemBuilder: (context, index) {
                     final match = matches[index];
@@ -219,48 +221,48 @@ class _OrganizerMatchesScreenState extends State<OrganizerMatchesScreen> {
                     }
 
                     return Card(
-                      color: AppTheme.cardDark,
-                      margin: const EdgeInsets.only(bottom: 12),
+                      color: Theme.of(context).colorScheme.surface,
+                      margin: EdgeInsets.only(bottom: 12),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       child: Padding(
-                        padding: const EdgeInsets.all(14),
+                        padding: EdgeInsets.all(14),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text(round, style: const TextStyle(fontSize: 12, color: Colors.white54)),
+                                Text(round, style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54))),
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                   decoration: BoxDecoration(color: statusColor.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(6)),
                                   child: Text(statusLabel, style: TextStyle(color: statusColor, fontSize: 11, fontWeight: FontWeight.bold)),
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 10),
+                            SizedBox(height: 10),
                             Row(
                               children: [
                                 Expanded(
-                                  child: Text(teamA, textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                                  child: Text(teamA, textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
                                 ),
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                                  decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.05), borderRadius: BorderRadius.circular(8)),
-                                  child: Text('$scoreA - $scoreB', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.primaryBlue)),
+                                  padding: EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                                  decoration: BoxDecoration(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05), borderRadius: BorderRadius.circular(8)),
+                                  child: Text('$scoreA - $scoreB', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.primaryBlue)),
                                 ),
                                 Expanded(
-                                  child: Text(teamB, textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                                  child: Text(teamB, textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 8),
+                            SizedBox(height: 8),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text('التوقيت: $time', style: const TextStyle(fontSize: 11, color: Colors.white38)),
+                                Text('التوقيت: $time', style: TextStyle(fontSize: 11, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38))),
                                 IconButton(
-                                  icon: const Icon(Icons.delete_outline, color: Colors.redAccent, size: 20),
+                                  icon: Icon(Icons.delete_outline, color: Colors.redAccent, size: 20),
                                   tooltip: 'حذف المباراة',
                                   onPressed: () => _confirmDeleteMatch(context, matchId, '$teamA ضد $teamB'),
                                 ),
@@ -283,10 +285,10 @@ class _OrganizerMatchesScreenState extends State<OrganizerMatchesScreen> {
   Widget _buildFilterChip(String value, String label) {
     final isSelected = _selectedStatus == value;
     return ChoiceChip(
-      label: Text(label, style: TextStyle(color: isSelected ? Colors.black : Colors.white, fontSize: 12)),
+      label: Text(label, style: TextStyle(color: isSelected ? Colors.black : Theme.of(context).colorScheme.onSurface, fontSize: 12)),
       selected: isSelected,
       selectedColor: AppTheme.primaryBlue,
-      backgroundColor: AppTheme.cardDark,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       onSelected: (_) => setState(() => _selectedStatus = value),
     );
   }

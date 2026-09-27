@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/user_model.dart';
+import '../models/news_model.dart';
 
 class FirestoreService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -12,17 +13,25 @@ class FirestoreService {
   // =========================================================================
   // 1. Users & Admin Roles
   // =========================================================================
+  UserModel? _cachedUser;
+  DateTime? _lastCacheTime;
+
   Future<UserModel?> getUser(String uid) async {
+    // Return cached user if requested within the last 5 seconds to speed up login flow
+    if (_cachedUser != null && _cachedUser!.uid == uid && _lastCacheTime != null) {
+      if (DateTime.now().difference(_lastCacheTime!).inSeconds < 5) {
+        return _cachedUser;
+      }
+    }
+
     try {
-      final doc = await _db
-          .collection('users')
-          .doc(uid)
-          .get()
-          .timeout(const Duration(seconds: 5));
+      final doc = await _db.collection('users').doc(uid).get();
       if (!doc.exists || doc.data() == null) return null;
-      return UserModel.fromMap(doc.data()!, doc.id);
+      _cachedUser = UserModel.fromMap(doc.data()!, doc.id);
+      _lastCacheTime = DateTime.now();
+      return _cachedUser;
     } catch (e) {
-      return null;
+      rethrow;
     }
   }
 
@@ -154,6 +163,8 @@ class FirestoreService {
   // 6. Leaderboards (التصنيفات والفرق)
   // =========================================================================
   Future<String> createTeam(Map<String, dynamic> teamData, String creatorUid) async {
+    teamData['pendingRequests'] = [];
+    teamData['joinType'] = teamData['joinType'] ?? 'approval'; // 'public' or 'approval'
     final docRef = await _db.collection('teams').add(teamData);
     await _db.collection('users').doc(creatorUid).set({
       'teamId': docRef.id,
@@ -170,6 +181,39 @@ class FirestoreService {
     await _db.collection('users').doc(uid).set({
       'teamId': teamId,
     }, SetOptions(merge: true));
+  }
+
+  
+  Future<void> requestToJoinTeam(String teamId, Map<String, dynamic> requestData) async {
+    await _db.collection('teams').doc(teamId).update({
+      'pendingRequests': FieldValue.arrayUnion([requestData])
+    });
+  }
+
+  Future<void> acceptJoinRequest(String teamId, String uid, Map<String, dynamic> requestData) async {
+    final teamRef = _db.collection('teams').doc(teamId);
+    
+    await _db.runTransaction((transaction) async {
+      // 1. Remove from pending
+      transaction.update(teamRef, {
+        'pendingRequests': FieldValue.arrayRemove([requestData])
+      });
+      // 2. Add to roster
+      requestData['role'] = 'Member';
+      requestData['joinedAt'] = DateTime.now().toIso8601String();
+      transaction.update(teamRef, {
+        'roster': FieldValue.arrayUnion([requestData])
+      });
+      // 3. Update user doc
+      final userRef = _db.collection('users').doc(uid);
+      transaction.set(userRef, {'teamId': teamId}, SetOptions(merge: true));
+    });
+  }
+
+  Future<void> rejectJoinRequest(String teamId, Map<String, dynamic> requestData) async {
+    await _db.collection('teams').doc(teamId).update({
+      'pendingRequests': FieldValue.arrayRemove([requestData])
+    });
   }
 
   Future<void> leaveTeam(String teamId, String uid, Map<String, dynamic> playerRosterData) async {
@@ -628,7 +672,7 @@ class FirestoreService {
   // 12. Players Search
   // =========================================================================
   Stream<List<Map<String, dynamic>>> searchPlayersStream(String query) {
-    if (query.isEmpty) return const Stream.empty();
+    if (query.isEmpty) return Stream.empty();
     return _db.collection('users')
         .where('role', isEqualTo: 'player')
         .orderBy('displayName')
@@ -644,7 +688,7 @@ class FirestoreService {
   }
 
   Stream<List<Map<String, dynamic>>> searchAllUsersStream(String query) {
-    if (query.isEmpty) return const Stream.empty();
+    if (query.isEmpty) return Stream.empty();
     return _db.collection('users')
         .orderBy('displayName')
         .startAt([query])
@@ -831,5 +875,63 @@ class FirestoreService {
       'refereeName': refereeName,
     });
   }
-}
 
+  // =========================================================================
+  // Notifications
+  // =========================================================================
+  Stream<List<Map<String, dynamic>>> getUserNotificationsStream(String uid) {
+    return _db
+        .collection('users')
+        .doc(uid)
+        .collection('notifications')
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .map((snapshot) => snapshot.docs.map((doc) => {'id': doc.id, ...doc.data()}).toList());
+  }
+
+  Future<void> markNotificationAsRead(String uid, String notificationId) async {
+    await _db
+        .collection('users')
+        .doc(uid)
+        .collection('notifications')
+        .doc(notificationId)
+        .update({'isRead': true});
+  }
+
+  Future<void> addNotification(String uid, String title, String body, {String type = 'general'}) async {
+    await _db.collection('users').doc(uid).collection('notifications').add({
+      'title': title,
+      'body': body,
+      'type': type,
+      'isRead': false,
+      'createdAt': FieldValue.serverTimestamp(),
+    });
+  }
+
+
+  // =========================================================================
+  // 15. News and Articles
+  // =========================================================================
+  
+  Stream<List<NewsModel>> getNewsStream() {
+    return _db
+        .collection('news')
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs.map((doc) => NewsModel.fromMap(doc.data(), doc.id)).toList();
+    });
+  }
+
+  Future<void> addNews(NewsModel news) async {
+    final docRef = _db.collection('news').doc();
+    final data = news.toMap();
+    data['id'] = docRef.id;
+    await docRef.set(data);
+  }
+
+  Future<void> deleteNews(String id) async {
+    await _db.collection('news').doc(id).delete();
+  }
+
+}

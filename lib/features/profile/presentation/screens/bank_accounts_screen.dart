@@ -42,7 +42,7 @@ class _BankAccountsScreenState extends State<BankAccountsScreen> {
 
     if (accountName.isEmpty || accountNumber.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('الرجاء إدخال جميع البيانات ⚠️'), backgroundColor: Colors.red),
+        SnackBar(content: Text('الرجاء إدخال جميع البيانات ⚠️'), backgroundColor: Colors.red),
       );
       return;
     }
@@ -62,7 +62,7 @@ class _BankAccountsScreenState extends State<BankAccountsScreen> {
       });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('تمت إضافة الحساب بنجاح ✅'), backgroundColor: AppTheme.primaryBlue),
+          SnackBar(content: Text('تمت إضافة الحساب بنجاح ✅'), backgroundColor: AppTheme.primaryBlue),
         );
       }
     } catch (e) {
@@ -80,105 +80,105 @@ class _BankAccountsScreenState extends State<BankAccountsScreen> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: const Text('إدارة الحسابات البنكية', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text('إدارة الحسابات البنكية', style: TextStyle(fontWeight: FontWeight.bold)),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'حساباتك المسجلة',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
             StreamBuilder<List<Map<String, dynamic>>>(
               stream: _firestoreService.getBankAccountsStream(_userId),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator(color: AppTheme.primaryBlue));
+                  return Center(child: CircularProgressIndicator(color: AppTheme.primaryBlue));
                 }
 
                 final accounts = snapshot.data ?? [];
 
                 if (accounts.isEmpty) {
                   return Container(
-                    padding: const EdgeInsets.all(24),
+                    padding: EdgeInsets.all(24),
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
-                      color: AppTheme.cardDark,
+                      color: Theme.of(context).colorScheme.surface,
                       borderRadius: BorderRadius.circular(16),
                     ),
-                    child: const Text(
+                    child: Text(
                       'لا توجد حسابات بنكية مضافة بعد',
-                      style: TextStyle(color: Colors.white54, fontSize: 16),
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 16),
                     ),
                   );
                 }
 
                 return ListView.builder(
                   shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
+                  physics: NeverScrollableScrollPhysics(),
                   itemCount: accounts.length,
                   itemBuilder: (context, index) {
                     final account = accounts[index];
                     return Container(
-                      margin: const EdgeInsets.only(bottom: 12),
-                      padding: const EdgeInsets.all(16),
+                      margin: EdgeInsets.only(bottom: 12),
+                      padding: EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: AppTheme.cardDark,
+                        color: Theme.of(context).colorScheme.surface,
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Colors.white10),
+                        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.10)),
                       ),
                       child: Row(
                         children: [
                           Container(
-                            padding: const EdgeInsets.all(10),
+                            padding: EdgeInsets.all(10),
                             decoration: BoxDecoration(
                               color: AppTheme.primaryBlue.withOpacity(0.15),
                               borderRadius: BorderRadius.circular(10),
                             ),
-                            child: const Icon(Icons.account_balance, color: AppTheme.primaryBlue, size: 24),
+                            child: Icon(Icons.account_balance, color: AppTheme.primaryBlue, size: 24),
                           ),
-                          const SizedBox(width: 16),
+                          SizedBox(width: 16),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
                                   account['bankName'] ?? '',
-                                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                                 ),
-                                const SizedBox(height: 4),
+                                SizedBox(height: 4),
                                 Text(
                                   account['accountName'] ?? '',
-                                  style: const TextStyle(color: Colors.white70, fontSize: 12),
+                                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 12),
                                 ),
                                 Text(
                                   account['accountNumber'] ?? '',
-                                  style: const TextStyle(color: Colors.white54, fontSize: 12, letterSpacing: 1.2),
+                                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 12, letterSpacing: 1.2),
                                 ),
                               ],
                             ),
                           ),
                           IconButton(
-                            icon: const Icon(Icons.delete, color: Colors.red),
+                            icon: Icon(Icons.delete, color: Colors.red),
                             onPressed: () async {
                               final confirm = await showDialog<bool>(
                                 context: context,
                                 builder: (ctx) => AlertDialog(
-                                  backgroundColor: AppTheme.cardDark,
-                                  title: const Text('حذف الحساب'),
-                                  content: const Text('هل أنت متأكد من حذف هذا الحساب؟'),
+                                  backgroundColor: Theme.of(context).colorScheme.surface,
+                                  title: Text('حذف الحساب'),
+                                  content: Text('هل أنت متأكد من حذف هذا الحساب؟'),
                                   actions: [
                                     TextButton(
                                       onPressed: () => Navigator.pop(ctx, false),
-                                      child: const Text('إلغاء', style: TextStyle(color: Colors.white)),
+                                      child: Text('إلغاء', style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
                                     ),
                                     TextButton(
                                       onPressed: () => Navigator.pop(ctx, true),
-                                      child: const Text('حذف', style: TextStyle(color: Colors.red)),
+                                      child: Text('حذف', style: TextStyle(color: Colors.red)),
                                     ),
                                   ],
                                 ),
@@ -195,7 +195,7 @@ class _BankAccountsScreenState extends State<BankAccountsScreen> {
                 );
               },
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: 24),
             if (!_isAdding)
               ElevatedButton.icon(
                 onPressed: () {
@@ -203,18 +203,18 @@ class _BankAccountsScreenState extends State<BankAccountsScreen> {
                     _isAdding = true;
                   });
                 },
-                icon: const Icon(Icons.add, color: Colors.black),
-                label: const Text('إضافة حساب جديد', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+                icon: Icon(Icons.add, color: Colors.black),
+                label: Text('إضافة حساب جديد', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppTheme.primaryBlue,
-                  minimumSize: const Size(double.infinity, 50),
+                  minimumSize: Size(double.infinity, 50),
                 ),
               ),
             if (_isAdding) ...[
               Container(
-                padding: const EdgeInsets.all(16),
+                padding: EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: AppTheme.cardDark,
+                  color: Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(color: AppTheme.primaryBlue.withOpacity(0.3)),
                 ),
@@ -224,9 +224,9 @@ class _BankAccountsScreenState extends State<BankAccountsScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text('إضافة حساب بنكي', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                        Text('إضافة حساب بنكي', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                         IconButton(
-                          icon: const Icon(Icons.close, color: Colors.white54, size: 20),
+                          icon: Icon(Icons.close, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), size: 20),
                           onPressed: () {
                             setState(() {
                               _isAdding = false;
@@ -235,11 +235,11 @@ class _BankAccountsScreenState extends State<BankAccountsScreen> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: 16),
                     DropdownButtonFormField<String>(
-                      value: _selectedBank,
-                      dropdownColor: AppTheme.cardDark,
-                      decoration: const InputDecoration(
+                      initialValue: _selectedBank,
+                      dropdownColor: Theme.of(context).colorScheme.surface,
+                      decoration: InputDecoration(
                         labelText: 'اسم البنك / المحفظة',
                         prefixIcon: Icon(Icons.account_balance),
                       ),
@@ -249,40 +249,40 @@ class _BankAccountsScreenState extends State<BankAccountsScreen> {
                       },
                     ),
                     if (_selectedBank == 'أخرى') ...[
-                      const SizedBox(height: 16),
+                      SizedBox(height: 16),
                       TextField(
                         controller: _bankNameController,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           labelText: 'اسم البنك',
                           prefixIcon: Icon(Icons.account_balance_wallet),
                         ),
                       ),
                     ],
-                    const SizedBox(height: 16),
+                    SizedBox(height: 16),
                     TextField(
                       controller: _accountNameController,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         labelText: 'الاسم رباعي (كما في البنك)',
                         prefixIcon: Icon(Icons.person),
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: 16),
                     TextField(
                       controller: _accountNumberController,
                       keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         labelText: 'رقم الحساب / رقم الهاتف',
                         prefixIcon: Icon(Icons.numbers),
                       ),
                     ),
-                    const SizedBox(height: 24),
+                    SizedBox(height: 24),
                     ElevatedButton(
                       onPressed: _addAccount,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppTheme.primaryBlue,
-                        minimumSize: const Size(double.infinity, 50),
+                        minimumSize: Size(double.infinity, 50),
                       ),
-                      child: const Text('حفظ الحساب', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+                      child: Text('حفظ الحساب', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
                     ),
                   ],
                 ),
