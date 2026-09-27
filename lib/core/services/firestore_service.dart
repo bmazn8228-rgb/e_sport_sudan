@@ -146,7 +146,10 @@ class FirestoreService {
       
       if (snapshot.data()?['status'] != 'pending') return; // Already processed
 
-      transaction.update(docRef, {'status': status});
+      transaction.update(docRef, {
+        'status': status,
+        'processedAt': FieldValue.serverTimestamp(),
+      });
       
       if (status == 'approved') {
         final userRef = _db.collection('users').doc(userId);
@@ -157,6 +160,24 @@ class FirestoreService {
         }
       }
     });
+
+    try {
+      if (status == 'approved') {
+        await addNotification(
+          userId,
+          'تم تأكيد شحن الرصيد! 💳✅',
+          'تمت الموافقة على طلب الشحن وإيداع مبلغ ${amount.toStringAsFixed(2)} ج.س في محفظتك بنجاح.',
+          type: 'deposit_approved',
+        );
+      } else if (status == 'rejected') {
+        await addNotification(
+          userId,
+          'تم رفض طلب شحن الرصيد ⚠️',
+          'نعتذر، لم يتم اعتماد طلب شحن الرصيد بمبلغ ${amount.toStringAsFixed(2)} ج.س. يرجى مراجعة إشعار التحويل أو التواصل مع الدعم الفني.',
+          type: 'deposit_rejected',
+        );
+      }
+    } catch (_) {}
   }
 
   // =========================================================================
@@ -487,6 +508,122 @@ class FirestoreService {
               return data;
             }).toList());
   }
+
+  Future<void> submitWithdrawalRequest({
+    required String userId,
+    required double amount,
+    required String bankAccountName,
+    required String accountNumber,
+    required String accountHolderName,
+  }) async {
+    await _db.runTransaction((transaction) async {
+      final userRef = _db.collection('users').doc(userId);
+      final userSnapshot = await transaction.get(userRef);
+      
+      if (!userSnapshot.exists) {
+        throw Exception('المستخدم غير موجود');
+      }
+
+      final currentBalance = (userSnapshot.data()?['walletBalance'] as num?)?.toDouble() ?? 0.0;
+      if (currentBalance < amount) {
+        throw Exception('رصيدك المتاح (${currentBalance.toStringAsFixed(2)} ج.س) غير كافٍ لسحب مبلغ ${amount.toStringAsFixed(2)} ج.س');
+      }
+
+      // Deduct immediately so the balance is held/reserved
+      transaction.update(userRef, {
+        'walletBalance': currentBalance - amount,
+      });
+
+      final txRef = _db.collection('transactions').doc();
+      transaction.set(txRef, {
+        'userId': userId,
+        'amount': amount,
+        'type': 'withdrawal',
+        'bankAccountName': bankAccountName,
+        'accountNumber': accountNumber,
+        'accountHolderName': accountHolderName,
+        'status': 'pending',
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+    });
+
+    try {
+      await addNotification(
+        userId,
+        'طلب سحب رصيد قيد المراجعة ⏳',
+        'تم استلام طلب سحب مبلغ ${amount.toStringAsFixed(2)} ج.س إلى $bankAccountName (حساب رقم: $accountNumber). سيتم التحويل وإشعارك قريباً.',
+        type: 'withdrawal_pending',
+      );
+    } catch (_) {}
+  }
+
+  Future<void> approveWithdrawalRequest({
+    required String docId,
+    required String userId,
+    required double amount,
+    required String bankName,
+    required String accountNumber,
+  }) async {
+    final docRef = _db.collection('transactions').doc(docId);
+    final snapshot = await docRef.get();
+    if (!snapshot.exists || snapshot.data()?['status'] != 'pending') {
+      return;
+    }
+
+    await docRef.update({
+      'status': 'approved',
+      'processedAt': FieldValue.serverTimestamp(),
+    });
+
+    try {
+      await addNotification(
+        userId,
+        'تم إيداع مبلغ السحب بنجاح! 💸✅',
+        'مرحباً! قام المسؤول بتأكيد إيداع مبلغ ${amount.toStringAsFixed(2)} ج.س في حسابك البنكي ($bankName - رقم: $accountNumber). شكراً لثقتكم بنا!',
+        type: 'withdrawal_approved',
+      );
+    } catch (_) {}
+  }
+
+  Future<void> rejectWithdrawalRequest({
+    required String docId,
+    required String userId,
+    required double amount,
+    String reason = 'بيانات الحساب البنكي غير مطابقة أو تم إلغاء الطلب',
+  }) async {
+    await _db.runTransaction((transaction) async {
+      final docRef = _db.collection('transactions').doc(docId);
+      final snapshot = await transaction.get(docRef);
+      if (!snapshot.exists || snapshot.data()?['status'] != 'pending') {
+        return;
+      }
+
+      transaction.update(docRef, {
+        'status': 'rejected',
+        'rejectReason': reason,
+        'processedAt': FieldValue.serverTimestamp(),
+      });
+
+      // Refund the reserved money back to the user's wallet
+      final userRef = _db.collection('users').doc(userId);
+      final userSnapshot = await transaction.get(userRef);
+      if (userSnapshot.exists) {
+        final currentBalance = (userSnapshot.data()?['walletBalance'] as num?)?.toDouble() ?? 0.0;
+        transaction.update(userRef, {
+          'walletBalance': currentBalance + amount,
+        });
+      }
+    });
+
+    try {
+      await addNotification(
+        userId,
+        'تم رفض طلب السحب واسترداد الرصيد ⚠️',
+        'تم رفض طلب سحب مبلغ ${amount.toStringAsFixed(2)} ج.س وتم استرجاع المبلغ بالكامل إلى محفظتك. السبب: $reason',
+        type: 'withdrawal_rejected',
+      );
+    } catch (_) {}
+  }
   // =========================================================================
   // 7. Data Seeding / تهيئة الجداول والبيانات الأولية والصلاحيات
   // =========================================================================
@@ -740,8 +877,11 @@ class FirestoreService {
     );
   }
 
-  Stream<List<Map<String, dynamic>>> getTransactionsByStatusStream(String? status) {
-    Query query = _db.collection('transactions').where('type', isEqualTo: 'deposit');
+  Stream<List<Map<String, dynamic>>> getTransactionsByStatusStream(String? status, {String type = 'deposit'}) {
+    Query query = _db.collection('transactions');
+    if (type != 'all') {
+      query = query.where('type', isEqualTo: type);
+    }
     if (status != null && status.isNotEmpty && status != 'all') {
       query = query.where('status', isEqualTo: status);
     }
