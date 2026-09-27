@@ -659,7 +659,7 @@ class FirestoreService {
   }
 
   Future<void> updateUserRole(String userId, String roleValue) async {
-    await _db.collection('users').doc(userId).update({'role': roleValue});
+    await _db.collection('users').doc(userId).set({'role': roleValue}, SetOptions(merge: true));
   }
 
   // =========================================================================
@@ -701,12 +701,23 @@ class FirestoreService {
     if (status != null && status.isNotEmpty && status != 'all') {
       query = query.where('status', isEqualTo: status);
     }
-    return query.orderBy('createdAt', descending: true).snapshots().map(
-      (snapshot) => snapshot.docs.map((doc) {
-        final data = doc.data() as Map<String, dynamic>;
-        data['id'] = doc.id;
-        return data;
-      }).toList(),
+    return query.snapshots().map(
+      (snapshot) {
+        final list = snapshot.docs.map((doc) {
+          final data = doc.data() as Map<String, dynamic>;
+          data['id'] = doc.id;
+          return data;
+        }).toList();
+        list.sort((a, b) {
+          final tA = a['createdAt'];
+          final tB = b['createdAt'];
+          if (tA is Timestamp && tB is Timestamp) {
+            return tB.compareTo(tA);
+          }
+          return 0;
+        });
+        return list;
+      },
     );
   }
 

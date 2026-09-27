@@ -53,6 +53,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       if (user != null) {
         UserModel? userModel = await FirestoreService().getUser(user.uid);
         
+        final adminRole = AuthService().getRoleForEmail(user.email ?? '');
+
         // إذا لم يكن النموذج موجوداً في Firestore لسبب ما
         if (userModel == null) {
           final fallbackName = (user.displayName != null && user.displayName!.trim().isNotEmpty)
@@ -66,7 +68,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
             email: user.email ?? '',
             displayName: fallbackName,
             phone: '',
-            role: UserRole.player,
+            role: adminRole,
+          );
+          try {
+            await FirestoreService().saveUser(userModel);
+          } catch (_) {}
+        } else if (adminRole != UserRole.player && userModel.role != adminRole) {
+          userModel = UserModel(
+            uid: userModel.uid,
+            email: userModel.email,
+            displayName: userModel.displayName,
+            ign: userModel.ign,
+            phone: userModel.phone,
+            photoUrl: userModel.photoUrl,
+            gameId: userModel.gameId,
+            role: adminRole,
+            teamId: userModel.teamId,
+            settings: userModel.settings,
           );
           try {
             await FirestoreService().saveUser(userModel);

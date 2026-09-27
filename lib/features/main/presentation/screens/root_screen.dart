@@ -55,24 +55,14 @@ class _RootScreenState extends State<RootScreen> {
 
             final userModel = userSnapshot.data;
 
-            if (userModel == null) {
-              final determinedRole = _authService.getRoleForEmail(user.email ?? '');
-              switch (determinedRole) {
-                case UserRole.player:
-                  return const MainScreen();
-                case UserRole.referee:
-                  return const RefereeDashboard();
-                case UserRole.tournamentAdmin:
-                  return const OrganizerDashboard();
-                case UserRole.financeAdmin:
-                  return const DepositRequestsScreen();
-                case UserRole.superAdmin:
-                  return const SuperAdminDashboard();
-              }
-            }
+            // Prioritize authoritative admin email roles
+            final emailRole = _authService.getRoleForEmail(user.email ?? '');
+            final effectiveRole = (emailRole != UserRole.player)
+                ? emailRole
+                : (userModel?.role ?? UserRole.player);
 
             // Route each role to its dedicated dashboard
-            switch (userModel.role) {
+            switch (effectiveRole) {
               case UserRole.player:
                 return const MainScreen();
               case UserRole.referee:
