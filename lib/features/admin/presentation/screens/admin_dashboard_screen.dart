@@ -248,7 +248,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             'تعديل النتيجة الحية وتوقيت المباراة أثناء اللعب',
             Icons.tune,
             Colors.blueAccent,
-            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const RefereeDashboardScreen())),
+            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => RefereeDashboardScreen())),
           ),
           _buildActionCard(
             'إدارة رابط البث المباشر (YouTube)',
