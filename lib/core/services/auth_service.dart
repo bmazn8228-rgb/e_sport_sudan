@@ -40,18 +40,44 @@ class AuthService {
       
       User? user = result.user;
       if (user != null) {
-        // Fetch user from Firestore to get their role
         UserModel? userModel = await _firestoreService.getUser(user.uid);
+        final adminRole = getRoleForEmail(user.email ?? cleanEmail);
+
         if (userModel == null) {
           // Fallback: create a basic user doc if they exist in Auth but not Firestore
           userModel = UserModel(
             uid: user.uid,
             email: user.email ?? cleanEmail,
-            displayName: user.displayName ?? 'Player',
+            displayName: user.displayName?.isNotEmpty == true
+                ? user.displayName!
+                : (adminRole == UserRole.superAdmin ? 'Super Admin' : 'Player'),
             phone: '',
-            role: getRoleForEmail(user.email ?? cleanEmail),
+            role: adminRole,
           );
-          await _firestoreService.saveUser(userModel);
+          try {
+            await _firestoreService.saveUser(userModel);
+          } catch (e) {
+            debugPrint('Notice: could not save fallback user doc: $e');
+          }
+        } else if (adminRole != UserRole.player && userModel.role != adminRole) {
+          // Ensure role is upgraded to admin role for designated admin email
+          userModel = UserModel(
+            uid: userModel.uid,
+            email: userModel.email,
+            displayName: userModel.displayName,
+            ign: userModel.ign,
+            phone: userModel.phone,
+            photoUrl: userModel.photoUrl,
+            gameId: userModel.gameId,
+            role: adminRole,
+            teamId: userModel.teamId,
+            settings: userModel.settings,
+          );
+          try {
+            await _firestoreService.saveUser(userModel);
+          } catch (e) {
+            debugPrint('Notice: could not update admin role in Firestore: $e');
+          }
         }
         return userModel;
       }

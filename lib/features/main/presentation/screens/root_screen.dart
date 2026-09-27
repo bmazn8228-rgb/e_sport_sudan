@@ -56,9 +56,19 @@ class _RootScreenState extends State<RootScreen> {
             final userModel = userSnapshot.data;
 
             if (userModel == null) {
-              // If user is authenticated but not in firestore, treat as player or error
-              // For now, let's sign out to reset state or just show MainScreen
-              return const MainScreen();
+              final determinedRole = _authService.getRoleForEmail(user.email ?? '');
+              switch (determinedRole) {
+                case UserRole.player:
+                  return const MainScreen();
+                case UserRole.referee:
+                  return const RefereeDashboard();
+                case UserRole.tournamentAdmin:
+                  return const OrganizerDashboard();
+                case UserRole.financeAdmin:
+                  return const DepositRequestsScreen();
+                case UserRole.superAdmin:
+                  return const SuperAdminDashboard();
+              }
             }
 
             // Route each role to its dedicated dashboard

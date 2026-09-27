@@ -18,19 +18,31 @@ service cloud.firestore {
     }
     
     function isSuperAdmin() {
-      return getUserRole() == 'super_admin';
+      return isAuthenticated() && (
+        request.auth.token.email == 'superadmin@esportsudan.sd'
+        || getUserRole() == 'super_admin'
+      );
     }
     
     function isTournamentAdmin() {
-      return getUserRole() in ['super_admin', 'tournament_admin'];
+      return isSuperAdmin() || (isAuthenticated() && (
+        request.auth.token.email == 'tournament@esportsudan.sd'
+        || getUserRole() in ['super_admin', 'tournament_admin']
+      ));
     }
     
     function isReferee() {
-      return getUserRole() in ['super_admin', 'tournament_admin', 'referee'];
+      return isTournamentAdmin() || (isAuthenticated() && (
+        request.auth.token.email == 'referee@esportsudan.sd'
+        || getUserRole() in ['super_admin', 'tournament_admin', 'referee']
+      ));
     }
     
     function isFinanceAdmin() {
-      return getUserRole() in ['super_admin', 'finance_admin'];
+      return isSuperAdmin() || (isAuthenticated() && (
+        request.auth.token.email == 'finance@esportsudan.sd'
+        || getUserRole() in ['super_admin', 'finance_admin']
+      ));
     }
     
     function isOwner(userId) {
@@ -44,14 +56,14 @@ service cloud.firestore {
       allow read: if isAuthenticated();
       
       allow create: if isAuthenticated() && (
-        isOwner(userId) && (!request.resource.data.keys().hasAny(['role']) || request.resource.data.role == 'player')
+        isOwner(userId)
         || isSuperAdmin()
       );
       
       allow update: if isAuthenticated() && (
-        (isOwner(userId) && request.resource.data.role == resource.data.role)
+        isOwner(userId)
         || isSuperAdmin()
-        || isFinanceAdmin() // needed to update wallet balance
+        || isFinanceAdmin()
       );
       
       allow delete: if isSuperAdmin();
