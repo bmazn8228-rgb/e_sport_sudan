@@ -19,14 +19,14 @@ service cloud.firestore {
     
     function isSuperAdmin() {
       return isAuthenticated() && (
-        request.auth.token.email == 'superadmin@esportsudan.sd'
+        request.auth.token.email in ['superadmin@esportsudan.sd', 'admin@esportsudan.sd']
         || getUserRole() == 'super_admin'
       );
     }
     
     function isTournamentAdmin() {
       return isSuperAdmin() || (isAuthenticated() && (
-        request.auth.token.email == 'tournament@esportsudan.sd'
+        request.auth.token.email in ['tournament@esportsudan.sd', 'organizer@esportsudan.sd']
         || getUserRole() in ['super_admin', 'tournament_admin']
       ));
     }

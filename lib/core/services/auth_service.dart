@@ -18,9 +18,9 @@ class AuthService {
 
   UserRole getRoleForEmail(String email) {
     final lowerEmail = email.trim().toLowerCase();
-    if (lowerEmail == 'superadmin@esportsudan.sd') {
+    if (lowerEmail == 'superadmin@esportsudan.sd' || lowerEmail == 'admin@esportsudan.sd') {
       return UserRole.superAdmin;
-    } else if (lowerEmail == 'tournament@esportsudan.sd') {
+    } else if (lowerEmail == 'tournament@esportsudan.sd' || lowerEmail == 'organizer@esportsudan.sd') {
       return UserRole.tournamentAdmin;
     } else if (lowerEmail == 'referee@esportsudan.sd') {
       return UserRole.referee;
@@ -28,6 +28,21 @@ class AuthService {
       return UserRole.financeAdmin;
     }
     return UserRole.player;
+  }
+
+  String _getDefaultDisplayNameForRole(UserRole role) {
+    switch (role) {
+      case UserRole.superAdmin:
+        return 'مدير النظام الأعلى (Super Admin)';
+      case UserRole.tournamentAdmin:
+        return 'منظم بطولات (Organizer)';
+      case UserRole.referee:
+        return 'حكم معتمد (Referee)';
+      case UserRole.financeAdmin:
+        return 'مسؤول مالي (Finance Admin)';
+      case UserRole.player:
+        return 'لاعب';
+    }
   }
 
   Future<UserModel?> signInWithEmailAndPassword(String email, String password) async {
@@ -50,7 +65,7 @@ class AuthService {
             email: user.email ?? cleanEmail,
             displayName: user.displayName?.isNotEmpty == true
                 ? user.displayName!
-                : (adminRole == UserRole.superAdmin ? 'Super Admin' : 'Player'),
+                : _getDefaultDisplayNameForRole(adminRole),
             phone: '',
             role: adminRole,
           );

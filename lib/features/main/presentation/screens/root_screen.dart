@@ -41,7 +41,24 @@ class _RootScreenState extends State<RootScreen> {
           return const LoginScreen();
         }
 
-        // User is logged in, fetch their role
+        // Fast-path: Immediately route authoritative admin emails without network wait
+        final emailRole = _authService.getRoleForEmail(user.email ?? '');
+        if (emailRole != UserRole.player) {
+          switch (emailRole) {
+            case UserRole.referee:
+              return const RefereeDashboard();
+            case UserRole.tournamentAdmin:
+              return const OrganizerDashboard();
+            case UserRole.financeAdmin:
+              return const DepositRequestsScreen();
+            case UserRole.superAdmin:
+              return const SuperAdminDashboard();
+            case UserRole.player:
+              break;
+          }
+        }
+
+        // Regular players or custom-role users: fetch from Firestore
         return FutureBuilder<UserModel?>(
           future: _firestoreService.getUser(user.uid),
           builder: (context, userSnapshot) {
@@ -54,12 +71,7 @@ class _RootScreenState extends State<RootScreen> {
             }
 
             final userModel = userSnapshot.data;
-
-            // Prioritize authoritative admin email roles
-            final emailRole = _authService.getRoleForEmail(user.email ?? '');
-            final effectiveRole = (emailRole != UserRole.player)
-                ? emailRole
-                : (userModel?.role ?? UserRole.player);
+            final effectiveRole = userModel?.role ?? UserRole.player;
 
             // Route each role to its dedicated dashboard
             switch (effectiveRole) {
