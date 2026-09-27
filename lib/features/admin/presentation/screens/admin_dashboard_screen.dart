@@ -9,6 +9,7 @@ import 'package:e_sport_sudan/features/roles/presentation/screens/organizer_dash
 import 'package:e_sport_sudan/features/roles/presentation/screens/referee_dashboard.dart';
 import 'deposit_requests_screen.dart';
 import 'tournament_admin_dashboard_screen.dart';
+import 'referee_dashboard_screen.dart';
 
 class AdminDashboardScreen extends StatefulWidget {
   const AdminDashboardScreen({super.key});
@@ -248,7 +249,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             'تعديل النتيجة الحية وتوقيت المباراة أثناء اللعب',
             Icons.tune,
             Colors.blueAccent,
-            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => RefereeDashboardScreen())),
+            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const RefereeDashboardScreen())),
           ),
           _buildActionCard(
             'إدارة رابط البث المباشر (YouTube)',
