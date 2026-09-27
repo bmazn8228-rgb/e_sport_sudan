@@ -135,7 +135,7 @@ class _AdminNewsManagementScreenState extends State<AdminNewsManagementScreen> {
                     icon: Icon(Icons.delete, color: Colors.redAccent),
                     onPressed: () async {
                       await _firestoreService.deleteNews(news.id);
-                      NotificationService.showCustomToast(context, title: 'حذف', message: 'تم حذف الخبر', type: ToastType.info);
+                      NotificationService.showCustomToast(context, title: 'حذف', message: 'تم حذف الخبر', type: ToastType.success);
                     },
                   ),
                 ),

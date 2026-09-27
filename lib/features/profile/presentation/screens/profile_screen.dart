@@ -671,9 +671,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Text('انقر للقلب 🔄 QR', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 10)),
             ],
           ),
-              Text('انقر للقلب 🔄 QR', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 10)),
-            ],
-          ),
         ],
       ),
     );
