@@ -44,4 +44,41 @@ class AppTheme {
       ),
     );
   }
+  static ThemeData get lightTheme {
+    return ThemeData(
+      brightness: Brightness.light,
+      scaffoldBackgroundColor: Colors.white,
+      primaryColor: primaryBlue,
+      colorScheme: const ColorScheme.light(
+        primary: primaryBlue,
+        secondary: primaryRed,
+        surface: Colors.white,
+        onSurface: Colors.black87,
+      ),
+      textTheme: GoogleFonts.cairoTextTheme(ThemeData.light().textTheme),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: primaryBlue,
+          foregroundColor: Colors.white,
+          minimumSize: const Size(double.infinity, 50),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          textStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+        ),
+      ),
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: Colors.grey.shade100,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: primaryBlue, width: 1.5),
+        ),
+      ),
+    );
+  }
 }

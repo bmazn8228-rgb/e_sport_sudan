@@ -7,6 +7,8 @@ import 'package:e_sport_sudan/core/models/user_model.dart';
 import 'package:e_sport_sudan/core/services/notification_service.dart';
 import 'package:e_sport_sudan/features/profile/presentation/screens/edit_profile_screen.dart';
 import 'package:e_sport_sudan/features/profile/presentation/screens/security_settings_screen.dart';
+import 'package:e_sport_sudan/features/profile/presentation/screens/bank_accounts_screen.dart';
+import 'package:e_sport_sudan/features/profile/presentation/screens/financial_transactions_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -118,24 +120,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ]),
             const SizedBox(height: 20),
 
-            // Gaming Preferences
-            _buildSectionHeader('تفضيلات الألعاب والبطولات', Icons.sports_esports),
-            _buildCardContainer([
-              _buildListTile(
-                title: 'الألعاب المفضلة',
-                subtitle: 'تخصيص البطولات والأخبار حسب ألعابك',
-                icon: Icons.gamepad,
-                onTap: _showComingSoon,
-              ),
-              _buildDivider(),
-              _buildListTile(
-                title: 'تفضيلات شجرة المباريات',
-                subtitle: 'طريقة عرض النتائج والمواجهات',
-                icon: Icons.account_tree,
-                onTap: _showComingSoon,
-              ),
-            ]),
-            const SizedBox(height: 20),
 
             // Notifications
             _buildSectionHeader('الإشعارات والتنبيهات', Icons.notifications),
@@ -150,6 +134,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   tournamentNotifs: val,
                   matchReminders: _settings.matchReminders,
                   teamInvites: _settings.teamInvites,
+                  hideStatistics: _settings.hideStatistics,
                   language: _settings.language,
                 )),
               ),
@@ -164,6 +149,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   tournamentNotifs: _settings.tournamentNotifs,
                   matchReminders: val,
                   teamInvites: _settings.teamInvites,
+                  hideStatistics: _settings.hideStatistics,
                   language: _settings.language,
                 )),
               ),
@@ -178,6 +164,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   tournamentNotifs: _settings.tournamentNotifs,
                   matchReminders: _settings.matchReminders,
                   teamInvites: val,
+                  hideStatistics: _settings.hideStatistics,
                   language: _settings.language,
                 )),
               ),
@@ -191,14 +178,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 title: 'طرق الدفع',
                 subtitle: 'إدارة الحسابات البنكية (بنكك، فوري)',
                 icon: Icons.payment,
-                onTap: _showComingSoon,
+                onTap: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => const BankAccountsScreen()));
+                },
               ),
               _buildDivider(),
               _buildListTile(
                 title: 'سجل المعاملات المالي',
                 subtitle: 'عرض المبالغ المسحوبة والمودعة',
                 icon: Icons.history,
-                onTap: _showComingSoon,
+                onTap: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => const FinancialTransactionsScreen()));
+                },
               ),
             ]),
             const SizedBox(height: 20),
@@ -206,11 +197,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
             // Privacy
             _buildSectionHeader('الخصوصية', Icons.lock),
             _buildCardContainer([
-              _buildListTile(
+              _buildSwitchTile(
                 title: 'إخفاء الإحصائيات',
                 subtitle: 'تحديد من يمكنه رؤية إحصائياتك',
-                icon: Icons.visibility_off,
-                onTap: _showComingSoon,
+                value: _settings.hideStatistics,
+                onChanged: (val) => _updateSettings(UserSettings(
+                  isDarkMode: _settings.isDarkMode,
+                  dataSaver: _settings.dataSaver,
+                  tournamentNotifs: _settings.tournamentNotifs,
+                  matchReminders: _settings.matchReminders,
+                  teamInvites: _settings.teamInvites,
+                  hideStatistics: val,
+                  language: _settings.language,
+                )),
               ),
             ]),
             const SizedBox(height: 20),
@@ -228,6 +227,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   tournamentNotifs: _settings.tournamentNotifs,
                   matchReminders: _settings.matchReminders,
                   teamInvites: _settings.teamInvites,
+                  hideStatistics: _settings.hideStatistics,
                   language: _settings.language,
                 )),
               ),
@@ -242,6 +242,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   tournamentNotifs: _settings.tournamentNotifs,
                   matchReminders: _settings.matchReminders,
                   teamInvites: _settings.teamInvites,
+                  hideStatistics: _settings.hideStatistics,
                   language: _settings.language,
                 )),
               ),
@@ -258,7 +259,41 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 title: const Text('لغة التطبيق', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
                 subtitle: Text(_settings.language, style: const TextStyle(color: Colors.white54, fontSize: 11)),
                 trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.white38),
-                onTap: _showComingSoon,
+                onTap: () async {
+                  final String? selectedLanguage = await showDialog<String>(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        backgroundColor: Theme.of(context).colorScheme.surface,
+                        title: const Text('اختر اللغة'),
+                        content: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            ListTile(
+                              title: const Text('العربية'),
+                              onTap: () => Navigator.pop(context, 'العربية'),
+                            ),
+                            ListTile(
+                              title: const Text('English'),
+                              onTap: () => Navigator.pop(context, 'English'),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                  if (selectedLanguage != null && selectedLanguage != _settings.language) {
+                    _updateSettings(UserSettings(
+                      isDarkMode: _settings.isDarkMode,
+                      dataSaver: _settings.dataSaver,
+                      tournamentNotifs: _settings.tournamentNotifs,
+                      matchReminders: _settings.matchReminders,
+                      teamInvites: _settings.teamInvites,
+                      hideStatistics: _settings.hideStatistics,
+                      language: selectedLanguage,
+                    ));
+                  }
+                },
               ),
             ]),
             const SizedBox(height: 20),

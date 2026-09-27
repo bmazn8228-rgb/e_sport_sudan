@@ -34,20 +34,80 @@ class OrganizerComplaintsScreen extends StatelessWidget {
             itemCount: complaints.length,
             itemBuilder: (context, index) {
               final complaint = complaints[index];
+              final status = complaint['status'] ?? 'pending';
+              Color statusColor = Colors.orange;
+              String statusLabel = 'قيد المراجعة';
+              if (status == 'resolved') {
+                statusColor = Colors.green;
+                statusLabel = 'تم الحل ✅';
+              } else if (status == 'rejected') {
+                statusColor = Colors.red;
+                statusLabel = 'مرفوضة ❌';
+              }
+
               return Card(
                 color: AppTheme.cardDark,
                 margin: const EdgeInsets.only(bottom: 12),
-                child: ListTile(
-                  leading: const CircleAvatar(
-                    backgroundColor: Colors.red,
-                    child: Icon(Icons.warning_amber, color: Colors.white),
-                  ),
-                  title: Text(complaint['title'] ?? 'بدون عنوان', style: const TextStyle(fontWeight: FontWeight.bold)),
-                  subtitle: Text(complaint['description'] ?? 'لا يوجد تفاصيل', style: const TextStyle(color: Colors.white54)),
-                  trailing: IconButton(
-                    icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
-                    tooltip: 'حذف الشكوى',
-                    onPressed: () => _confirmDeleteComplaint(context, complaint['id'], complaint['title'] ?? 'الشكوى'),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Row(
+                              children: [
+                                CircleAvatar(
+                                  radius: 14,
+                                  backgroundColor: statusColor.withValues(alpha: 0.2),
+                                  child: Icon(Icons.warning_amber, color: statusColor, size: 16),
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(complaint['title'] ?? 'بدون عنوان', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                            decoration: BoxDecoration(color: statusColor.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(6)),
+                            child: Text(statusLabel, style: TextStyle(color: statusColor, fontSize: 11, fontWeight: FontWeight.bold)),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Text(complaint['description'] ?? 'لا يوجد تفاصيل', style: const TextStyle(color: Colors.white70, fontSize: 12)),
+                      const SizedBox(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          if (status != 'resolved') ...[
+                            TextButton.icon(
+                              onPressed: () async {
+                                await FirestoreService().updateComplaintStatus(complaint['id'], 'resolved');
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text('تم تعليم الشكوى كمحلولة بنجاح ✅', style: TextStyle(color: Colors.black)), backgroundColor: AppTheme.primaryBlue),
+                                  );
+                                }
+                              },
+                              icon: const Icon(Icons.check_circle_outline, size: 16, color: Colors.green),
+                              label: const Text('حل الشكوى', style: TextStyle(color: Colors.green, fontSize: 12)),
+                            ),
+                            const SizedBox(width: 4),
+                          ],
+                          IconButton(
+                            icon: const Icon(Icons.delete_outline, color: Colors.redAccent, size: 18),
+                            tooltip: 'حذف الشكوى',
+                            onPressed: () => _confirmDeleteComplaint(context, complaint['id'], complaint['title'] ?? 'الشكوى'),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
               );

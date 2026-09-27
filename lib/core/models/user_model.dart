@@ -57,6 +57,7 @@ class UserSettings {
   final bool tournamentNotifs;
   final bool matchReminders;
   final bool teamInvites;
+  final bool hideStatistics;
   final String language;
 
   UserSettings({
@@ -65,6 +66,7 @@ class UserSettings {
     this.tournamentNotifs = true,
     this.matchReminders = true,
     this.teamInvites = true,
+    this.hideStatistics = false,
     this.language = 'العربية',
   });
 
@@ -75,6 +77,7 @@ class UserSettings {
       'tournamentNotifs': tournamentNotifs,
       'matchReminders': matchReminders,
       'teamInvites': teamInvites,
+      'hideStatistics': hideStatistics,
       'language': language,
     };
   }
@@ -87,6 +90,7 @@ class UserSettings {
       tournamentNotifs: map['tournamentNotifs'] ?? true,
       matchReminders: map['matchReminders'] ?? true,
       teamInvites: map['teamInvites'] ?? true,
+      hideStatistics: map['hideStatistics'] ?? false,
       language: map['language'] ?? 'العربية',
     );
   }

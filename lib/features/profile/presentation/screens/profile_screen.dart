@@ -14,6 +14,8 @@ import 'package:e_sport_sudan/features/roles/presentation/screens/super_admin_da
 import 'package:e_sport_sudan/features/auth/presentation/screens/login_screen.dart';
 import 'package:e_sport_sudan/features/wallet/presentation/screens/wallet_screen.dart';
 import 'package:e_sport_sudan/features/admin/presentation/screens/admin_dashboard_screen.dart';
+import 'package:e_sport_sudan/features/admin/presentation/screens/deposit_requests_screen.dart';
+import 'package:e_sport_sudan/features/admin/presentation/screens/tournament_admin_dashboard_screen.dart';
 import 'package:e_sport_sudan/features/profile/presentation/screens/settings_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:e_sport_sudan/core/services/auth_service.dart';
@@ -290,7 +292,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const SizedBox(height: 20),
 
             // 7. Administrative Portals (Based on Role)
-            if (role != UserRole.player && role != UserRole.financeAdmin) ...[
+            if (role != UserRole.player) ...[
               _buildSectionHeader('بوابات إدارة النظام والصلاحيات'),
               const SizedBox(height: 8),
               Container(
@@ -301,6 +303,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 child: Column(
                   children: [
+                    if (role == UserRole.superAdmin || role == UserRole.financeAdmin) ...[
+                      _buildPortalTile(
+                        title: 'مراجعة طلبات شحن الرصيد (Finance)',
+                        subtitle: 'اعتماد إشعارات بنكك وفوري وإيداع الأرصدة في المحافظ',
+                        icon: Icons.account_balance_rounded,
+                        color: Colors.greenAccent,
+                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const DepositRequestsScreen())),
+                      ),
+                      Divider(color: Colors.white.withValues(alpha: 0.06), height: 1, indent: 64),
+                    ],
                     if (role == UserRole.superAdmin || role == UserRole.tournamentAdmin) ...[
                       _buildPortalTile(
                         title: 'لوحة تحكم منظم البطولة',
@@ -308,6 +320,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         icon: Icons.admin_panel_settings_rounded,
                         color: Colors.orangeAccent,
                         onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const OrganizerDashboard())),
+                      ),
+                      Divider(color: Colors.white.withValues(alpha: 0.06), height: 1, indent: 64),
+                      _buildPortalTile(
+                        title: 'لوحة إدارة وإنشاء البطولات',
+                        subtitle: 'إنشاء بطولات جديدة، تعديل الحالات، وحذف البطولات',
+                        icon: Icons.emoji_events_rounded,
+                        color: Colors.amber,
+                        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const TournamentAdminDashboardScreen())),
                       ),
                       Divider(color: Colors.white.withValues(alpha: 0.06), height: 1, indent: 64),
                     ],
@@ -327,7 +347,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         title: 'لوحة المشرف العام (Super Admin)',
                         subtitle: 'السيادة الوطنية واعتماد الرخص والحكام والفرق',
                         icon: Icons.security_rounded,
-                        color: Colors.amber,
+                        color: Colors.purpleAccent,
                         onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const SuperAdminDashboard())),
                       ),
                       Divider(color: Colors.white.withValues(alpha: 0.06), height: 1, indent: 64),

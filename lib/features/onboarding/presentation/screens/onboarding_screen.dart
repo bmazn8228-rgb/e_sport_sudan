@@ -65,8 +65,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    
     return Scaffold(
-      backgroundColor: AppTheme.backgroundDark,
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: Stack(
         children: [
           // خلفية الصور الترحيبية والتدرج المتناسق مع ألوان التطبيق
@@ -91,9 +93,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         colors: [
-                          AppTheme.backgroundDark.withValues(alpha: 0.15),
-                          AppTheme.backgroundDark.withValues(alpha: 0.75),
-                          AppTheme.backgroundDark,
+                          theme.scaffoldBackgroundColor.withValues(alpha: 0.15),
+                          theme.scaffoldBackgroundColor.withValues(alpha: 0.75),
+                          theme.scaffoldBackgroundColor,
                         ],
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
@@ -109,7 +111,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 22),
                       decoration: BoxDecoration(
-                        color: AppTheme.cardDark.withValues(alpha: 0.9),
+                        color: theme.cardColor.withValues(alpha: 0.9),
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
                           color: AppTheme.primaryBlue.withValues(alpha: 0.35),
@@ -117,7 +119,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.5),
+                            color: Colors.black.withValues(alpha: 0.2),
                             blurRadius: 20,
                             offset: const Offset(0, 10),
                           ),
@@ -165,10 +167,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           Text(
                             _pages[index]['title']!,
                             textAlign: TextAlign.center,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 26,
                               fontWeight: FontWeight.w900,
-                              color: Colors.white,
+                              color: theme.textTheme.bodyLarge?.color,
                               letterSpacing: 0.5,
                             ),
                           ),
@@ -179,7 +181,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 14,
-                              color: Colors.white.withValues(alpha: 0.8),
+                              color: theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.8),
                               height: 1.6,
                             ),
                           ),
@@ -213,12 +215,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       decoration: BoxDecoration(
                         color: _currentPage == index
                             ? AppTheme.primaryBlue
-                            : AppTheme.cardDark,
+                            : theme.cardColor,
                         borderRadius: BorderRadius.circular(4),
                         border: Border.all(
                           color: _currentPage == index
                               ? AppTheme.primaryBlue
-                              : Colors.white.withValues(alpha: 0.2),
+                              : theme.dividerColor.withValues(alpha: 0.2),
                         ),
                         boxShadow: _currentPage == index
                             ? [
@@ -282,18 +284,18 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           },
                           style: OutlinedButton.styleFrom(
                             side: BorderSide(
-                              color: Colors.white.withValues(alpha: 0.2),
+                              color: theme.dividerColor.withValues(alpha: 0.2),
                             ),
-                            backgroundColor: AppTheme.cardDark,
+                            backgroundColor: theme.cardColor,
                             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
                           ),
-                          child: const Text(
+                          child: Text(
                             'السابق',
                             style: TextStyle(
-                              color: Colors.white70,
+                              color: theme.textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
                               fontSize: 15,
                               fontWeight: FontWeight.w600,
                             ),

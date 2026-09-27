@@ -16,10 +16,25 @@ class AuthService {
   Stream<User?> get authStateChanges => _auth.authStateChanges();
   User? get currentUser => _auth.currentUser;
 
+  UserRole getRoleForEmail(String email) {
+    final lowerEmail = email.trim().toLowerCase();
+    if (lowerEmail == 'superadmin@esportsudan.sd') {
+      return UserRole.superAdmin;
+    } else if (lowerEmail == 'tournament@esportsudan.sd') {
+      return UserRole.tournamentAdmin;
+    } else if (lowerEmail == 'referee@esportsudan.sd') {
+      return UserRole.referee;
+    } else if (lowerEmail == 'finance@esportsudan.sd') {
+      return UserRole.financeAdmin;
+    }
+    return UserRole.player;
+  }
+
   Future<UserModel?> signInWithEmailAndPassword(String email, String password) async {
     try {
+      final cleanEmail = email.trim();
       UserCredential result = await _auth.signInWithEmailAndPassword(
-        email: email,
+        email: cleanEmail,
         password: password,
       );
       
@@ -31,10 +46,10 @@ class AuthService {
           // Fallback: create a basic user doc if they exist in Auth but not Firestore
           userModel = UserModel(
             uid: user.uid,
-            email: user.email ?? email,
+            email: user.email ?? cleanEmail,
             displayName: user.displayName ?? 'Player',
             phone: '',
-            role: UserRole.player,
+            role: getRoleForEmail(user.email ?? cleanEmail),
           );
           await _firestoreService.saveUser(userModel);
         }
@@ -56,8 +71,9 @@ class AuthService {
     String? gameId,
   }) async {
     try {
+      final cleanEmail = email.trim();
       UserCredential result = await _auth.createUserWithEmailAndPassword(
-        email: email,
+        email: cleanEmail,
         password: password,
       );
       
@@ -69,23 +85,12 @@ class AuthService {
         } catch (_) {}
 
         // Determine role based on hardcoded admin emails
-        UserRole assignedRole = UserRole.player;
-        final lowerEmail = email.toLowerCase();
-        
-        if (lowerEmail == 'superadmin@esportsudan.sd') {
-          assignedRole = UserRole.superAdmin;
-        } else if (lowerEmail == 'tournament@esportsudan.sd') {
-          assignedRole = UserRole.tournamentAdmin;
-        } else if (lowerEmail == 'referee@esportsudan.sd') {
-          assignedRole = UserRole.referee;
-        } else if (lowerEmail == 'finance@esportsudan.sd') {
-          assignedRole = UserRole.financeAdmin;
-        }
+        UserRole assignedRole = getRoleForEmail(cleanEmail);
 
         // Create a new UserModel with the assigned role
         UserModel newUser = UserModel(
           uid: user.uid,
-          email: email,
+          email: cleanEmail,
           displayName: displayName,
           ign: ign,
           gameId: gameId,

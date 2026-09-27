@@ -26,6 +26,13 @@ class FirestoreService {
     }
   }
 
+  Stream<UserModel?> getUserStream(String uid) {
+    return _db.collection('users').doc(uid).snapshots().map((doc) {
+      if (!doc.exists || doc.data() == null) return null;
+      return UserModel.fromMap(doc.data()!, doc.id);
+    });
+  }
+
   Future<void> saveUser(UserModel user) async {
     await _db.collection('users').doc(user.uid).set(user.toMap(), SetOptions(merge: true));
   }
@@ -440,7 +447,99 @@ class FirestoreService {
   // 7. Data Seeding / تهيئة الجداول والبيانات الأولية والصلاحيات
   // =========================================================================
   Future<void> seedInitialData() async {
-    // Initial data seeding logic removed to avoid dummy data.
+    final batch = _db.batch();
+
+    // 1. Live stream settings
+    final liveStreamRef = _db.collection('settings').doc('live_stream');
+    batch.set(liveStreamRef, {
+      'id': 'sample_live_match',
+      'youtubeVideoId': '',
+      'title': 'البث المباشر لبطولات السودان',
+      'isLive': false,
+      'status': 'offline',
+      'updatedAt': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
+
+    // 2. Global live match document
+    final matchRef = _db.collection('matches').doc('sample_live_match');
+    batch.set(matchRef, {
+      'id': 'sample_live_match',
+      'youtubeVideoId': '',
+      'title': 'البث المباشر لمنافسات اليوم',
+      'isLive': false,
+      'status': 'offline',
+      'teamA': 'بث مباشر',
+      'teamB': 'E-Sport Sudan',
+      'scoreA': 0,
+      'scoreB': 0,
+      'time': 'متوقف',
+      'updatedAt': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
+
+    // 3. App config
+    final configRef = _db.collection('settings').doc('app_config');
+    batch.set(configRef, {
+      'appName': 'E-Sport Sudan',
+      'version': '1.0.0',
+      'maintenanceMode': false,
+      'supportPhone': '+249912345678',
+      'currency': 'ج.س',
+      'updatedAt': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
+
+    // 4. Game Stats
+    final games = [
+      {'id': 'pubg_mobile', 'name': 'PUBG Mobile', 'activePlayers': 1250, 'tournamentsCount': 4},
+      {'id': 'ea_fc_25', 'name': 'EA FC 25', 'activePlayers': 890, 'tournamentsCount': 3},
+      {'id': 'free_fire', 'name': 'Free Fire', 'activePlayers': 720, 'tournamentsCount': 2},
+      {'id': 'valorant', 'name': 'Valorant', 'activePlayers': 430, 'tournamentsCount': 1},
+    ];
+
+    for (var g in games) {
+      final docRef = _db.collection('game_stats').doc(g['id'] as String);
+      batch.set(docRef, {
+        'name': g['name'],
+        'activePlayers': g['activePlayers'],
+        'tournamentsCount': g['tournamentsCount'],
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+    }
+
+    await batch.commit();
+
+    // 5. Initial Tournaments if empty
+    final tournamentsSnap = await _db.collection('tournaments').limit(1).get();
+    if (tournamentsSnap.docs.isEmpty) {
+      await _db.collection('tournaments').add({
+        'title': 'بطولة النخبة الوطنية الأولى PUBG Mobile',
+        'game': 'PUBG Mobile',
+        'prizePool': '1,000,000 ج.س',
+        'entryFee': 2000,
+        'maxTeams': 16,
+        'playersPerTeam': 4,
+        'registeredTeamsCount': 0,
+        'startDate': '2026-10-15',
+        'status': 'upcoming',
+        'posterUrl': '',
+        'logoUrl': '',
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+
+      await _db.collection('tournaments').add({
+        'title': 'كأس السودان الإلكتروني EA FC 25',
+        'game': 'EA FC 25',
+        'prizePool': '500,000 ج.س',
+        'entryFee': 1500,
+        'maxTeams': 32,
+        'playersPerTeam': 1,
+        'registeredTeamsCount': 0,
+        'startDate': '2026-10-20',
+        'status': 'upcoming',
+        'posterUrl': '',
+        'logoUrl': '',
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+    }
   }
 
   // =========================================================================
@@ -561,6 +660,165 @@ class FirestoreService {
 
   Future<void> updateUserRole(String userId, String roleValue) async {
     await _db.collection('users').doc(userId).update({'role': roleValue});
+  }
+
+  // =========================================================================
+  // 13. Bank Accounts
+  // =========================================================================
+  Stream<List<Map<String, dynamic>>> getBankAccountsStream(String userId) {
+    return _db.collection('users').doc(userId).collection('bank_accounts').snapshots().map(
+      (snapshot) => snapshot.docs.map((doc) {
+        final data = doc.data();
+        data['id'] = doc.id;
+        return data;
+      }).toList(),
+    );
+  }
+
+  Future<void> addBankAccount(String userId, Map<String, dynamic> accountData) async {
+    await _db.collection('users').doc(userId).collection('bank_accounts').add(accountData);
+  }
+
+  Future<void> deleteBankAccount(String userId, String accountId) async {
+    await _db.collection('users').doc(userId).collection('bank_accounts').doc(accountId).delete();
+  }
+
+  // =========================================================================
+  // 14. Admin User Management & General Queries
+  // =========================================================================
+  Stream<List<Map<String, dynamic>>> getAllUsersStream({int limit = 50}) {
+    return _db.collection('users').limit(limit).snapshots().map(
+      (snapshot) => snapshot.docs.map((doc) {
+        final data = doc.data();
+        data['id'] = doc.id;
+        return data;
+      }).toList(),
+    );
+  }
+
+  Stream<List<Map<String, dynamic>>> getTransactionsByStatusStream(String? status) {
+    Query query = _db.collection('transactions').where('type', isEqualTo: 'deposit');
+    if (status != null && status.isNotEmpty && status != 'all') {
+      query = query.where('status', isEqualTo: status);
+    }
+    return query.orderBy('createdAt', descending: true).snapshots().map(
+      (snapshot) => snapshot.docs.map((doc) {
+        final data = doc.data() as Map<String, dynamic>;
+        data['id'] = doc.id;
+        return data;
+      }).toList(),
+    );
+  }
+
+  Future<int> autoGenerateTournamentDraw({
+    required String tournamentId,
+    required String tournamentName,
+    required String game,
+  }) async {
+    final teamsSnap = await _db.collection('teams')
+        .where('game', isEqualTo: game)
+        .get();
+
+    List<Map<String, dynamic>> teams = teamsSnap.docs.map((d) {
+      final data = d.data();
+      data['id'] = d.id;
+      return data;
+    }).toList();
+
+    if (teams.length < 2) {
+      final allTeamsSnap = await _db.collection('teams').limit(16).get();
+      teams = allTeamsSnap.docs.map((d) {
+        final data = d.data();
+        data['id'] = d.id;
+        return data;
+      }).toList();
+    }
+
+    if (teams.length < 2) {
+      throw Exception('لا يوجد عدد كافٍ من الفرق (الحد الأدنى فريقان) لتوليد القرعة');
+    }
+
+    teams.shuffle();
+
+    int matchCount = 0;
+    final batch = _db.batch();
+
+    for (int i = 0; i < teams.length - 1; i += 2) {
+      final teamA = teams[i];
+      final teamB = teams[i + 1];
+      final matchRef = _db.collection('matches').doc();
+
+      batch.set(matchRef, {
+        'id': matchRef.id,
+        'tournamentId': tournamentId,
+        'tournamentName': tournamentName,
+        'game': game,
+        'teamA': teamA['name'] ?? 'فريق أ',
+        'teamAId': teamA['id'],
+        'teamALogo': teamA['logoUrl'] ?? '',
+        'teamB': teamB['name'] ?? 'فريق ب',
+        'teamBId': teamB['id'],
+        'teamBLogo': teamB['logoUrl'] ?? '',
+        'scoreA': 0,
+        'scoreB': 0,
+        'time': 'مجدولة',
+        'status': 'scheduled',
+        'round': 'دور المجموعات / الجولة ${(i ~/ 2) + 1}',
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+      matchCount++;
+    }
+
+    await batch.commit();
+    return matchCount;
+  }
+
+  Future<int> approveTournamentResults(String tournamentId) async {
+    final matchesSnap = await _db.collection('matches')
+        .where('tournamentId', isEqualTo: tournamentId)
+        .get();
+
+    int updatedCount = 0;
+    final batch = _db.batch();
+
+    for (var doc in matchesSnap.docs) {
+      final data = doc.data();
+      if (data['status'] == 'completed') {
+        final scoreA = (data['scoreA'] as num?)?.toInt() ?? 0;
+        final scoreB = (data['scoreB'] as num?)?.toInt() ?? 0;
+        final teamAId = data['teamAId'] as String?;
+        final teamBId = data['teamBId'] as String?;
+
+        if (scoreA > scoreB && teamAId != null) {
+          batch.update(_db.collection('teams').doc(teamAId), {
+            'points': FieldValue.increment(3),
+            'wins': FieldValue.increment(1),
+          });
+        } else if (scoreB > scoreA && teamBId != null) {
+          batch.update(_db.collection('teams').doc(teamBId), {
+            'points': FieldValue.increment(3),
+            'wins': FieldValue.increment(1),
+          });
+        }
+        updatedCount++;
+      }
+    }
+
+    if (updatedCount > 0) {
+      await batch.commit();
+    }
+    return updatedCount;
+  }
+
+  Future<void> deleteMatch(String matchId) async {
+    await _db.collection('matches').doc(matchId).delete();
+  }
+
+  Future<void> assignRefereeToMatch(String matchId, String refereeId, String refereeName) async {
+    await _db.collection('matches').doc(matchId).update({
+      'refereeId': refereeId,
+      'refereeName': refereeName,
+    });
   }
 }
 

@@ -424,7 +424,7 @@ class _TeamManagementScreenState extends State<TeamManagementScreen> {
         color: AppTheme.cardDark,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: player['isLeader'] ? AppTheme.primaryBlue.withOpacity(0.4) : Colors.white10,
+          color: (player['isLeader'] == true) ? AppTheme.primaryBlue.withValues(alpha: 0.4) : Colors.white10,
         ),
       ),
       child: Row(
@@ -434,10 +434,10 @@ class _TeamManagementScreenState extends State<TeamManagementScreen> {
             children: [
               CircleAvatar(
                 radius: 20,
-                backgroundColor: player['isLeader'] ? AppTheme.primaryBlue.withOpacity(0.2) : Colors.white10,
+                backgroundColor: (player['isLeader'] == true) ? AppTheme.primaryBlue.withValues(alpha: 0.2) : Colors.white10,
                 child: Icon(
-                  player['isLeader'] ? Icons.star : Icons.person,
-                  color: player['isLeader'] ? AppTheme.primaryBlue : Colors.white70,
+                  (player['isLeader'] == true) ? Icons.star : Icons.person,
+                  color: (player['isLeader'] == true) ? AppTheme.primaryBlue : Colors.white70,
                   size: 20,
                 ),
               ),
@@ -447,15 +447,15 @@ class _TeamManagementScreenState extends State<TeamManagementScreen> {
                 children: [
                   Row(
                     children: [
-                      Text(player['ign'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                      if (player['verified']) ...[
+                      Text(player['ign'] ?? '', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                      if (player['verified'] == true) ...[
                         const SizedBox(width: 4),
                         const Icon(Icons.check_circle, color: AppTheme.primaryBlue, size: 14),
                       ],
                     ],
                   ),
-                  Text(player['name'], style: const TextStyle(color: Colors.white70, fontSize: 11)),
-                  Text(player['role'], style: const TextStyle(color: Colors.white54, fontSize: 10)),
+                  Text(player['name'] ?? '', style: const TextStyle(color: Colors.white70, fontSize: 11)),
+                  Text(player['role'] ?? '', style: const TextStyle(color: Colors.white54, fontSize: 10)),
                 ],
               ),
             ],

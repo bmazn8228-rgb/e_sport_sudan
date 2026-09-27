@@ -3,7 +3,11 @@ class Validators {
     if (value == null || value.trim().isEmpty) {
       return 'مطلوب إدخال البريد الإلكتروني';
     }
-    final emailRegex = RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$");
+    // يدعم جميع النطاقات بما فيها حسابات الأدمن (@esportsudan.sd، .org، .com، .net، إلخ)
+    final emailRegex = RegExp(
+      r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+      caseSensitive: false,
+    );
     if (!emailRegex.hasMatch(value.trim())) {
       return 'صيغة البريد الإلكتروني غير صحيحة';
     }

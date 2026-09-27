@@ -327,8 +327,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                 _buildModernTextField(
                                   controller: _identifierController,
                                   label: 'البريد الإلكتروني',
-                                  hint: 'أدخل بريدك الإلكتروني',
+                                  hint: 'أدخل البريد الإلكتروني (مثل: admin@esportsudan.sd)',
                                   icon: Icons.alternate_email,
+                                  keyboardType: TextInputType.emailAddress,
                                   validator: Validators.validateEmail,
                                 ),
                                 const SizedBox(height: 20),
@@ -575,6 +576,7 @@ class _LoginScreenState extends State<LoginScreen> {
     required String hint,
     required IconData icon,
     bool isPassword = false,
+    TextInputType? keyboardType,
     String? Function(String?)? validator,
   }) {
     return Column(
@@ -591,10 +593,15 @@ class _LoginScreenState extends State<LoginScreen> {
         const SizedBox(height: 8),
         TextFormField(
           controller: controller,
+          keyboardType: keyboardType,
           obscureText: isPassword && _obscurePassword,
           validator: validator,
           style: const TextStyle(color: Colors.white),
-          textDirection: isPassword ? TextDirection.ltr : null,
+          textDirection: isPassword ||
+                  keyboardType == TextInputType.emailAddress ||
+                  keyboardType == TextInputType.phone
+              ? TextDirection.ltr
+              : null,
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: TextStyle(

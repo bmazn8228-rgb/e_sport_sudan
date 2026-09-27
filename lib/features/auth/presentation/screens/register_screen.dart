@@ -339,7 +339,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               _buildModernTextField(
                                 controller: _emailController,
                                 label: 'البريد الإلكتروني',
-                                hint: 'example@email.com',
+                                hint: 'example@domain.com أو بريدك الرسمي',
                                 icon: Icons.email_outlined,
                                 keyboardType: TextInputType.emailAddress,
                                 validator: Validators.validateEmail,

@@ -345,6 +345,65 @@ class _TournamentAdminDashboardScreenState extends State<TournamentAdminDashboar
     );
   }
 
+  void _showRegistrationsDialog(BuildContext context, String tournamentId, String title) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppTheme.cardDark,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Icon(Icons.groups, color: AppTheme.primaryBlue),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text('الفرق المسجلة في: $title', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              height: 300,
+              child: StreamBuilder<List<Map<String, dynamic>>>(
+                stream: _firestoreService.getTournamentRegistrationsStream(tournamentId),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator(color: AppTheme.primaryBlue));
+                  }
+                  final registrations = snapshot.data ?? [];
+                  if (registrations.isEmpty) {
+                    return const Center(
+                      child: Text('لا توجد فرق مسجلة في هذه البطولة بعد', style: TextStyle(color: Colors.white54)),
+                    );
+                  }
+                  return ListView.builder(
+                    itemCount: registrations.length,
+                    itemBuilder: (context, index) {
+                      final reg = registrations[index];
+                      return ListTile(
+                        leading: CircleAvatar(
+                          backgroundColor: AppTheme.primaryBlue.withValues(alpha: 0.2),
+                          child: Text('${index + 1}', style: const TextStyle(color: AppTheme.primaryBlue, fontWeight: FontWeight.bold)),
+                        ),
+                        title: Text(reg['teamName'] ?? 'فريق', style: const TextStyle(fontWeight: FontWeight.bold)),
+                        subtitle: Text('القائد: ${reg['leaderName'] ?? 'كابتن'} • الهاتف: ${reg['contactPhone'] ?? 'غير متوفر'}', style: const TextStyle(color: Colors.white54, fontSize: 12)),
+                        trailing: const Text('مسجل ✅', style: TextStyle(color: Colors.greenAccent, fontSize: 11)),
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -415,7 +474,7 @@ class _TournamentAdminDashboardScreenState extends State<TournamentAdminDashboar
                           ),
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(color: statusColor.withOpacity(0.2), borderRadius: BorderRadius.circular(8)),
+                            decoration: BoxDecoration(color: statusColor.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(8)),
                             child: Text(statusText, style: TextStyle(color: statusColor, fontSize: 12, fontWeight: FontWeight.bold)),
                           ),
                         ],
@@ -429,11 +488,17 @@ class _TournamentAdminDashboardScreenState extends State<TournamentAdminDashboar
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           TextButton.icon(
+                            onPressed: () => _showRegistrationsDialog(context, t['id'], t['title'] ?? 'البطولة'),
+                            icon: const Icon(Icons.people_outline, size: 18, color: AppTheme.primaryBlue),
+                            label: const Text('المسجلين', style: TextStyle(color: AppTheme.primaryBlue)),
+                          ),
+                          const SizedBox(width: 6),
+                          TextButton.icon(
                             onPressed: () => _confirmDeleteTournament(t['id'], t['title'] ?? 'البطولة'),
                             icon: const Icon(Icons.delete_outline, size: 18, color: Colors.redAccent),
                             label: const Text('حذف', style: TextStyle(color: Colors.redAccent)),
                           ),
-                          const SizedBox(width: 8),
+                          const SizedBox(width: 6),
                           TextButton.icon(
                             onPressed: () => _updateStatus(t['id'], status),
                             icon: const Icon(Icons.edit, size: 18),

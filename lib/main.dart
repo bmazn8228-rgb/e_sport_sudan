@@ -7,6 +7,9 @@ import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'core/services/notification_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'core/services/firestore_service.dart';
+import 'core/models/user_model.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -42,16 +45,41 @@ class ESportSudanApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (context, authSnapshot) {
+        if (authSnapshot.connectionState == ConnectionState.waiting) {
+          return const MaterialApp(
+            home: Scaffold(
+              backgroundColor: AppTheme.backgroundDark,
+              body: Center(child: CircularProgressIndicator(color: AppTheme.primaryBlue)),
+            ),
+          );
+        }
+
+        final user = authSnapshot.data;
+
+        return StreamBuilder<UserModel?>(
+          stream: user != null ? FirestoreService().getUserStream(user.uid) : const Stream.empty(),
+          builder: (context, userSnapshot) {
+            final userSettings = userSnapshot.data?.settings ?? UserSettings();
+            return _buildApp(userSettings);
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildApp(UserSettings settings) {
     return MaterialApp(
       title: 'E-Sport Sudan',
       navigatorKey: navigatorKey,
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.darkTheme,
-      // Forcing RTL for Arabic UI
+      theme: settings.isDarkMode ? AppTheme.darkTheme : AppTheme.lightTheme,
       builder: (context, child) {
         return NetworkAwareWidget(
           child: Directionality(
-            textDirection: TextDirection.rtl,
+            textDirection: settings.language == 'English' ? TextDirection.ltr : TextDirection.rtl,
             child: child!,
           ),
         );

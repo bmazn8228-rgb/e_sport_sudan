@@ -4,6 +4,11 @@ import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/models/user_model.dart';
 import '../../../../core/services/firestore_service.dart';
+import 'package:e_sport_sudan/features/roles/presentation/screens/super_admin_dashboard.dart';
+import 'package:e_sport_sudan/features/roles/presentation/screens/organizer_dashboard.dart';
+import 'package:e_sport_sudan/features/roles/presentation/screens/referee_dashboard.dart';
+import 'deposit_requests_screen.dart';
+import 'tournament_admin_dashboard_screen.dart';
 
 class AdminDashboardScreen extends StatefulWidget {
   const AdminDashboardScreen({super.key});
@@ -181,69 +186,154 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     switch (_activeRole) {
       case UserRole.superAdmin:
         return [
-          _buildActionCard('إدارة كافة الحسابات والأدوار', 'تحديد وتغيير رتب المستخدمين ومنح صلاحيات الأدمن', Icons.admin_panel_settings, Colors.purple),
-          _buildActionCard('إدارة قواعد الأمان (Security Rules)', 'تطبيق سياسات Firestore والحماية الشاملة', Icons.security, Colors.blue),
-          _buildActionCard('الوصول المالي والبطولات الكامل', 'صلاحيات مطلقة للتعديل والحذف لكافة الجداول', Icons.all_inclusive, AppTheme.primaryBlue),
+          _buildActionCard(
+            'إدارة كافة الحسابات والأدوار',
+            'تحديد وتغيير رتب المستخدمين ومنح صلاحيات الأدمن في Firebase',
+            Icons.admin_panel_settings,
+            Colors.purple,
+            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const SuperAdminDashboard())),
+          ),
+          _buildActionCard(
+            'مراجعة طلبات شحن الرصيد',
+            'اعتماد إشعارات الدفع والتحويلات المالية للمحافظ',
+            Icons.account_balance,
+            Colors.greenAccent,
+            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const DepositRequestsScreen())),
+          ),
+          _buildActionCard(
+            'الوصول الشامل للبطولات والمواجهات',
+            'إنشاء وتعديل وحذف البطولات وجداول المباريات',
+            Icons.emoji_events,
+            Colors.amber,
+            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const TournamentAdminDashboardScreen())),
+          ),
         ];
 
       case UserRole.tournamentAdmin:
         return [
-          _buildActionCard('إنشاء وإدارة البطولات', 'تحديد رسوم الاشتراك، الجوائز، والتواريخ في جدول tournaments', Icons.emoji_events, Colors.amber),
-          _buildActionCard('اعتماد تسجيل الفرق', 'مراجعة طلبات الانضمام للبطولات وإنشاء شجرة المواجهات (Brackets)', Icons.groups, Colors.teal),
-          _buildActionCard('تحديث إحصائيات الألعاب', 'تعديل جدول rankings و game_stats لكل لعبة بشكل منفصل', Icons.bar_chart, Colors.orange),
+          _buildActionCard(
+            'إنشاء وإدارة البطولات',
+            'تحديد رسوم الاشتراك، الجوائز، والتواريخ في جدول tournaments',
+            Icons.emoji_events,
+            Colors.amber,
+            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const TournamentAdminDashboardScreen())),
+          ),
+          _buildActionCard(
+            'لوحة تحكم منظم البطولة والقرعة',
+            'توليد القرعة التلقائية وتوزيع المجموعات وجدولة المباريات',
+            Icons.dashboard_customize,
+            Colors.teal,
+            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const OrganizerDashboard())),
+          ),
+          _buildActionCard(
+            'إدارة الفرق والتشكيلات',
+            'مراجعة الفرق المعتمدة وحذف أو تعديل بيانات الفرق',
+            Icons.groups,
+            Colors.orange,
+            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const OrganizerDashboard())),
+          ),
         ];
 
       case UserRole.referee:
         return [
-          _buildActionCard('التحكم في نتائج المباريات المباشرة', 'تعديل النتيجة الحية وحالة المباراة (مباشر / انتهت)', Icons.sports_score, Colors.lightBlue),
-          _buildActionCard('إدارة رابط البث المباشر (YouTube)', 'تحديث معرف أو رابط فيديو البث المباشر', Icons.live_tv, Colors.red),
-          _buildActionCard('الإشراف على الدردشة المباشرة (Chat)', 'حظر المستخدمين المسيئين وحذف التعليقات المخالفة', Icons.chat_bubble_outline, Colors.pink),
+          _buildActionCard(
+            'لوحة تحكم الحكم المعتمد',
+            'توثيق نتائج المباريات ورفع لقطات الشاشة المعتمدة',
+            Icons.sports_score,
+            Colors.lightBlue,
+            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const RefereeDashboard())),
+          ),
+          _buildActionCard(
+            'غرفة التحكم المباشر (كافة المباريات)',
+            'تعديل النتيجة الحية وتوقيت المباراة أثناء اللعب',
+            Icons.tune,
+            Colors.blueAccent,
+            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const RefereeDashboardScreen())),
+          ),
+          _buildActionCard(
+            'إدارة رابط البث المباشر (YouTube)',
+            'تحديث وتوجيه بث الفيديو المباشر للمستخدمين',
+            Icons.live_tv,
+            Colors.red,
+            onTap: () => _showLiveStreamDialog(context),
+          ),
         ];
 
       case UserRole.financeAdmin:
         return [
-          _buildActionCard('مراجعة إشعارات التحويل (بنكك / فوري)', 'فحص صور الإشعارات في جدول transactions وقبولها', Icons.receipt_long, Colors.green),
-          _buildActionCard('إيداع الأرصدة في محافظ اللاعبين', 'تحديث رصيد جدول wallets عند نجاح التحويل', Icons.account_balance_wallet, Colors.teal),
-          _buildActionCard('صرف جوائز البطولات', 'تسليم الجوائز المالية للفائزين بعد انتهاء البطولة', Icons.payments, Colors.amber),
+          _buildActionCard(
+            'مراجعة إشعارات التحويل (بنكك / فوري)',
+            'فحص صور الإشعارات في جدول transactions وقبولها',
+            Icons.receipt_long,
+            Colors.green,
+            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const DepositRequestsScreen())),
+          ),
+          _buildActionCard(
+            'إيداع الأرصدة في محافظ اللاعبين',
+            'تحديث رصيد جدول wallets عند نجاح التحويل',
+            Icons.account_balance_wallet,
+            Colors.teal,
+            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const DepositRequestsScreen())),
+          ),
         ];
 
       case UserRole.player:
         return [
-          _buildActionCard('إنشاء وإدارة الفريق الخاص', 'تعديل بيانات فريقه وإضافة اللاعبين واللوقو', Icons.group_add, Colors.blue),
-          _buildActionCard('التسجيل في البطولات وشحن الرصيد', 'دفع الرسوم عبر المحفظة وإرفاق إشعار التحويل', Icons.sports_esports, AppTheme.primaryBlue),
-          _buildActionCard('المشاركة في الدردشة وتصفح التصنيفات', 'متابعة البث الحي والتعليق ورؤية الترتيب العام', Icons.chat, Colors.cyan),
+          _buildActionCard(
+            'محفظة اللاعب والشحن',
+            'إرسال إشعارات التحويل وشحن الرصيد عبر بنكك',
+            Icons.account_balance_wallet,
+            AppTheme.primaryBlue,
+          ),
+          _buildActionCard(
+            'التسجيل في البطولات الرسمية',
+            'دفع الرسوم عبر المحفظة والاشتراك في البطولات المفتوحة',
+            Icons.sports_esports,
+            Colors.amber,
+          ),
         ];
     }
   }
 
-  Widget _buildActionCard(String title, String subtitle, IconData icon, Color color) {
+  Widget _buildActionCard(String title, String subtitle, IconData icon, Color color, {VoidCallback? onTap}) {
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
+      child: Material(
         color: AppTheme.cardDark,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white10),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(color: color.withOpacity(0.15), shape: BoxShape.circle),
-            child: Icon(icon, color: color, size: 22),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.white10),
+            ),
+            child: Row(
               children: [
-                Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                const SizedBox(height: 3),
-                Text(subtitle, style: const TextStyle(color: Colors.white54, fontSize: 11)),
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(color: color.withValues(alpha: 0.15), shape: BoxShape.circle),
+                  child: Icon(icon, color: color, size: 22),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                      const SizedBox(height: 3),
+                      Text(subtitle, style: const TextStyle(color: Colors.white54, fontSize: 11)),
+                    ],
+                  ),
+                ),
+                if (onTap != null)
+                  const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.white30),
               ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }

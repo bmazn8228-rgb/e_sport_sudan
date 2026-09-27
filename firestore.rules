@@ -141,9 +141,8 @@ service cloud.firestore {
     // 7. Complaints
     // =========================================================================
     match /complaints/{complaintId} {
-      allow read: if isSuperAdmin();
+      allow read, update, delete: if isTournamentAdmin();
       allow create: if isAuthenticated();
-      allow update, delete: if isSuperAdmin();
     }
   }
 }
