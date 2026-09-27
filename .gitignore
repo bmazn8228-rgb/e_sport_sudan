@@ -66,3 +66,5 @@ gh_cli/
 *.zip
 .kotlin/
 **/android/.kotlin/
+*.py
+*.ps1
