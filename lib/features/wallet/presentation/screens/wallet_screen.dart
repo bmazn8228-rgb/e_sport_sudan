@@ -18,7 +18,7 @@ class _WalletScreenState extends State<WalletScreen> {
   // Deposit State
   bool _isAddingFunds = false;
   bool _isUploadingReceipt = false;
-  String _selectedPaymentMethod = 'بنكك (Bankak - بنك الخرطوم)';
+  String _selectedPaymentMethod = 'بنك الخرطوم (تطبيق بنكك - Bankak)';
   final _transactionIdController = TextEditingController();
   final _amountController = TextEditingController();
   File? _receiptFile;

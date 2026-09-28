@@ -17,6 +17,7 @@ import 'package:e_sport_sudan/features/profile/presentation/screens/profile_scre
 import 'package:e_sport_sudan/features/wallet/presentation/screens/wallet_screen.dart';
 import 'package:e_sport_sudan/features/team/presentation/screens/team_management_screen.dart';
 import 'package:e_sport_sudan/core/services/notification_service.dart';
+import 'package:e_sport_sudan/features/profile/presentation/screens/notifications_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class MainScreen extends StatefulWidget {
@@ -82,7 +83,7 @@ class _MainScreenState extends State<MainScreen> {
           filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
           child: Container(
             decoration: BoxDecoration(
-              color: Color(0xE6121722),
+              color: Theme.of(context).brightness == Brightness.dark ? const Color(0xE6121722) : Colors.white.withValues(alpha: 0.9),
               borderRadius: BorderRadius.circular(34),
               border: Border.all(
                 color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12),
@@ -218,7 +219,13 @@ class HomeScreen extends StatelessWidget {
             ),
             // Notification Bell (iOS Style)
             GestureDetector(
-              onTap: () => HapticFeedback.lightImpact(),
+              onTap: () {
+                HapticFeedback.lightImpact();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const NotificationsScreen()),
+                );
+              },
               child: Container(
                 padding: EdgeInsets.all(10),
                 decoration: BoxDecoration(
@@ -795,7 +802,7 @@ class HomeScreen extends StatelessWidget {
           padding: EdgeInsets.all(18),
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [Color(0xFF261217), Color(0xFF131822)],
+              colors: Theme.of(context).brightness == Brightness.dark ? const [Color(0xFF261217), Color(0xFF131822)] : [Colors.red.shade50, Colors.blue.shade50],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),

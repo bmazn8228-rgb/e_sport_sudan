@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:e_sport_sudan/core/theme/app_theme.dart';
 import 'package:e_sport_sudan/core/services/firestore_service.dart';
+import 'package:e_sport_sudan/features/shared/presentation/screens/qr_scanner_screen.dart';
 
 class PlayerSearchScreen extends StatefulWidget {
   final String? initialQuery;
@@ -39,10 +40,13 @@ class _PlayerSearchScreenState extends State<PlayerSearchScreen> {
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                hintText: 'ابحث عن لاعب بالاسم...',
+                hintText: 'ابحث عن لاعب عبر المعرف (ID)...',
                 prefixIcon: Icon(Icons.search, color: AppTheme.primaryBlue),
-                suffixIcon: _searchQuery.isNotEmpty
-                    ? IconButton(
+                suffixIcon: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (_searchQuery.isNotEmpty)
+                      IconButton(
                         icon: Icon(Icons.clear, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54)),
                         onPressed: () {
                           _searchController.clear();
@@ -50,8 +54,24 @@ class _PlayerSearchScreenState extends State<PlayerSearchScreen> {
                             _searchQuery = '';
                           });
                         },
-                      )
-                    : null,
+                      ),
+                    IconButton(
+                      icon: Icon(Icons.qr_code_scanner_rounded, color: AppTheme.primaryBlue),
+                      onPressed: () async {
+                        final result = await Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const QRScannerScreen(title: 'مسح هوية اللاعب')),
+                        );
+                        if (result != null && result is String && mounted) {
+                          _searchController.text = result;
+                          setState(() {
+                            _searchQuery = result;
+                          });
+                        }
+                      },
+                    ),
+                  ],
+                ),
                 filled: true,
                 fillColor: Theme.of(context).colorScheme.surface,
                 border: OutlineInputBorder(
@@ -71,7 +91,7 @@ class _PlayerSearchScreenState extends State<PlayerSearchScreen> {
             child: _searchQuery.isEmpty
                 ? Center(
                     child: Text(
-                      'أدخل اسم اللاعب للبحث',
+                      'أدخل معرف اللاعب (ID) للبحث',
                       style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54)),
                     ),
                   )
@@ -95,7 +115,7 @@ class _PlayerSearchScreenState extends State<PlayerSearchScreen> {
                       if (players.isEmpty) {
                         return Center(
                           child: Text(
-                            'لم يتم العثور على لاعبين بهذا الاسم',
+                            'لم يتم العثور على لاعب بهذا المعرف',
                             style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54)),
                           ),
                         );

@@ -1,4 +1,8 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:e_sport_sudan/core/theme/app_theme.dart';
 import 'package:e_sport_sudan/core/services/auth_service.dart';
 import 'package:e_sport_sudan/core/services/firestore_service.dart';
@@ -21,6 +25,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   bool _isLoading = true;
   bool _isSaving = false;
   UserModel? _userModel;
+  File? _imageFile;
+  String? _currentPhotoUrl;
 
   @override
   void initState() {
@@ -67,6 +73,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             _ignController.text = _userModel!.ign ?? '';
             _phoneController.text = _userModel!.phone;
             _gameController.text = _userModel!.gameId ?? '';
+            _currentPhotoUrl = _userModel!.photoUrl ?? user.photoURL;
           });
         }
       }
@@ -75,6 +82,25 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  Future<void> _pickImage() async {
+    try {
+      final picker = ImagePicker();
+      final pickedFile = await picker.pickImage(source: ImageSource.gallery, imageQuality: 70);
+      if (pickedFile != null) {
+        setState(() {
+          _imageFile = File(pickedFile.path);
+        });
+      }
+    } catch (e) {
+      debugPrint('Error picking image: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('حدث خطأ أثناء اختيار الصورة'), backgroundColor: Colors.redAccent),
+        );
       }
     }
   }
@@ -95,13 +121,25 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     setState(() => _isSaving = true);
 
     try {
+      String? uploadedPhotoUrl = _currentPhotoUrl;
+
+      if (_imageFile != null) {
+        final storageRef = FirebaseStorage.instance
+            .ref()
+            .child('user_avatars')
+            .child('${user.uid}_${DateTime.now().millisecondsSinceEpoch}.jpg');
+            
+        final uploadTask = await storageRef.putFile(_imageFile!);
+        uploadedPhotoUrl = await uploadTask.ref.getDownloadURL();
+      }
+
       final updatedModel = UserModel(
         uid: user.uid,
         email: _userModel?.email.isNotEmpty == true ? _userModel!.email : (user.email ?? ''),
         displayName: _nameController.text.trim(),
         ign: _ignController.text.trim().isNotEmpty ? _ignController.text.trim() : null,
         phone: _phoneController.text.trim(),
-        photoUrl: _userModel?.photoUrl ?? user.photoURL,
+        photoUrl: uploadedPhotoUrl,
         gameId: _gameController.text.trim().isNotEmpty ? _gameController.text.trim() : null,
         role: _userModel?.role ?? UserRole.player,
         teamId: _userModel?.teamId,
@@ -187,35 +225,48 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   children: [
                     // Avatar Header
                     Center(
-                      child: Stack(
-                        alignment: Alignment.bottomRight,
-                        children: [
-                          Container(
-                            width: 90,
-                            height: 90,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              gradient: LinearGradient(
-                                colors: [
-                                  AppTheme.primaryBlue.withValues(alpha: 0.3),
-                                  Color(0xFF00E5FF).withValues(alpha: 0.1),
-                                ],
+                      child: GestureDetector(
+                        onTap: _isSaving ? null : _pickImage,
+                        child: Stack(
+                          alignment: Alignment.bottomRight,
+                          children: [
+                            Container(
+                              width: 90,
+                              height: 90,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                gradient: LinearGradient(
+                                  colors: [
+                                    AppTheme.primaryBlue.withValues(alpha: 0.3),
+                                    Color(0xFF00E5FF).withValues(alpha: 0.1),
+                                  ],
+                                ),
+                                border: Border.all(color: AppTheme.primaryBlue.withValues(alpha: 0.6), width: 2),
+                                image: _imageFile != null
+                                    ? DecorationImage(image: FileImage(_imageFile!), fit: BoxFit.cover)
+                                    : (_currentPhotoUrl != null && _currentPhotoUrl!.isNotEmpty)
+                                        ? DecorationImage(
+                                            image: CachedNetworkImageProvider(_currentPhotoUrl!),
+                                            fit: BoxFit.cover,
+                                          )
+                                        : null,
                               ),
-                              border: Border.all(color: AppTheme.primaryBlue.withValues(alpha: 0.6), width: 2),
+                              child: (_imageFile == null && (_currentPhotoUrl == null || _currentPhotoUrl!.isEmpty))
+                                  ? Center(
+                                      child: Icon(Icons.person_outline, size: 48, color: AppTheme.primaryBlue),
+                                    )
+                                  : null,
                             ),
-                            child: Center(
-                              child: Icon(Icons.person_outline, size: 48, color: AppTheme.primaryBlue),
+                            Container(
+                              padding: EdgeInsets.all(6),
+                              decoration: BoxDecoration(
+                                color: AppTheme.primaryBlue,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(Icons.edit, size: 14, color: Colors.black),
                             ),
-                          ),
-                          Container(
-                            padding: EdgeInsets.all(6),
-                            decoration: BoxDecoration(
-                              color: AppTheme.primaryBlue,
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(Icons.edit, size: 14, color: Colors.black),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                     SizedBox(height: 8),

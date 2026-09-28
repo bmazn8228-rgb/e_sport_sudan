@@ -14,7 +14,9 @@ service cloud.firestore {
     }
     
     function getUserRole() {
-      return isAuthenticated() ? getUserData().role : 'guest';
+      return (isAuthenticated() && exists(/databases/$(database)/documents/users/$(request.auth.uid))) 
+        ? getUserData().role 
+        : 'guest';
     }
     
     function isSuperAdmin() {

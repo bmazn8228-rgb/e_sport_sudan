@@ -1,9 +1,10 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:e_sport_sudan/core/theme/app_theme.dart';
 import 'package:e_sport_sudan/core/services/firestore_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:e_sport_sudan/core/services/notification_service.dart';
 import 'package:e_sport_sudan/core/widgets/esport_toast.dart';
+import 'package:e_sport_sudan/features/shared/presentation/screens/qr_scanner_screen.dart';
 
 class TeamSearchScreen extends StatefulWidget {
   final String? initialQuery;
@@ -95,8 +96,38 @@ class _TeamSearchScreenState extends State<TeamSearchScreen> {
             child: TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                hintText: 'ابحث عن اسم الفريق...',
+                hintText: 'ابحث عن اسم أو معرف الفريق...',
                 prefixIcon: Icon(Icons.search, color: AppTheme.primaryBlue),
+                suffixIcon: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (_searchQuery.isNotEmpty)
+                      IconButton(
+                        icon: Icon(Icons.clear, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54)),
+                        onPressed: () {
+                          _searchController.clear();
+                          setState(() {
+                            _searchQuery = '';
+                          });
+                        },
+                      ),
+                    IconButton(
+                      icon: Icon(Icons.qr_code_scanner_rounded, color: AppTheme.primaryBlue),
+                      onPressed: () async {
+                        final result = await Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const QRScannerScreen(title: 'مسح معرف الفريق')),
+                        );
+                        if (result != null && result is String && mounted) {
+                          _searchController.text = result;
+                          setState(() {
+                            _searchQuery = result.toLowerCase();
+                          });
+                        }
+                      },
+                    ),
+                  ],
+                ),
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
               ),
               onChanged: (val) => setState(() => _searchQuery = val.toLowerCase()),
@@ -115,7 +146,8 @@ class _TeamSearchScreenState extends State<TeamSearchScreen> {
                 if (_searchQuery.isNotEmpty) {
                   teams = teams.where((t) {
                     final name = (t['name'] ?? '').toString().toLowerCase();
-                    return name.contains(_searchQuery);
+                    final id = (t['id'] ?? '').toString().toLowerCase();
+                    return name.contains(_searchQuery) || id.contains(_searchQuery);
                   }).toList();
                 }
 
@@ -139,7 +171,7 @@ class _TeamSearchScreenState extends State<TeamSearchScreen> {
                           child: Icon(Icons.shield, color: AppTheme.primaryBlue),
                         ),
                         title: Text(team['name'] ?? 'بدون اسم', style: TextStyle(fontWeight: FontWeight.bold)),
-                        subtitle: Text('اللعبة:  | الأعضاء: '),
+                        subtitle: Text('اللعبة: ${team['game'] ?? 'غير محدد'} | الأعضاء: $memberCount'),
                         trailing: Builder(
                           builder: (context) {
                             final joinType = team['joinType'] ?? 'public';

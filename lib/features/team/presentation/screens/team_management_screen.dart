@@ -3,6 +3,7 @@ import 'package:e_sport_sudan/core/widgets/esport_toast.dart';
 import 'package:e_sport_sudan/features/team/presentation/screens/team_search_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/services.dart';
 import 'package:e_sport_sudan/core/theme/app_theme.dart';
 import 'package:e_sport_sudan/core/services/firestore_service.dart';
 import 'package:e_sport_sudan/core/models/user_model.dart';
@@ -36,7 +37,7 @@ class _TeamManagementScreenState extends State<TeamManagementScreen> {
     }
 
     try {
-      UserModel? user = await _firestoreService.getUser(authUser.uid);
+      UserModel? user = await _firestoreService.getUser(authUser.uid, forceRefresh: true);
       if (user == null) {
         final fallbackName = (authUser.displayName != null && authUser.displayName!.trim().isNotEmpty)
             ? authUser.displayName!.trim()
@@ -211,7 +212,7 @@ class _TeamManagementScreenState extends State<TeamManagementScreen> {
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text('حدث خطأ أثناء إنشاء الفريق. يرجى المحاولة مرة أخرى.'),
+                            content: Text('حدث خطأ: ${e.toString()}'),
                             backgroundColor: Colors.redAccent,
                           ),
                         );
@@ -401,6 +402,30 @@ class _TeamManagementScreenState extends State<TeamManagementScreen> {
               SizedBox(height: 16),
               Text(teamName, style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface)),
               SizedBox(height: 4),
+              GestureDetector(
+                onTap: () {
+                  final id = _teamData?['id'];
+                  if (id != null) {
+                    HapticFeedback.lightImpact();
+                    Clipboard.setData(ClipboardData(text: id));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('تم نسخ معرف الفريق: $id'), duration: Duration(seconds: 2), behavior: SnackBarBehavior.floating),
+                    );
+                  }
+                },
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      _teamData?['id'] ?? 'بدون معرف',
+                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.primaryBlue, letterSpacing: 1.1),
+                    ),
+                    SizedBox(width: 6),
+                    Icon(Icons.copy_rounded, size: 14, color: AppTheme.primaryBlue),
+                  ],
+                ),
+              ),
+              SizedBox(height: 10),
               Text('لعبة: $game', style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7))),
               SizedBox(height: 16),
               Row(

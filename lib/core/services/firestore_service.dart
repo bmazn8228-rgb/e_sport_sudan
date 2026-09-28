@@ -16,16 +16,18 @@ class FirestoreService {
   UserModel? _cachedUser;
   DateTime? _lastCacheTime;
 
-  Future<UserModel?> getUser(String uid) async {
+  Future<UserModel?> getUser(String uid, {bool forceRefresh = false}) async {
     // Return cached user if requested within the last 5 seconds to speed up login flow
-    if (_cachedUser != null && _cachedUser!.uid == uid && _lastCacheTime != null) {
+    if (!forceRefresh && _cachedUser != null && _cachedUser!.uid == uid && _lastCacheTime != null) {
       if (DateTime.now().difference(_lastCacheTime!).inSeconds < 5) {
         return _cachedUser;
       }
     }
 
     try {
-      final doc = await _db.collection('users').doc(uid).get();
+      final doc = await _db.collection('users').doc(uid).get(
+        GetOptions(source: forceRefresh ? Source.server : Source.serverAndCache),
+      );
       if (!doc.exists || doc.data() == null) return null;
       _cachedUser = UserModel.fromMap(doc.data()!, doc.id);
       _lastCacheTime = DateTime.now();
@@ -61,12 +63,13 @@ class FirestoreService {
       // Since this is just an admin dashboard, a client-side sum over deposits is acceptable for now.
       final txSnapshot = await _db.collection('transactions')
           .where('type', isEqualTo: 'deposit')
-          .where('status', isEqualTo: 'approved')
           .get();
           
       double totalFees = 0;
       for (var doc in txSnapshot.docs) {
-        totalFees += (doc.data()['amount'] as num?)?.toDouble() ?? 0;
+        if (doc.data()['status'] == 'approved') {
+          totalFees += (doc.data()['amount'] as num?)?.toDouble() ?? 0;
+        }
       }
 
       return {
@@ -99,15 +102,28 @@ class FirestoreService {
   // 2. Tournaments (البطولات)
   // =========================================================================
   Stream<List<Map<String, dynamic>>> getTournamentsStream({String? game}) {
-    Query query = _db.collection('tournaments').orderBy('startDate', descending: true);
-    if (game != null && game.isNotEmpty) {
-      query = query.where('game', isEqualTo: game);
-    }
-    return query.snapshots().map((snapshot) => snapshot.docs.map((doc) {
-          final data = doc.data() as Map<String, dynamic>;
-          data['id'] = doc.id;
-          return data;
-        }).toList());
+    return _db.collection('tournaments').snapshots().map((snapshot) {
+      var list = snapshot.docs.map((doc) {
+        final data = doc.data() as Map<String, dynamic>;
+        data['id'] = doc.id;
+        return data;
+      }).toList();
+
+      if (game != null && game.isNotEmpty) {
+        list = list.where((t) => t['game'] == game).toList();
+      }
+
+      list.sort((a, b) {
+        final tA = a['startDate'];
+        final tB = b['startDate'];
+        if (tA is Timestamp && tB is Timestamp) {
+          return tB.compareTo(tA);
+        }
+        return 0;
+      });
+
+      return list;
+    });
   }
 
   Future<void> createTournament(Map<String, dynamic> tournamentData) async {
@@ -129,13 +145,22 @@ class FirestoreService {
   Stream<List<Map<String, dynamic>>> getPendingDepositRequestsStream() {
     return _db.collection('transactions')
         .where('type', isEqualTo: 'deposit')
-        .where('status', isEqualTo: 'pending')
-        .orderBy('createdAt', descending: true)
-        .snapshots().map((snapshot) => snapshot.docs.map((doc) {
-          final data = doc.data();
-          data['id'] = doc.id;
-          return data;
-        }).toList());
+        .snapshots().map((snapshot) {
+          var docs = snapshot.docs.map((doc) {
+            final data = doc.data();
+            data['id'] = doc.id;
+            return data;
+          }).where((tx) => tx['status'] == 'pending').toList();
+
+          docs.sort((a, b) {
+            final tA = a['createdAt'];
+            final tB = b['createdAt'];
+            if (tA is Timestamp && tB is Timestamp) return tB.compareTo(tA);
+            return 0;
+          });
+
+          return docs;
+        });
   }
 
   Future<void> updateDepositRequestStatus(String docId, String status, double amount, String userId) async {
@@ -298,16 +323,20 @@ class FirestoreService {
     return _db
         .collection('rankings')
         .where('game', isEqualTo: game)
-        .where('type', isEqualTo: type)
-        .where('season', isEqualTo: season)
-        .orderBy('mmr', descending: true)
         .snapshots()
         .map((snapshot) {
-      final list = snapshot.docs.map((doc) {
+      var list = snapshot.docs.map((doc) {
         final data = doc.data();
         data['id'] = doc.id;
         return data;
-      }).toList();
+      }).where((r) => r['type'] == type && r['season'] == season).toList();
+      
+      list.sort((a, b) {
+        final aMmr = (a['mmr'] as num?)?.toDouble() ?? 0.0;
+        final bMmr = (b['mmr'] as num?)?.toDouble() ?? 0.0;
+        return bMmr.compareTo(aMmr);
+      });
+
       // Calculate rank locally based on order
       for (int i = 0; i < list.length; i++) {
         list[i]['rank'] = i + 1;
@@ -362,8 +391,11 @@ class FirestoreService {
   }
 
   Future<void> updateMatchStreamUrl(String matchId, String youtubeVideoId) async {
+    final isLive = youtubeVideoId.isNotEmpty;
     await _db.collection('matches').doc(matchId).update({
       'youtubeVideoId': youtubeVideoId,
+      'isLive': isLive,
+      'status': isLive ? 'live' : 'scheduled',
     });
   }
 
@@ -500,13 +532,23 @@ class FirestoreService {
     return _db
         .collection('transactions')
         .where('userId', isEqualTo: userId)
-        .orderBy('createdAt', descending: true)
         .snapshots()
-        .map((snapshot) => snapshot.docs.map((doc) {
+        .map((snapshot) {
+            final txs = snapshot.docs.map((doc) {
               final data = doc.data();
               data['id'] = doc.id;
               return data;
-            }).toList());
+            }).toList();
+            txs.sort((a, b) {
+              final tA = a['createdAt'];
+              final tB = b['createdAt'];
+              if (tA is Timestamp && tB is Timestamp) {
+                return tB.compareTo(tA);
+              }
+              return 0;
+            });
+            return txs;
+        });
   }
 
   Future<void> submitWithdrawalRequest({
@@ -663,10 +705,27 @@ class FirestoreService {
       'appName': 'E-Sport Sudan',
       'version': '1.0.0',
       'maintenanceMode': false,
-      'supportPhone': '+249912345678',
+      'supportPhone': '+249123456789',
+      'telegramUsername': 'EsportSudanSupport',
+      'facebookUrl': 'https://facebook.com/EsportSudan',
       'currency': 'ج.س',
       'updatedAt': FieldValue.serverTimestamp(),
     }, SetOptions(merge: true));
+  }
+
+  Future<Map<String, dynamic>> getAppConfig() async {
+    try {
+      final doc = await _db.collection('settings').doc('app_config').get();
+      if (doc.exists && doc.data() != null) {
+        return doc.data()!;
+      }
+    } catch (_) {}
+    // Fallback if not found
+    return {
+      'supportPhone': '+249123456789',
+      'telegramUsername': 'EsportSudanSupport',
+      'facebookUrl': 'https://facebook.com/EsportSudan',
+    };
 
     // 4. Game Stats
     final games = [
@@ -765,13 +824,12 @@ class FirestoreService {
   Stream<List<Map<String, dynamic>>> getMatchesForRefereeStream(String refereeUid) {
     return _db.collection('matches')
         .where('refereeId', isEqualTo: refereeUid)
-        .where('status', isEqualTo: 'scheduled')
         .snapshots()
         .map((snapshot) => snapshot.docs.map((doc) {
               final data = doc.data();
               data['id'] = doc.id;
               return data;
-            }).toList());
+            }).where((match) => match['status'] == 'scheduled').toList());
   }
 
   Future<void> submitMatchResult({
@@ -810,18 +868,18 @@ class FirestoreService {
   // =========================================================================
   Stream<List<Map<String, dynamic>>> searchPlayersStream(String query) {
     if (query.isEmpty) return Stream.empty();
-    return _db.collection('users')
-        .where('role', isEqualTo: 'player')
-        .orderBy('displayName')
-        .startAt([query])
-        .endAt(['$query\uf8ff'])
-        .limit(20)
-        .snapshots()
-        .map((snapshot) => snapshot.docs.map((doc) {
-              final data = doc.data();
-              data['id'] = doc.id;
-              return data;
-            }).toList());
+    
+    // To avoid complex composite indexes, search by EXACT player ID (uid).
+    return _db.collection('users').doc(query).snapshots().map((doc) {
+      if (doc.exists && doc.data() != null) {
+        final data = doc.data()!;
+        if (data['role'] == 'player') {
+          data['id'] = doc.id;
+          return [data];
+        }
+      }
+      return [];
+    });
   }
 
   Stream<List<Map<String, dynamic>>> searchAllUsersStream(String query) {
@@ -882,16 +940,19 @@ class FirestoreService {
     if (type != 'all') {
       query = query.where('type', isEqualTo: type);
     }
-    if (status != null && status.isNotEmpty && status != 'all') {
-      query = query.where('status', isEqualTo: status);
-    }
+    
     return query.snapshots().map(
       (snapshot) {
-        final list = snapshot.docs.map((doc) {
+        var list = snapshot.docs.map((doc) {
           final data = doc.data() as Map<String, dynamic>;
           data['id'] = doc.id;
           return data;
         }).toList();
+        
+        if (status != null && status.isNotEmpty && status != 'all') {
+          list = list.where((tx) => tx['status'] == status).toList();
+        }
+
         list.sort((a, b) {
           final tA = a['createdAt'];
           final tB = b['createdAt'];

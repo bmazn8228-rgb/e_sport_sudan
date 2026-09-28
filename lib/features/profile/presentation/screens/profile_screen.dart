@@ -17,6 +17,7 @@ import 'package:e_sport_sudan/features/admin/presentation/screens/admin_dashboar
 import 'package:e_sport_sudan/features/admin/presentation/screens/deposit_requests_screen.dart';
 import 'package:e_sport_sudan/features/admin/presentation/screens/tournament_admin_dashboard_screen.dart';
 import 'package:e_sport_sudan/features/profile/presentation/screens/settings_screen.dart';
+import 'package:e_sport_sudan/features/support/presentation/screens/help_center_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:e_sport_sudan/core/services/auth_service.dart';
 import 'package:e_sport_sudan/core/services/firestore_service.dart';
@@ -383,7 +384,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
               SizedBox(height: 24),
             ],
 
-            // 8. Logout Action
+            // 8. Help Center & Support
+            _buildSectionHeader('المساعدة والدعم'),
+            SizedBox(height: 8),
+            Container(
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.9),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)),
+              ),
+              child: Column(
+                children: [
+                  _buildPortalTile(
+                    title: 'مركز المساعدة والدعم',
+                    subtitle: 'الأسئلة الشائعة، الدعم الفني، وتقديم الشكاوى',
+                    icon: Icons.support_agent_rounded,
+                    color: Colors.pinkAccent,
+                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const HelpCenterScreen())),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(height: 24),
+
+            // 9. Logout Action
             SizedBox(
               width: double.infinity,
               child: OutlinedButton.icon(
@@ -637,12 +661,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
             children: [
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('معرف اللاعب (Player ID)', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 10)),
+                  GestureDetector(
+                    onTap: () {
+                      HapticFeedback.lightImpact();
+                      Clipboard.setData(ClipboardData(text: uid));
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('تم نسخ المعرف: $uid'), duration: Duration(seconds: 2), behavior: SnackBarBehavior.floating),
+                      );
+                    },
+                    child: Row(
+                      children: [
+                        Text('معرف اللاعب (Player ID)', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 10)),
+                        SizedBox(width: 4),
+                        Icon(Icons.copy_rounded, size: 10, color: AppTheme.primaryBlue),
+                      ],
+                    ),
+                  ),
                   SizedBox(height: 3),
-                  Text(
-                    'SD-$shortUid-SDN',
-                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold, fontSize: 14, letterSpacing: 1.1),
+                  Container(
+                    width: 130,
+                    child: Text(
+                      uid,
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold, fontSize: 12, letterSpacing: 1.1),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                 ],
               ),
