@@ -661,6 +661,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             children: [
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
                   GestureDetector(
                     onTap: () {
                       HapticFeedback.lightImpact();

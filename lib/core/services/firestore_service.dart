@@ -735,6 +735,7 @@ class FirestoreService {
       {'id': 'valorant', 'name': 'Valorant', 'activePlayers': 430, 'tournamentsCount': 1},
     ];
 
+    final batch = _db.batch();
     for (var g in games) {
       final docRef = _db.collection('game_stats').doc(g['id'] as String);
       batch.set(docRef, {

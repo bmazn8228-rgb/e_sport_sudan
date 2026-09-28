@@ -223,7 +223,7 @@ class HomeScreen extends StatelessWidget {
                 HapticFeedback.lightImpact();
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const NotificationsScreen()),
+                  MaterialPageRoute(builder: (context) => NotificationsScreen(userId: FirebaseAuth.instance.currentUser?.uid ?? '')),
                 );
               },
               child: Container(
