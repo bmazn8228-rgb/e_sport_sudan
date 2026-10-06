@@ -101,7 +101,7 @@ class UserModel {
   final String email;
   final String displayName;
   final String? ign;
-  final String? phone;
+  final String phone;
   final String? photoUrl;
   final String? gameId;
   final String? playerId; // Short numeric ID
@@ -114,7 +114,7 @@ class UserModel {
     required this.email,
     required this.displayName,
     this.ign,
-    this.phone,
+    this.phone = '',
     this.photoUrl,
     this.gameId,
     this.playerId,
