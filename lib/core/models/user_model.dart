@@ -101,7 +101,7 @@ class UserModel {
   final String email;
   final String displayName;
   final String? ign;
-  final String phone;
+  final String? phone;
   final String? photoUrl;
   final String? gameId;
   final String? playerId; // Short numeric ID
