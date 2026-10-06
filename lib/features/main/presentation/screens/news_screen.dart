@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:e_sport_sudan/core/theme/app_theme.dart';
 import 'package:e_sport_sudan/core/models/news_model.dart';
 import 'package:e_sport_sudan/core/services/firestore_service.dart';
+import 'package:intl/intl.dart';
 
 class NewsListScreen extends StatelessWidget {
   const NewsListScreen({Key? key}) : super(key: key);
@@ -119,7 +120,7 @@ class NewsListScreen extends StatelessWidget {
                         style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5), fontSize: 11),
                       ),
                       Text(
-                        '//',
+                        DateFormat('yyyy/MM/dd').format(news.createdAt),
                         style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5), fontSize: 11),
                       ),
                     ],
@@ -188,7 +189,7 @@ class NewsDetailsScreen extends StatelessWidget {
                       SizedBox(width: 16),
                       Icon(Icons.access_time, size: 16, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)),
                       SizedBox(width: 4),
-                      Text('//', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5), fontSize: 12)),
+                      Text(DateFormat('yyyy/MM/dd - hh:mm a').format(news.createdAt), style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5), fontSize: 12)),
                     ],
                   ),
                   Divider(height: 32, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1)),

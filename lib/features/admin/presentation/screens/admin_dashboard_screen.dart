@@ -14,6 +14,8 @@ import 'package:e_sport_sudan/features/roles/presentation/screens/referee_dashbo
 import 'deposit_requests_screen.dart';
 import 'tournament_admin_dashboard_screen.dart';
 import 'referee_dashboard_screen.dart';
+import 'package:e_sport_sudan/core/services/auth_service.dart';
+import 'package:e_sport_sudan/features/auth/presentation/screens/login_screen.dart';
 
 class AdminDashboardScreen extends StatefulWidget {
   const AdminDashboardScreen({super.key});
@@ -54,6 +56,22 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         title: Text('لوحة تحكم الإدارة والصلاحيات', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.logout, color: Colors.redAccent),
+            tooltip: 'تسجيل الخروج',
+            onPressed: () async {
+              await AuthService().signOut();
+              if (context.mounted) {
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LoginScreen()),
+                  (route) => false,
+                );
+              }
+            },
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16.0),
@@ -539,7 +557,14 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                               return;
                             }
 
-                            final videoId = YoutubePlayer.convertUrlToId(rawInput) ?? rawInput;
+                            String videoId = rawInput;
+                            final regex = RegExp(r'(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/|youtube\.com\/live\/)([^"&?\/\s]{11})', caseSensitive: false);
+                            final match = regex.firstMatch(rawInput);
+                            if (match != null && match.groupCount >= 1) {
+                              videoId = match.group(1) ?? rawInput;
+                            } else {
+                              videoId = YoutubePlayer.convertUrlToId(rawInput) ?? rawInput;
+                            }
 
                             setModalState(() => isSaving = true);
                             try {

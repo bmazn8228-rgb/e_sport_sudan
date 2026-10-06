@@ -8,6 +8,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:e_sport_sudan/core/theme/app_theme.dart';
 import 'package:e_sport_sudan/core/services/firestore_service.dart';
 import 'package:e_sport_sudan/features/admin/presentation/screens/referee_dashboard_screen.dart';
+import 'package:e_sport_sudan/core/services/auth_service.dart';
+import 'package:e_sport_sudan/features/auth/presentation/screens/login_screen.dart';
 
 class RefereeDashboard extends StatefulWidget {
   RefereeDashboard({super.key});
@@ -98,6 +100,22 @@ class _RefereeDashboardState extends State<RefereeDashboard> with SingleTickerPr
         backgroundColor: Colors.transparent,
         elevation: 0,
         title: Text('لوحة تحكم الحكم المعتمد', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.logout, color: Colors.redAccent),
+            tooltip: 'تسجيل الخروج',
+            onPressed: () async {
+              await AuthService().signOut();
+              if (context.mounted) {
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LoginScreen()),
+                  (route) => false,
+                );
+              }
+            },
+          ),
+        ],
         bottom: TabBar(
           controller: _tabController,
           indicatorColor: AppTheme.primaryBlue,

@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:e_sport_sudan/core/services/notification_service.dart';
 import 'package:e_sport_sudan/core/widgets/esport_toast.dart';
 import 'package:e_sport_sudan/core/theme/app_theme.dart';
+import 'package:e_sport_sudan/core/services/auth_service.dart';
+import 'package:e_sport_sudan/features/auth/presentation/screens/login_screen.dart';
 import 'package:e_sport_sudan/core/services/firestore_service.dart';
 import 'package:e_sport_sudan/features/admin/presentation/screens/deposit_requests_screen.dart';
 import 'package:e_sport_sudan/features/admin/presentation/screens/admin_dashboard_screen.dart';
@@ -54,6 +56,20 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard> {
             icon: Icon(Icons.cloud_sync, color: AppTheme.primaryBlue),
             tooltip: 'لوحة تحكم البث والتهيئة',
             onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => AdminDashboardScreen())),
+          ),
+          IconButton(
+            icon: Icon(Icons.logout, color: Colors.redAccent),
+            tooltip: 'تسجيل الخروج',
+            onPressed: () async {
+              await AuthService().signOut();
+              if (context.mounted) {
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LoginScreen()),
+                  (route) => false,
+                );
+              }
+            },
           ),
           IconButton(
             icon: Icon(Icons.swap_horiz, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),

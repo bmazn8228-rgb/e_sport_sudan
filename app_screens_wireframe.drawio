@@ -1,0 +1,141 @@
+<mxfile host="Electron" modified="2023-10-04T00:00:00.000Z" agent="Mozilla/5.0" etag="1" version="22.0.4" type="device">
+  <diagram id="diagram_1" name="App Wireframes">
+    <mxGraphModel dx="1000" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Screen 1: Super Admin Dashboard -->
+        <mxCell id="s1_phone" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=5;strokeWidth=3;fillColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="40" y="40" width="300" height="600" as="geometry" />
+        </mxCell>
+        <mxCell id="s1_notch" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;arcSize=50;" vertex="1" parent="1">
+          <mxGeometry x="140" y="45" width="100" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="s1_appbar" value="Super Admin Dashboard" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1976D2;fontColor=#ffffff;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="80" width="300" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="s1_stat1" value="Total Users&#10;1,245" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="60" y="150" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="s1_stat2" value="Tournaments&#10;12 Active" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="200" y="150" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="s1_btn1" value="Manage Organizers" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#4CAF50;fontColor=#ffffff;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="60" y="260" width="260" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="s1_btn2" value="Manage Referees" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#4CAF50;fontColor=#ffffff;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="60" y="320" width="260" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="s1_btn3" value="System Settings" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#607D8B;fontColor=#ffffff;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="60" y="380" width="260" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="s1_nav" value="Home | Reports | Profile" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="40" y="580" width="300" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Screen 2: Organizer - Referees -->
+        <mxCell id="s2_phone" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=5;strokeWidth=3;fillColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="380" y="40" width="300" height="600" as="geometry" />
+        </mxCell>
+        <mxCell id="s2_notch" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;arcSize=50;" vertex="1" parent="1">
+          <mxGeometry x="480" y="45" width="100" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="s2_appbar" value="&lt;   Referees" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1976D2;fontColor=#ffffff;fontSize=16;fontStyle=1;align=left;spacingLeft=15;" vertex="1" parent="1">
+          <mxGeometry x="380" y="80" width="300" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="s2_ref1" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#dddddd;" vertex="1" parent="1">
+          <mxGeometry x="400" y="150" width="260" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="s2_ref1_av" value="" style="ellipse;whiteSpace=wrap;html=1;fillColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="410" y="160" width="50" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="s2_ref1_txt" value="Ahmed Ali&#10;Status: Available" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="470" y="160" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="s2_ref1_btn" value="Assign" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FF9800;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="590" y="170" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="s2_ref2" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#dddddd;" vertex="1" parent="1">
+          <mxGeometry x="400" y="235" width="260" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="s2_ref2_av" value="" style="ellipse;whiteSpace=wrap;html=1;fillColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="410" y="245" width="50" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="s2_ref2_txt" value="Mohammed Omer&#10;Status: In Match" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="470" y="245" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="s2_ref2_btn" value="View" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#9E9E9E;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="590" y="255" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="s2_fab" value="+" style="ellipse;whiteSpace=wrap;html=1;fillColor=#E91E63;fontColor=#ffffff;fontSize=24;" vertex="1" parent="1">
+          <mxGeometry x="600" y="550" width="60" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Screen 3: Player Search Screen -->
+        <mxCell id="s3_phone" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=5;strokeWidth=3;fillColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="720" y="40" width="300" height="600" as="geometry" />
+        </mxCell>
+        <mxCell id="s3_notch" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;arcSize=50;" vertex="1" parent="1">
+          <mxGeometry x="820" y="45" width="100" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="s3_appbar" value="&lt;   Search Players" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1976D2;fontColor=#ffffff;fontSize=16;fontStyle=1;align=left;spacingLeft=15;" vertex="1" parent="1">
+          <mxGeometry x="720" y="80" width="300" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="s3_searchbox" value="Search by name or ID..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=left;spacingLeft=10;fontColor=#888888;" vertex="1" parent="1">
+          <mxGeometry x="740" y="140" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="s3_chip1" value="PUBG" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#2196F3;fontColor=#2196F3;arcSize=50;" vertex="1" parent="1">
+          <mxGeometry x="740" y="195" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="s3_chip2" value="Free Fire" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cccccc;arcSize=50;" vertex="1" parent="1">
+          <mxGeometry x="810" y="195" width="70" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="s3_chip3" value="Pro" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cccccc;arcSize=50;" vertex="1" parent="1">
+          <mxGeometry x="890" y="195" width="50" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="s3_res1" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#dddddd;" vertex="1" parent="1">
+          <mxGeometry x="740" y="245" width="260" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="s3_res1_av" value="Img" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eeeeee;" vertex="1" parent="1">
+          <mxGeometry x="750" y="255" width="60" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="s3_res1_txt" value="Sniper_SD&#10;Rank: Conqueror&#10;Team: Falcons" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="820" y="255" width="100" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="s3_res1_btn" value="Invite" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#4CAF50;fontColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="930" y="270" width="60" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- Screen 4: Live Match Screen -->
+        <mxCell id="s4_phone" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=5;strokeWidth=3;fillColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="40" width="300" height="600" as="geometry" />
+        </mxCell>
+        <mxCell id="s4_notch" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;arcSize=50;" vertex="1" parent="1">
+          <mxGeometry x="1160" y="45" width="100" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="s4_appbar" value="&lt;   Live Match" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F44336;fontColor=#ffffff;fontSize=16;fontStyle=1;align=left;spacingLeft=15;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="80" width="300" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="s4_scorebox" value="TEAM A      2  -  1      TEAM B&#10;05:23" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#333333;fontColor=#ffffff;fontSize=18;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="130" width="300" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="s4_stream" value="Live Stream Placeholder" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#000000;fontColor=#ffffff;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="210" width="300" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="s4_log_bg" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="380" width="300" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="s4_log1" value="[04:12] Snipe_SD eliminated User123" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1070" y="390" width="280" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="s4_log2" value="[03:50] Team A secured the objective" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontColor=#2196F3;" vertex="1" parent="1">
+          <mxGeometry x="1070" y="410" width="280" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="s4_btn_act" value="End Match" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F44336;fontColor=#ffffff;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="1080" y="580" width="260" height="40" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

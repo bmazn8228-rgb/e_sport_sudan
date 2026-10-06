@@ -8,6 +8,7 @@ import 'package:e_sport_sudan/core/utils/validators.dart';
 import 'package:e_sport_sudan/core/utils/connectivity_helper.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:e_sport_sudan/features/auth/presentation/screens/login_screen.dart';
+import 'package:e_sport_sudan/core/services/auth_service.dart';
 
 class TournamentAdminDashboardScreen extends StatefulWidget {
   const TournamentAdminDashboardScreen({super.key});
@@ -20,7 +21,7 @@ class _TournamentAdminDashboardScreenState extends State<TournamentAdminDashboar
   final FirestoreService _firestoreService = FirestoreService();
 
   Future<void> _logout(BuildContext context) async {
-    await FirebaseAuth.instance.signOut();
+    await AuthService().signOut();
     if (context.mounted) {
       Navigator.pushAndRemoveUntil(
         context,

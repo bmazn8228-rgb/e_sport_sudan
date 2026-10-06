@@ -521,8 +521,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _buildFrontCard() {
     final user = FirebaseAuth.instance.currentUser;
-    final uid = user?.uid ?? '000000';
-    final shortUid = uid.length >= 6 ? uid.substring(0, 6).toUpperCase() : uid.toUpperCase();
+    final uid = _userModel?.playerId ?? user?.uid ?? '000000';
 
     // اسم اللاعب الكامل واسم المستخدم في اللعبة
     final String fullName = (_userModel?.displayName != null && _userModel!.displayName.trim().isNotEmpty)
@@ -722,7 +721,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _buildBackCard() {
     final user = FirebaseAuth.instance.currentUser;
-    final uid = user?.uid ?? '000000';
+    final uid = _userModel?.playerId ?? user?.uid ?? '000000';
 
     return Container(
       width: double.infinity,

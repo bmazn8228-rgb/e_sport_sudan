@@ -1,0 +1,1090 @@
+<mxfile host="Electron" modified="2023-10-04T00:00:00.000Z" agent="Mozilla/5.0" etag="1" version="22.0.4" type="device">
+  <diagram id="diagram_all" name="All Screens Wireframe">
+    <mxGraphModel dx="1000" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="4000" pageHeight="5000" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="splash_grp" value="Auth" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="40" y="0" width="300" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="splash_phone" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=5;strokeWidth=3;fillColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="40" y="40" width="300" height="600" as="geometry" />
+        </mxCell>
+        <mxCell id="splash_notch" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;arcSize=50;" vertex="1" parent="1">
+          <mxGeometry x="140" y="45" width="100" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="splash_appbar" value="شاشة البداية" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1976D2;fontColor=#ffffff;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="80" width="300" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="splash_c1" value="محتوى / صورة" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="60" y="150" width="260" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="splash_c2" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="60" y="290" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="splash_c3" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="60" y="350" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="splash_btn" value="إجراء (زر)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2196F3;fontColor=#ffffff;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="60" y="410" width="260" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="splash_nav" value="قائمة التنقل السفلية" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="40" y="580" width="300" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="onboarding_grp" value="Auth" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="390" y="0" width="300" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="onboarding_phone" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=5;strokeWidth=3;fillColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="390" y="40" width="300" height="600" as="geometry" />
+        </mxCell>
+        <mxCell id="onboarding_notch" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;arcSize=50;" vertex="1" parent="1">
+          <mxGeometry x="490" y="45" width="100" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="onboarding_appbar" value="الترحيب (Onboarding)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1976D2;fontColor=#ffffff;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="390" y="80" width="300" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="onboarding_c1" value="محتوى / صورة" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="410" y="150" width="260" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="onboarding_c2" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="410" y="290" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="onboarding_c3" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="410" y="350" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="onboarding_btn" value="إجراء (زر)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2196F3;fontColor=#ffffff;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="410" y="410" width="260" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="onboarding_nav" value="قائمة التنقل السفلية" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="390" y="580" width="300" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="login_grp" value="Auth" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="740" y="0" width="300" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="login_phone" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=5;strokeWidth=3;fillColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="740" y="40" width="300" height="600" as="geometry" />
+        </mxCell>
+        <mxCell id="login_notch" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;arcSize=50;" vertex="1" parent="1">
+          <mxGeometry x="840" y="45" width="100" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="login_appbar" value="تسجيل الدخول" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1976D2;fontColor=#ffffff;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="740" y="80" width="300" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="login_c1" value="محتوى / صورة" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="760" y="150" width="260" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="login_c2" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="760" y="290" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="login_c3" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="760" y="350" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="login_btn" value="إجراء (زر)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2196F3;fontColor=#ffffff;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="760" y="410" width="260" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="login_nav" value="قائمة التنقل السفلية" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="740" y="580" width="300" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="register_grp" value="Auth" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="1090" y="0" width="300" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="register_phone" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=5;strokeWidth=3;fillColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="1090" y="40" width="300" height="600" as="geometry" />
+        </mxCell>
+        <mxCell id="register_notch" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;arcSize=50;" vertex="1" parent="1">
+          <mxGeometry x="1190" y="45" width="100" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="register_appbar" value="إنشاء حساب" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1976D2;fontColor=#ffffff;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1090" y="80" width="300" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="register_c1" value="محتوى / صورة" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="1110" y="150" width="260" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="register_c2" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="1110" y="290" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="register_c3" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="1110" y="350" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="register_btn" value="إجراء (زر)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2196F3;fontColor=#ffffff;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="1110" y="410" width="260" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="register_nav" value="قائمة التنقل السفلية" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="1090" y="580" width="300" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="root_grp" value="Main" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="1440" y="0" width="300" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="root_phone" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=5;strokeWidth=3;fillColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="1440" y="40" width="300" height="600" as="geometry" />
+        </mxCell>
+        <mxCell id="root_notch" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;arcSize=50;" vertex="1" parent="1">
+          <mxGeometry x="1540" y="45" width="100" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="root_appbar" value="الشاشة الرئيسية (Root)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1976D2;fontColor=#ffffff;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1440" y="80" width="300" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="root_c1" value="محتوى / صورة" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="1460" y="150" width="260" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="root_c2" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="1460" y="290" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="root_c3" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="1460" y="350" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="root_btn" value="إجراء (زر)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2196F3;fontColor=#ffffff;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="1460" y="410" width="260" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="root_nav" value="قائمة التنقل السفلية" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="1440" y="580" width="300" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="main_grp" value="Main" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="1790" y="0" width="300" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="main_phone" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=5;strokeWidth=3;fillColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="1790" y="40" width="300" height="600" as="geometry" />
+        </mxCell>
+        <mxCell id="main_notch" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;arcSize=50;" vertex="1" parent="1">
+          <mxGeometry x="1890" y="45" width="100" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="main_appbar" value="الرئيسية" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1976D2;fontColor=#ffffff;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1790" y="80" width="300" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="main_c1" value="محتوى / صورة" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="1810" y="150" width="260" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="main_c2" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="1810" y="290" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="main_c3" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="1810" y="350" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="main_btn" value="إجراء (زر)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2196F3;fontColor=#ffffff;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="1810" y="410" width="260" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="main_nav" value="قائمة التنقل السفلية" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="1790" y="580" width="300" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="news_grp" value="Main" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="40" y="700" width="300" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="news_phone" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=5;strokeWidth=3;fillColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="40" y="740" width="300" height="600" as="geometry" />
+        </mxCell>
+        <mxCell id="news_notch" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;arcSize=50;" vertex="1" parent="1">
+          <mxGeometry x="140" y="745" width="100" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="news_appbar" value="الأخبار" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1976D2;fontColor=#ffffff;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="780" width="300" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="news_c1" value="محتوى / صورة" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="60" y="850" width="260" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="news_c2" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="60" y="990" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="news_c3" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="60" y="1050" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="news_btn" value="إجراء (زر)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2196F3;fontColor=#ffffff;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="60" y="1110" width="260" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="news_nav" value="قائمة التنقل السفلية" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="40" y="1280" width="300" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="rankings_grp" value="Main" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="390" y="700" width="300" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="rankings_phone" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=5;strokeWidth=3;fillColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="390" y="740" width="300" height="600" as="geometry" />
+        </mxCell>
+        <mxCell id="rankings_notch" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;arcSize=50;" vertex="1" parent="1">
+          <mxGeometry x="490" y="745" width="100" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="rankings_appbar" value="التصنيفات" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1976D2;fontColor=#ffffff;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="390" y="780" width="300" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="rankings_c1" value="محتوى / صورة" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="410" y="850" width="260" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="rankings_c2" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="410" y="990" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="rankings_c3" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="410" y="1050" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="rankings_btn" value="إجراء (زر)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2196F3;fontColor=#ffffff;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="410" y="1110" width="260" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="rankings_nav" value="قائمة التنقل السفلية" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="390" y="1280" width="300" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="tournaments_grp" value="Main" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="740" y="700" width="300" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="tournaments_phone" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=5;strokeWidth=3;fillColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="740" y="740" width="300" height="600" as="geometry" />
+        </mxCell>
+        <mxCell id="tournaments_notch" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;arcSize=50;" vertex="1" parent="1">
+          <mxGeometry x="840" y="745" width="100" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="tournaments_appbar" value="البطولات" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1976D2;fontColor=#ffffff;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="740" y="780" width="300" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="tournaments_c1" value="محتوى / صورة" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="760" y="850" width="260" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="tournaments_c2" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="760" y="990" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="tournaments_c3" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="760" y="1050" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="tournaments_btn" value="إجراء (زر)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2196F3;fontColor=#ffffff;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="760" y="1110" width="260" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="tournaments_nav" value="قائمة التنقل السفلية" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="740" y="1280" width="300" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="super_admin_grp" value="Admin" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="1090" y="700" width="300" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="super_admin_phone" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=5;strokeWidth=3;fillColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="1090" y="740" width="300" height="600" as="geometry" />
+        </mxCell>
+        <mxCell id="super_admin_notch" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;arcSize=50;" vertex="1" parent="1">
+          <mxGeometry x="1190" y="745" width="100" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="super_admin_appbar" value="الإدارة العليا (Super Admin)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1976D2;fontColor=#ffffff;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1090" y="780" width="300" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="super_admin_c1" value="محتوى / صورة" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="1110" y="850" width="260" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="super_admin_c2" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="1110" y="990" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="super_admin_c3" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="1110" y="1050" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="super_admin_btn" value="إجراء (زر)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2196F3;fontColor=#ffffff;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="1110" y="1110" width="260" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="super_admin_nav" value="قائمة التنقل السفلية" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="1090" y="1280" width="300" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="admin_dash_grp" value="Admin" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="1440" y="700" width="300" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="admin_dash_phone" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=5;strokeWidth=3;fillColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="1440" y="740" width="300" height="600" as="geometry" />
+        </mxCell>
+        <mxCell id="admin_dash_notch" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;arcSize=50;" vertex="1" parent="1">
+          <mxGeometry x="1540" y="745" width="100" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="admin_dash_appbar" value="لوحة تحكم الإدارة" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1976D2;fontColor=#ffffff;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1440" y="780" width="300" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="admin_dash_c1" value="محتوى / صورة" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="1460" y="850" width="260" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="admin_dash_c2" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="1460" y="990" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="admin_dash_c3" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="1460" y="1050" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="admin_dash_btn" value="إجراء (زر)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2196F3;fontColor=#ffffff;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="1460" y="1110" width="260" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="admin_dash_nav" value="قائمة التنقل السفلية" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="1440" y="1280" width="300" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="deposit_req_grp" value="Admin" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="1790" y="700" width="300" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="deposit_req_phone" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=5;strokeWidth=3;fillColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="1790" y="740" width="300" height="600" as="geometry" />
+        </mxCell>
+        <mxCell id="deposit_req_notch" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;arcSize=50;" vertex="1" parent="1">
+          <mxGeometry x="1890" y="745" width="100" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="deposit_req_appbar" value="طلبات الإيداع" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1976D2;fontColor=#ffffff;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1790" y="780" width="300" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="deposit_req_c1" value="محتوى / صورة" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="1810" y="850" width="260" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="deposit_req_c2" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="1810" y="990" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="deposit_req_c3" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="1810" y="1050" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="deposit_req_btn" value="إجراء (زر)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2196F3;fontColor=#ffffff;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="1810" y="1110" width="260" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="deposit_req_nav" value="قائمة التنقل السفلية" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="1790" y="1280" width="300" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="admin_news_grp" value="Admin" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="40" y="1400" width="300" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="admin_news_phone" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=5;strokeWidth=3;fillColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="40" y="1440" width="300" height="600" as="geometry" />
+        </mxCell>
+        <mxCell id="admin_news_notch" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;arcSize=50;" vertex="1" parent="1">
+          <mxGeometry x="140" y="1445" width="100" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="admin_news_appbar" value="إدارة الأخبار" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1976D2;fontColor=#ffffff;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="1480" width="300" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="admin_news_c1" value="محتوى / صورة" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="60" y="1550" width="260" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="admin_news_c2" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="60" y="1690" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="admin_news_c3" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="60" y="1750" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="admin_news_btn" value="إجراء (زر)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2196F3;fontColor=#ffffff;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="60" y="1810" width="260" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="admin_news_nav" value="قائمة التنقل السفلية" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="40" y="1980" width="300" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="tourn_admin_grp" value="Admin" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="390" y="1400" width="300" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="tourn_admin_phone" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=5;strokeWidth=3;fillColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="390" y="1440" width="300" height="600" as="geometry" />
+        </mxCell>
+        <mxCell id="tourn_admin_notch" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;arcSize=50;" vertex="1" parent="1">
+          <mxGeometry x="490" y="1445" width="100" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="tourn_admin_appbar" value="إدارة البطولات (Admin)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1976D2;fontColor=#ffffff;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="390" y="1480" width="300" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="tourn_admin_c1" value="محتوى / صورة" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="410" y="1550" width="260" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="tourn_admin_c2" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="410" y="1690" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="tourn_admin_c3" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="410" y="1750" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="tourn_admin_btn" value="إجراء (زر)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2196F3;fontColor=#ffffff;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="410" y="1810" width="260" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="tourn_admin_nav" value="قائمة التنقل السفلية" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="390" y="1980" width="300" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="org_dash_grp" value="Organizer" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="740" y="1400" width="300" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="org_dash_phone" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=5;strokeWidth=3;fillColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="740" y="1440" width="300" height="600" as="geometry" />
+        </mxCell>
+        <mxCell id="org_dash_notch" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;arcSize=50;" vertex="1" parent="1">
+          <mxGeometry x="840" y="1445" width="100" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="org_dash_appbar" value="لوحة تحكم المنظم" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1976D2;fontColor=#ffffff;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="740" y="1480" width="300" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="org_dash_c1" value="محتوى / صورة" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="760" y="1550" width="260" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="org_dash_c2" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="760" y="1690" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="org_dash_c3" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="760" y="1750" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="org_dash_btn" value="إجراء (زر)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2196F3;fontColor=#ffffff;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="760" y="1810" width="260" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="org_dash_nav" value="قائمة التنقل السفلية" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="740" y="1980" width="300" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="org_matches_grp" value="Organizer" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="1090" y="1400" width="300" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="org_matches_phone" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=5;strokeWidth=3;fillColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="1090" y="1440" width="300" height="600" as="geometry" />
+        </mxCell>
+        <mxCell id="org_matches_notch" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;arcSize=50;" vertex="1" parent="1">
+          <mxGeometry x="1190" y="1445" width="100" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="org_matches_appbar" value="مباريات المنظم" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1976D2;fontColor=#ffffff;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1090" y="1480" width="300" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="org_matches_c1" value="محتوى / صورة" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="1110" y="1550" width="260" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="org_matches_c2" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="1110" y="1690" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="org_matches_c3" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="1110" y="1750" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="org_matches_btn" value="إجراء (زر)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2196F3;fontColor=#ffffff;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="1110" y="1810" width="260" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="org_matches_nav" value="قائمة التنقل السفلية" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="1090" y="1980" width="300" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="org_refs_grp" value="Organizer" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="1440" y="1400" width="300" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="org_refs_phone" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=5;strokeWidth=3;fillColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="1440" y="1440" width="300" height="600" as="geometry" />
+        </mxCell>
+        <mxCell id="org_refs_notch" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;arcSize=50;" vertex="1" parent="1">
+          <mxGeometry x="1540" y="1445" width="100" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="org_refs_appbar" value="حكام المنظم" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1976D2;fontColor=#ffffff;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1440" y="1480" width="300" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="org_refs_c1" value="محتوى / صورة" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="1460" y="1550" width="260" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="org_refs_c2" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="1460" y="1690" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="org_refs_c3" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="1460" y="1750" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="org_refs_btn" value="إجراء (زر)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2196F3;fontColor=#ffffff;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="1460" y="1810" width="260" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="org_refs_nav" value="قائمة التنقل السفلية" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="1440" y="1980" width="300" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="org_teams_grp" value="Organizer" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="1790" y="1400" width="300" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="org_teams_phone" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=5;strokeWidth=3;fillColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="1790" y="1440" width="300" height="600" as="geometry" />
+        </mxCell>
+        <mxCell id="org_teams_notch" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;arcSize=50;" vertex="1" parent="1">
+          <mxGeometry x="1890" y="1445" width="100" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="org_teams_appbar" value="فرق المنظم" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1976D2;fontColor=#ffffff;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1790" y="1480" width="300" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="org_teams_c1" value="محتوى / صورة" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="1810" y="1550" width="260" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="org_teams_c2" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="1810" y="1690" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="org_teams_c3" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="1810" y="1750" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="org_teams_btn" value="إجراء (زر)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2196F3;fontColor=#ffffff;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="1810" y="1810" width="260" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="org_teams_nav" value="قائمة التنقل السفلية" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="1790" y="1980" width="300" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="org_comps_grp" value="Organizer" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="40" y="2100" width="300" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="org_comps_phone" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=5;strokeWidth=3;fillColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="40" y="2140" width="300" height="600" as="geometry" />
+        </mxCell>
+        <mxCell id="org_comps_notch" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;arcSize=50;" vertex="1" parent="1">
+          <mxGeometry x="140" y="2145" width="100" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="org_comps_appbar" value="شكاوى المنظمين" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1976D2;fontColor=#ffffff;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="2180" width="300" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="org_comps_c1" value="محتوى / صورة" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="60" y="2250" width="260" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="org_comps_c2" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="60" y="2390" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="org_comps_c3" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="60" y="2450" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="org_comps_btn" value="إجراء (زر)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2196F3;fontColor=#ffffff;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="60" y="2510" width="260" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="org_comps_nav" value="قائمة التنقل السفلية" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="40" y="2680" width="300" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="ref_dash_grp" value="Referee" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="390" y="2100" width="300" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="ref_dash_phone" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=5;strokeWidth=3;fillColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="390" y="2140" width="300" height="600" as="geometry" />
+        </mxCell>
+        <mxCell id="ref_dash_notch" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;arcSize=50;" vertex="1" parent="1">
+          <mxGeometry x="490" y="2145" width="100" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="ref_dash_appbar" value="لوحة تحكم الحكم" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1976D2;fontColor=#ffffff;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="390" y="2180" width="300" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="ref_dash_c1" value="محتوى / صورة" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="410" y="2250" width="260" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="ref_dash_c2" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="410" y="2390" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="ref_dash_c3" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="410" y="2450" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="ref_dash_btn" value="إجراء (زر)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2196F3;fontColor=#ffffff;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="410" y="2510" width="260" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="ref_dash_nav" value="قائمة التنقل السفلية" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="390" y="2680" width="300" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="live_match_grp" value="Referee" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="740" y="2100" width="300" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="live_match_phone" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=5;strokeWidth=3;fillColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="740" y="2140" width="300" height="600" as="geometry" />
+        </mxCell>
+        <mxCell id="live_match_notch" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;arcSize=50;" vertex="1" parent="1">
+          <mxGeometry x="840" y="2145" width="100" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="live_match_appbar" value="المباراة المباشرة" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1976D2;fontColor=#ffffff;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="740" y="2180" width="300" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="live_match_c1" value="محتوى / صورة" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="760" y="2250" width="260" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="live_match_c2" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="760" y="2390" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="live_match_c3" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="760" y="2450" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="live_match_btn" value="إجراء (زر)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2196F3;fontColor=#ffffff;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="760" y="2510" width="260" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="live_match_nav" value="قائمة التنقل السفلية" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="740" y="2680" width="300" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="bracket_grp" value="Referee" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="1090" y="2100" width="300" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="bracket_phone" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=5;strokeWidth=3;fillColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="1090" y="2140" width="300" height="600" as="geometry" />
+        </mxCell>
+        <mxCell id="bracket_notch" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;arcSize=50;" vertex="1" parent="1">
+          <mxGeometry x="1190" y="2145" width="100" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="bracket_appbar" value="شجرة التصفيات" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1976D2;fontColor=#ffffff;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1090" y="2180" width="300" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="bracket_c1" value="محتوى / صورة" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="1110" y="2250" width="260" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="bracket_c2" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="1110" y="2390" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="bracket_c3" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="1110" y="2450" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="bracket_btn" value="إجراء (زر)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2196F3;fontColor=#ffffff;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="1110" y="2510" width="260" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="bracket_nav" value="قائمة التنقل السفلية" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="1090" y="2680" width="300" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="profile_grp" value="Profile" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="1440" y="2100" width="300" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="profile_phone" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=5;strokeWidth=3;fillColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="1440" y="2140" width="300" height="600" as="geometry" />
+        </mxCell>
+        <mxCell id="profile_notch" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;arcSize=50;" vertex="1" parent="1">
+          <mxGeometry x="1540" y="2145" width="100" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="profile_appbar" value="الملف الشخصي" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1976D2;fontColor=#ffffff;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1440" y="2180" width="300" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="profile_c1" value="محتوى / صورة" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="1460" y="2250" width="260" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="profile_c2" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="1460" y="2390" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="profile_c3" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="1460" y="2450" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="profile_btn" value="إجراء (زر)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2196F3;fontColor=#ffffff;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="1460" y="2510" width="260" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="profile_nav" value="قائمة التنقل السفلية" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="1440" y="2680" width="300" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="edit_profile_grp" value="Profile" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="1790" y="2100" width="300" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="edit_profile_phone" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=5;strokeWidth=3;fillColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="1790" y="2140" width="300" height="600" as="geometry" />
+        </mxCell>
+        <mxCell id="edit_profile_notch" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;arcSize=50;" vertex="1" parent="1">
+          <mxGeometry x="1890" y="2145" width="100" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="edit_profile_appbar" value="تعديل الملف" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1976D2;fontColor=#ffffff;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1790" y="2180" width="300" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="edit_profile_c1" value="محتوى / صورة" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="1810" y="2250" width="260" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="edit_profile_c2" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="1810" y="2390" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="edit_profile_c3" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="1810" y="2450" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="edit_profile_btn" value="إجراء (زر)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2196F3;fontColor=#ffffff;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="1810" y="2510" width="260" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="edit_profile_nav" value="قائمة التنقل السفلية" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="1790" y="2680" width="300" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="settings_grp" value="Profile" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="40" y="2800" width="300" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="settings_phone" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=5;strokeWidth=3;fillColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="40" y="2840" width="300" height="600" as="geometry" />
+        </mxCell>
+        <mxCell id="settings_notch" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;arcSize=50;" vertex="1" parent="1">
+          <mxGeometry x="140" y="2845" width="100" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="settings_appbar" value="الإعدادات العامة" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1976D2;fontColor=#ffffff;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="2880" width="300" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="settings_c1" value="محتوى / صورة" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="60" y="2950" width="260" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="settings_c2" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="60" y="3090" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="settings_c3" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="60" y="3150" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="settings_btn" value="إجراء (زر)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2196F3;fontColor=#ffffff;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="60" y="3210" width="260" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="settings_nav" value="قائمة التنقل السفلية" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="40" y="3380" width="300" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="sec_settings_grp" value="Profile" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="390" y="2800" width="300" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="sec_settings_phone" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=5;strokeWidth=3;fillColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="390" y="2840" width="300" height="600" as="geometry" />
+        </mxCell>
+        <mxCell id="sec_settings_notch" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;arcSize=50;" vertex="1" parent="1">
+          <mxGeometry x="490" y="2845" width="100" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="sec_settings_appbar" value="إعدادات الأمان" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1976D2;fontColor=#ffffff;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="390" y="2880" width="300" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="sec_settings_c1" value="محتوى / صورة" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="410" y="2950" width="260" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="sec_settings_c2" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="410" y="3090" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="sec_settings_c3" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="410" y="3150" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="sec_settings_btn" value="إجراء (زر)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2196F3;fontColor=#ffffff;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="410" y="3210" width="260" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="sec_settings_nav" value="قائمة التنقل السفلية" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="390" y="3380" width="300" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="bank_accs_grp" value="Profile" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="740" y="2800" width="300" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="bank_accs_phone" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=5;strokeWidth=3;fillColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="740" y="2840" width="300" height="600" as="geometry" />
+        </mxCell>
+        <mxCell id="bank_accs_notch" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;arcSize=50;" vertex="1" parent="1">
+          <mxGeometry x="840" y="2845" width="100" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="bank_accs_appbar" value="الحسابات البنكية" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1976D2;fontColor=#ffffff;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="740" y="2880" width="300" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="bank_accs_c1" value="محتوى / صورة" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="760" y="2950" width="260" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="bank_accs_c2" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="760" y="3090" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="bank_accs_c3" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="760" y="3150" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="bank_accs_btn" value="إجراء (زر)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2196F3;fontColor=#ffffff;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="760" y="3210" width="260" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="bank_accs_nav" value="قائمة التنقل السفلية" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="740" y="3380" width="300" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="fin_trans_grp" value="Profile" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="1090" y="2800" width="300" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="fin_trans_phone" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=5;strokeWidth=3;fillColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="1090" y="2840" width="300" height="600" as="geometry" />
+        </mxCell>
+        <mxCell id="fin_trans_notch" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;arcSize=50;" vertex="1" parent="1">
+          <mxGeometry x="1190" y="2845" width="100" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="fin_trans_appbar" value="المعاملات المالية" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1976D2;fontColor=#ffffff;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1090" y="2880" width="300" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="fin_trans_c1" value="محتوى / صورة" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="1110" y="2950" width="260" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="fin_trans_c2" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="1110" y="3090" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="fin_trans_c3" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="1110" y="3150" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="fin_trans_btn" value="إجراء (زر)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2196F3;fontColor=#ffffff;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="1110" y="3210" width="260" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="fin_trans_nav" value="قائمة التنقل السفلية" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="1090" y="3380" width="300" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="notifs_grp" value="Profile" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="1440" y="2800" width="300" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="notifs_phone" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=5;strokeWidth=3;fillColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="1440" y="2840" width="300" height="600" as="geometry" />
+        </mxCell>
+        <mxCell id="notifs_notch" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;arcSize=50;" vertex="1" parent="1">
+          <mxGeometry x="1540" y="2845" width="100" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="notifs_appbar" value="الإشعارات" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1976D2;fontColor=#ffffff;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1440" y="2880" width="300" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="notifs_c1" value="محتوى / صورة" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="1460" y="2950" width="260" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="notifs_c2" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="1460" y="3090" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="notifs_c3" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="1460" y="3150" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="notifs_btn" value="إجراء (زر)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2196F3;fontColor=#ffffff;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="1460" y="3210" width="260" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="notifs_nav" value="قائمة التنقل السفلية" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="1440" y="3380" width="300" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="wallet_grp" value="Profile" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="1790" y="2800" width="300" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="wallet_phone" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=5;strokeWidth=3;fillColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="1790" y="2840" width="300" height="600" as="geometry" />
+        </mxCell>
+        <mxCell id="wallet_notch" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;arcSize=50;" vertex="1" parent="1">
+          <mxGeometry x="1890" y="2845" width="100" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="wallet_appbar" value="المحفظة" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1976D2;fontColor=#ffffff;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1790" y="2880" width="300" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="wallet_c1" value="محتوى / صورة" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="1810" y="2950" width="260" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="wallet_c2" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="1810" y="3090" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="wallet_c3" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="1810" y="3150" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="wallet_btn" value="إجراء (زر)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2196F3;fontColor=#ffffff;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="1810" y="3210" width="260" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="wallet_nav" value="قائمة التنقل السفلية" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="1790" y="3380" width="300" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="team_mgmt_grp" value="Teams" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="40" y="3500" width="300" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="team_mgmt_phone" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=5;strokeWidth=3;fillColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="40" y="3540" width="300" height="600" as="geometry" />
+        </mxCell>
+        <mxCell id="team_mgmt_notch" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;arcSize=50;" vertex="1" parent="1">
+          <mxGeometry x="140" y="3545" width="100" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="team_mgmt_appbar" value="إدارة الفريق" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1976D2;fontColor=#ffffff;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="3580" width="300" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="team_mgmt_c1" value="محتوى / صورة" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="60" y="3650" width="260" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="team_mgmt_c2" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="60" y="3790" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="team_mgmt_c3" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="60" y="3850" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="team_mgmt_btn" value="إجراء (زر)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2196F3;fontColor=#ffffff;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="60" y="3910" width="260" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="team_mgmt_nav" value="قائمة التنقل السفلية" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="40" y="4080" width="300" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="team_det_grp" value="Teams" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="390" y="3500" width="300" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="team_det_phone" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=5;strokeWidth=3;fillColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="390" y="3540" width="300" height="600" as="geometry" />
+        </mxCell>
+        <mxCell id="team_det_notch" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;arcSize=50;" vertex="1" parent="1">
+          <mxGeometry x="490" y="3545" width="100" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="team_det_appbar" value="تفاصيل الفريق" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1976D2;fontColor=#ffffff;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="390" y="3580" width="300" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="team_det_c1" value="محتوى / صورة" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="410" y="3650" width="260" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="team_det_c2" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="410" y="3790" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="team_det_c3" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="410" y="3850" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="team_det_btn" value="إجراء (زر)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2196F3;fontColor=#ffffff;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="410" y="3910" width="260" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="team_det_nav" value="قائمة التنقل السفلية" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="390" y="4080" width="300" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="team_search_grp" value="Teams" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="740" y="3500" width="300" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="team_search_phone" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=5;strokeWidth=3;fillColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="740" y="3540" width="300" height="600" as="geometry" />
+        </mxCell>
+        <mxCell id="team_search_notch" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;arcSize=50;" vertex="1" parent="1">
+          <mxGeometry x="840" y="3545" width="100" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="team_search_appbar" value="البحث عن فريق" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1976D2;fontColor=#ffffff;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="740" y="3580" width="300" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="team_search_c1" value="محتوى / صورة" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="760" y="3650" width="260" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="team_search_c2" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="760" y="3790" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="team_search_c3" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="760" y="3850" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="team_search_btn" value="إجراء (زر)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2196F3;fontColor=#ffffff;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="760" y="3910" width="260" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="team_search_nav" value="قائمة التنقل السفلية" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="740" y="4080" width="300" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="player_search_grp" value="Teams" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="1090" y="3500" width="300" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="player_search_phone" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=5;strokeWidth=3;fillColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="1090" y="3540" width="300" height="600" as="geometry" />
+        </mxCell>
+        <mxCell id="player_search_notch" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;arcSize=50;" vertex="1" parent="1">
+          <mxGeometry x="1190" y="3545" width="100" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="player_search_appbar" value="البحث عن لاعب" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1976D2;fontColor=#ffffff;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1090" y="3580" width="300" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="player_search_c1" value="محتوى / صورة" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="1110" y="3650" width="260" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="player_search_c2" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="1110" y="3790" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="player_search_c3" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="1110" y="3850" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="player_search_btn" value="إجراء (زر)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2196F3;fontColor=#ffffff;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="1110" y="3910" width="260" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="player_search_nav" value="قائمة التنقل السفلية" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="1090" y="4080" width="300" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="tourn_det_grp" value="Tournaments" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="1440" y="3500" width="300" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="tourn_det_phone" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=5;strokeWidth=3;fillColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="1440" y="3540" width="300" height="600" as="geometry" />
+        </mxCell>
+        <mxCell id="tourn_det_notch" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;arcSize=50;" vertex="1" parent="1">
+          <mxGeometry x="1540" y="3545" width="100" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="tourn_det_appbar" value="تفاصيل البطولة" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1976D2;fontColor=#ffffff;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1440" y="3580" width="300" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="tourn_det_c1" value="محتوى / صورة" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="1460" y="3650" width="260" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="tourn_det_c2" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="1460" y="3790" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="tourn_det_c3" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="1460" y="3850" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="tourn_det_btn" value="إجراء (زر)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2196F3;fontColor=#ffffff;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="1460" y="3910" width="260" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="tourn_det_nav" value="قائمة التنقل السفلية" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="1440" y="4080" width="300" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="tourn_reg_grp" value="Tournaments" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="1790" y="3500" width="300" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="tourn_reg_phone" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=5;strokeWidth=3;fillColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="1790" y="3540" width="300" height="600" as="geometry" />
+        </mxCell>
+        <mxCell id="tourn_reg_notch" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;arcSize=50;" vertex="1" parent="1">
+          <mxGeometry x="1890" y="3545" width="100" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="tourn_reg_appbar" value="التسجيل في البطولة" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1976D2;fontColor=#ffffff;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1790" y="3580" width="300" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="tourn_reg_c1" value="محتوى / صورة" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="1810" y="3650" width="260" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="tourn_reg_c2" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="1810" y="3790" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="tourn_reg_c3" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="1810" y="3850" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="tourn_reg_btn" value="إجراء (زر)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2196F3;fontColor=#ffffff;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="1810" y="3910" width="260" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="tourn_reg_nav" value="قائمة التنقل السفلية" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="1790" y="4080" width="300" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="pay_fail_grp" value="Tournaments" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="40" y="4200" width="300" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="pay_fail_phone" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=5;strokeWidth=3;fillColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="40" y="4240" width="300" height="600" as="geometry" />
+        </mxCell>
+        <mxCell id="pay_fail_notch" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;arcSize=50;" vertex="1" parent="1">
+          <mxGeometry x="140" y="4245" width="100" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="pay_fail_appbar" value="فشل الدفع" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1976D2;fontColor=#ffffff;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="4280" width="300" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="pay_fail_c1" value="محتوى / صورة" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="60" y="4350" width="260" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="pay_fail_c2" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="60" y="4490" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="pay_fail_c3" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="60" y="4550" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="pay_fail_btn" value="إجراء (زر)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2196F3;fontColor=#ffffff;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="60" y="4610" width="260" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="pay_fail_nav" value="قائمة التنقل السفلية" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="40" y="4780" width="300" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="help_center_grp" value="Support" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="390" y="4200" width="300" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="help_center_phone" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=5;strokeWidth=3;fillColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="390" y="4240" width="300" height="600" as="geometry" />
+        </mxCell>
+        <mxCell id="help_center_notch" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;arcSize=50;" vertex="1" parent="1">
+          <mxGeometry x="490" y="4245" width="100" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="help_center_appbar" value="مركز المساعدة" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1976D2;fontColor=#ffffff;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="390" y="4280" width="300" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="help_center_c1" value="محتوى / صورة" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="410" y="4350" width="260" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="help_center_c2" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="410" y="4490" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="help_center_c3" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="410" y="4550" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="help_center_btn" value="إجراء (زر)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2196F3;fontColor=#ffffff;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="410" y="4610" width="260" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="help_center_nav" value="قائمة التنقل السفلية" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="390" y="4780" width="300" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="submit_comp_grp" value="Support" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="740" y="4200" width="300" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="submit_comp_phone" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=5;strokeWidth=3;fillColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="740" y="4240" width="300" height="600" as="geometry" />
+        </mxCell>
+        <mxCell id="submit_comp_notch" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;arcSize=50;" vertex="1" parent="1">
+          <mxGeometry x="840" y="4245" width="100" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="submit_comp_appbar" value="تقديم شكوى" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1976D2;fontColor=#ffffff;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="740" y="4280" width="300" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="submit_comp_c1" value="محتوى / صورة" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="760" y="4350" width="260" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="submit_comp_c2" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="760" y="4490" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="submit_comp_c3" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="760" y="4550" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="submit_comp_btn" value="إجراء (زر)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2196F3;fontColor=#ffffff;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="760" y="4610" width="260" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="submit_comp_nav" value="قائمة التنقل السفلية" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="740" y="4780" width="300" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="qr_scanner_grp" value="Support" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="1090" y="4200" width="300" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="qr_scanner_phone" value="" style="rounded=1;whiteSpace=wrap;html=1;arcSize=5;strokeWidth=3;fillColor=#ffffff;" vertex="1" parent="1">
+          <mxGeometry x="1090" y="4240" width="300" height="600" as="geometry" />
+        </mxCell>
+        <mxCell id="qr_scanner_notch" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;arcSize=50;" vertex="1" parent="1">
+          <mxGeometry x="1190" y="4245" width="100" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="qr_scanner_appbar" value="الماسح الضوئي QR" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1976D2;fontColor=#ffffff;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1090" y="4280" width="300" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="qr_scanner_c1" value="محتوى / صورة" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="1110" y="4350" width="260" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="qr_scanner_c2" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="1110" y="4490" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="qr_scanner_c3" value="نص تفصيلي..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#cccccc;align=right;spacingRight=10;" vertex="1" parent="1">
+          <mxGeometry x="1110" y="4550" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="qr_scanner_btn" value="إجراء (زر)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#2196F3;fontColor=#ffffff;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="1110" y="4610" width="260" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="qr_scanner_nav" value="قائمة التنقل السفلية" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#cccccc;" vertex="1" parent="1">
+          <mxGeometry x="1090" y="4780" width="300" height="60" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

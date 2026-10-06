@@ -5,6 +5,9 @@ import 'package:e_sport_sudan/core/services/firestore_service.dart';
 import 'package:e_sport_sudan/core/services/notification_service.dart';
 import 'package:e_sport_sudan/core/widgets/esport_toast.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:intl/intl.dart';
+import 'package:e_sport_sudan/core/services/auth_service.dart';
+import 'package:e_sport_sudan/features/auth/presentation/screens/login_screen.dart';
 
 class AdminNewsManagementScreen extends StatefulWidget {
   const AdminNewsManagementScreen({Key? key}) : super(key: key);
@@ -104,6 +107,22 @@ class _AdminNewsManagementScreenState extends State<AdminNewsManagementScreen> {
         title: Text('إدارة الأخبار', style: TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: Colors.transparent,
         elevation: 0,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.logout, color: Colors.redAccent),
+            tooltip: 'تسجيل الخروج',
+            onPressed: () async {
+              await AuthService().signOut();
+              if (context.mounted) {
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LoginScreen()),
+                  (route) => false,
+                );
+              }
+            },
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: _showAddNewsDialog,
@@ -130,7 +149,7 @@ class _AdminNewsManagementScreenState extends State<AdminNewsManagementScreen> {
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 child: ListTile(
                   title: Text(news.title, style: TextStyle(fontWeight: FontWeight.bold)),
-                  subtitle: Text(' - /'),
+                  subtitle: Text('${DateFormat('yyyy/MM/dd').format(news.createdAt)} - ${news.authorName}'),
                   trailing: IconButton(
                     icon: Icon(Icons.delete, color: Colors.redAccent),
                     onPressed: () async {

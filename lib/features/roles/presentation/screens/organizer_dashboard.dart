@@ -10,6 +10,8 @@ import 'organizer_complaints_screen.dart';
 import 'organizer_teams_screen.dart';
 
 import 'package:e_sport_sudan/features/admin/presentation/screens/tournament_admin_dashboard_screen.dart';
+import 'package:e_sport_sudan/core/services/auth_service.dart';
+import 'package:e_sport_sudan/features/auth/presentation/screens/login_screen.dart';
 
 class OrganizerDashboard extends StatefulWidget {
   OrganizerDashboard({super.key});
@@ -298,6 +300,20 @@ class _OrganizerDashboardState extends State<OrganizerDashboard> {
         elevation: 0,
         title: Text('لوحة تحكم منظم البطولة', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
         actions: [
+          IconButton(
+            icon: Icon(Icons.logout, color: Colors.redAccent),
+            tooltip: 'تسجيل الخروج',
+            onPressed: () async {
+              await AuthService().signOut();
+              if (context.mounted) {
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LoginScreen()),
+                  (route) => false,
+                );
+              }
+            },
+          ),
           IconButton(
             icon: Icon(Icons.emoji_events_outlined, color: Colors.amber),
             tooltip: 'إدارة وتعديل البطولات',

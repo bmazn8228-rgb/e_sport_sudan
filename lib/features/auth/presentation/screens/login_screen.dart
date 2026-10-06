@@ -461,47 +461,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                     ],
                                   ],
                                 ),
-                                SizedBox(height: 24),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: Divider(
-                                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12),
-                                        thickness: 1,
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: 16,
-                                      ),
-                                      child: Text(
-                                        'أو سجل بواسطة',
-                                        style: TextStyle(
-                                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54),
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child: Divider(
-                                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12),
-                                        thickness: 1,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(height: 24),
-                                _buildModernButton(
-                                  onPressed: _isLoading
-                                      ? null
-                                      : _handleGoogleSignIn,
-                                  label: 'متابعة بـ Google',
-                                  icon: Icons
-                                      .g_mobiledata, // Or use a custom google icon
-                                  iconSize: 32,
-                                  isLoading: false,
-                                  isPrimary: false,
-                                ),
                               ],
                             ),
                           ),

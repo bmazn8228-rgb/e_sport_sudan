@@ -1,0 +1,53 @@
+@startuml
+right to left direction
+skinparam packageStyle rectangle
+
+actor "المدير (Super Admin)" as admin
+actor "المنظم (Organizer)" as organizer
+actor "الحكم (Referee)" as referee
+actor "اللاعب (Player)" as player
+
+rectangle "تطبيق الرياضات الإلكترونية السوداني" {
+  (تسجيل الدخول) as (Login)
+  (إنشاء حساب) as (Register)
+  
+  (إدارة المنظمين) as (ManageOrganizers)
+  (إدارة الحكام) as (ManageReferees)
+  (إدارة إعدادات النظام) as (SystemSettings)
+  
+  (إنشاء وإدارة البطولات) as (ManageTournaments)
+  (إدارة الفرق) as (ManageTeams)
+  (تعيين الحكام للمباريات) as (AssignReferees)
+  
+  (تحكيم المباريات المباشرة) as (JudgeMatch)
+  (تسجيل النتائج) as (RecordScores)
+  
+  (البحث عن فرق ولاعبين) as (Search)
+  (الانضمام لفريق) as (JoinTeam)
+  (مشاهدة البث المباشر) as (WatchLive)
+  (تحديث الملف الشخصي) as (UpdateProfile)
+}
+
+admin --> (Login)
+organizer --> (Login)
+referee --> (Login)
+player --> (Login)
+player --> (Register)
+
+admin --> (ManageOrganizers)
+admin --> (ManageReferees)
+admin --> (SystemSettings)
+
+organizer --> (ManageTournaments)
+organizer --> (ManageTeams)
+organizer --> (AssignReferees)
+
+referee --> (JudgeMatch)
+referee --> (RecordScores)
+
+player --> (Search)
+player --> (JoinTeam)
+player --> (WatchLive)
+player --> (UpdateProfile)
+
+@enduml

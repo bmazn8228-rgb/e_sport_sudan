@@ -870,16 +870,15 @@ class FirestoreService {
   Stream<List<Map<String, dynamic>>> searchPlayersStream(String query) {
     if (query.isEmpty) return Stream.empty();
     
-    // To avoid complex composite indexes, search by EXACT player ID (uid).
-    return _db.collection('users').doc(query).snapshots().map((doc) {
-      if (doc.exists && doc.data() != null) {
-        final data = doc.data()!;
-        if (data['role'] == 'player') {
-          data['id'] = doc.id;
-          return [data];
-        }
-      }
-      return [];
+    return _db.collection('users')
+        .where('playerId', isEqualTo: query)
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs.map((doc) {
+        final data = doc.data();
+        data['id'] = doc.id;
+        return data;
+      }).where((user) => user['role'] == 'player').toList();
     });
   }
 
@@ -1098,6 +1097,15 @@ class FirestoreService {
         .collection('notifications')
         .doc(notificationId)
         .update({'isRead': true});
+  }
+
+  Future<void> deleteNotification(String uid, String notificationId) async {
+    await _db
+        .collection('users')
+        .doc(uid)
+        .collection('notifications')
+        .doc(notificationId)
+        .delete();
   }
 
   Future<void> addNotification(String uid, String title, String body, {String type = 'general'}) async {

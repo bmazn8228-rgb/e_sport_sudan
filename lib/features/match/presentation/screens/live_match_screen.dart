@@ -181,7 +181,18 @@ class _LiveMatchScreenState extends State<LiveMatchScreen> {
 
           final matchData = snapshot.data!.data()!;
           final isLive = matchData['isLive'] == true;
-          final videoId = (matchData['youtubeVideoId'] ?? '').toString().trim();
+          final rawVideoId = (matchData['youtubeVideoId'] ?? '').toString().trim();
+          
+          String videoId = rawVideoId;
+          if (videoId.isNotEmpty) {
+            final regex = RegExp(r'(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/|youtube\.com\/live\/)([^"&?\/\s]{11})', caseSensitive: false);
+            final match = regex.firstMatch(videoId);
+            if (match != null && match.groupCount >= 1) {
+              videoId = match.group(1) ?? videoId;
+            } else {
+              videoId = YoutubePlayer.convertUrlToId(videoId) ?? videoId;
+            }
+          }
           
           if (videoId.isNotEmpty && isLive) {
             _initializeOrUpdateYoutubePlayer(videoId);

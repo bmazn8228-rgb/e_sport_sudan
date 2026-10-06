@@ -104,6 +104,7 @@ class UserModel {
   final String phone;
   final String? photoUrl;
   final String? gameId;
+  final String? playerId; // Short numeric ID
   final UserRole role;
   final String? teamId;
   final UserSettings settings;
@@ -113,9 +114,10 @@ class UserModel {
     required this.email,
     required this.displayName,
     this.ign,
-    required this.phone,
+    this.phone,
     this.photoUrl,
     this.gameId,
+    this.playerId,
     this.role = UserRole.player,
     this.teamId,
     UserSettings? settings,
@@ -130,6 +132,7 @@ class UserModel {
       'phone': phone,
       'photoUrl': photoUrl,
       'gameId': gameId,
+      'playerId': playerId,
       'role': role.toValue(),
       'teamId': teamId,
       'settings': settings.toMap(),
@@ -145,6 +148,7 @@ class UserModel {
       phone: map['phone'] ?? '',
       photoUrl: map['photoUrl'],
       gameId: map['gameId'],
+      playerId: map['playerId'],
       role: UserRole.fromValue(map['role']),
       teamId: map['teamId'],
       settings: UserSettings.fromMap(map['settings'] as Map<String, dynamic>?),

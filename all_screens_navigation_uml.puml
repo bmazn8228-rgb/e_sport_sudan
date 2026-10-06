@@ -1,0 +1,83 @@
+@startuml
+scale 2
+skinparam BackgroundColor white
+skinparam state {
+  BackgroundColor LightBlue
+  BorderColor Blue
+  FontName Arial
+}
+
+title خريطة تنقل شاشات التطبيق (App Navigation Map)
+
+[*] --> Splash
+Splash --> Onboarding : لأول مرة
+Splash --> Login : مستخدم مسجل
+Splash --> Main : مستخدم مسجل مسبقاً
+
+state "قسم المصادقة" as Auth {
+  Login --> Register : إنشاء حساب
+  Register --> Login : العودة
+  Login --> Main : نجاح الدخول
+}
+
+state "القسم الرئيسي" as MainApp {
+  Main --> News : عرض الأخبار
+  Main --> Tournaments : استعراض البطولات
+  Main --> Rankings : عرض التصنيفات
+  Main --> Root : الحاوية الرئيسية
+}
+
+state "قسم الإدارة العليا (Super Admin)" as SuperAdmin {
+  Main --> SuperAdminDashboard
+  SuperAdminDashboard --> AdminDashboard
+  AdminDashboard --> DepositRequests
+  AdminDashboard --> AdminNews
+  AdminDashboard --> TournamentAdmin
+}
+
+state "قسم المنظم (Organizer)" as Org {
+  Main --> OrgDashboard
+  OrgDashboard --> OrgMatches
+  OrgDashboard --> OrgReferees
+  OrgDashboard --> OrgTeams
+  OrgDashboard --> OrgComplaints
+}
+
+state "قسم الحكم (Referee)" as Ref {
+  Main --> RefDashboard
+  RefDashboard --> LiveMatch
+  RefDashboard --> Bracket
+}
+
+state "قسم الملف الشخصي (Profile)" as Prof {
+  Main --> Profile
+  Profile --> EditProfile
+  Profile --> Settings
+  Profile --> SecSettings
+  Profile --> BankAccs
+  Profile --> FinTrans
+  Profile --> Notifications
+  Profile --> Wallet
+}
+
+state "قسم الفرق واللاعبين" as TeamsPlayers {
+  Main --> TeamSearch
+  Main --> PlayerSearch
+  TeamSearch --> TeamDetails
+  TeamDetails --> TeamMgmt : كابتن الفريق
+}
+
+state "قسم تفاصيل البطولات" as TournDetails {
+  Tournaments --> TournDetailsScreen
+  TournDetailsScreen --> TournRegistration
+  TournRegistration --> PayFail : فشل الدفع
+  TournRegistration --> TournDetailsScreen : نجاح الدفع
+}
+
+state "قسم الدعم والمساعدة" as Support {
+  Settings --> HelpCenter
+  HelpCenter --> SubmitComplaint
+  Main --> QrScanner : مسح كود
+}
+
+@enduml

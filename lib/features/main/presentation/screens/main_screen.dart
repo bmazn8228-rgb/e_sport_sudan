@@ -747,52 +747,7 @@ class HomeScreen extends StatelessWidget {
             (data['youtubeVideoId'] ?? '').toString().isNotEmpty);
 
         if (!isLive) {
-          return Container(
-            width: double.infinity,
-            padding: EdgeInsets.symmetric(vertical: 24, horizontal: 20),
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.9),
-              borderRadius: BorderRadius.circular(22),
-              border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  padding: EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Icon(
-                    Icons.tv_off_rounded,
-                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38),
-                    size: 24,
-                  ),
-                ),
-                SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'لا يوجد بث مباشر نشط حالياً',
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurface,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                        ),
-                      ),
-                      SizedBox(height: 3),
-                      Text(
-                        'سيظهر البث هنا فور قيام إدارة البطولة بنقل مجريات المباريات.',
-                        style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 11),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          );
+          return SizedBox.shrink();
         }
 
         final title = data['title'] ?? 'مباراة مباشرة';

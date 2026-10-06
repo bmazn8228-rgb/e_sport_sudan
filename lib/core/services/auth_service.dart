@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'dart:math';
 import 'package:flutter/foundation.dart';
 import '../models/user_model.dart';
 import 'firestore_service.dart';
@@ -128,6 +129,9 @@ class AuthService {
         // Determine role based on hardcoded admin emails
         UserRole assignedRole = getRoleForEmail(cleanEmail);
 
+        // Generate a random 6-digit numeric ID
+        final String generatedPlayerId = (100000 + Random().nextInt(900000)).toString();
+
         // Create a new UserModel with the assigned role
         UserModel newUser = UserModel(
           uid: user.uid,
@@ -135,6 +139,7 @@ class AuthService {
           displayName: displayName,
           ign: ign,
           gameId: gameId,
+          playerId: generatedPlayerId,
           phone: phone,
           role: assignedRole,
         );
@@ -244,11 +249,13 @@ class AuthService {
           UserModel? userModel = await _firestoreService.getUser(user.uid);
           // If this is a new user from Google, save basic info
           if (userModel == null) {
+             final String generatedPlayerId = (100000 + Random().nextInt(900000)).toString();
              userModel = UserModel(
                 uid: user.uid,
                 email: user.email ?? '',
                 displayName: user.displayName ?? 'Google User',
                 phone: '',
+                playerId: generatedPlayerId,
                 role: UserRole.player,
              );
              await _firestoreService.saveUser(userModel);

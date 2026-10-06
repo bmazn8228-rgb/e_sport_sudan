@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:e_sport_sudan/core/theme/app_theme.dart';
 import 'package:e_sport_sudan/core/services/firestore_service.dart';
@@ -50,7 +50,7 @@ class NotificationsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Ø§Ù„Ø¥Ø´Ø¹Ø§Ø±Ø§Øª', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text('الإشعارات', style: TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
@@ -63,7 +63,7 @@ class NotificationsScreen extends StatelessWidget {
           }
 
           if (snapshot.hasError) {
-            return Center(child: Text('Ø­Ø¯Ø« Ø®Ø·Ø£ Ù ÙŠ ØªØ­Ù…ÙŠÙ„ Ø§Ù„Ø¥Ø´Ø¹Ø§Ø±Ø§Øª', style: TextStyle(color: Theme.of(context).colorScheme.onSurface)));
+            return Center(child: Text('حدث خطأ في تحميل الإشعارات', style: TextStyle(color: Theme.of(context).colorScheme.onSurface)));
           }
 
           final notifications = snapshot.data ?? [];
@@ -76,7 +76,7 @@ class NotificationsScreen extends StatelessWidget {
                   Icon(Icons.notifications_off_rounded, size: 80, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3)),
                   const SizedBox(height: 16),
                   Text(
-                    'Ù„Ø§ ØªÙˆØ¬Ø¯ Ø¥Ø´Ø¹Ø§Ø±Ø§Øª Ø­Ø§Ù„ÙŠØ§Ù‹',
+                    'لا توجد إشعارات حالياً',
                     style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 16),
                   ),
                 ],
@@ -92,12 +92,30 @@ class NotificationsScreen extends StatelessWidget {
               final isRead = notif['isRead'] ?? false;
               final type = notif['type'] ?? 'general';
 
-              return GestureDetector(
-                onTap: () {
-                  if (!isRead) {
-                    FirestoreService().markNotificationAsRead(userId, notif['id']);
+              return Dismissible(
+                key: Key(notif['id'] ?? index.toString()),
+                direction: DismissDirection.endToStart,
+                background: Container(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  alignment: Alignment.centerRight,
+                  padding: const EdgeInsets.only(right: 20),
+                  decoration: BoxDecoration(
+                    color: AppTheme.primaryRed,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: const Icon(Icons.delete, color: Colors.white),
+                ),
+                onDismissed: (direction) {
+                  if (notif['id'] != null) {
+                    FirestoreService().deleteNotification(userId, notif['id']);
                   }
                 },
+                child: GestureDetector(
+                  onTap: () {
+                    if (!isRead && notif['id'] != null) {
+                      FirestoreService().markNotificationAsRead(userId, notif['id']);
+                    }
+                  },
                 child: Container(
                   margin: const EdgeInsets.only(bottom: 12),
                   padding: const EdgeInsets.all(16),
@@ -136,7 +154,7 @@ class NotificationsScreen extends StatelessWidget {
                               children: [
                                 Expanded(
                                   child: Text(
-                                    notif['title'] ?? 'Ø¨Ø¯ÙˆÙ† Ø¹Ù†ÙˆØ§Ù†',
+                                    notif['title'] ?? 'بدون عنوان',
                                     style: TextStyle(
                                       fontWeight: isRead ? FontWeight.normal : FontWeight.bold,
                                       fontSize: 16,
