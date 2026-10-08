@@ -53,7 +53,14 @@ class _MainScreenState extends State<MainScreen> {
         },
       ),
       TournamentsScreen(isGuest: widget.isGuest),
-      LiveMatchScreen(matchId: 'sample_live_match'),
+      LiveMatchScreen(
+        matchId: 'sample_live_match',
+        onNavigateTab: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+      ),
       RankingsScreen(),
       ProfileScreen(),
     ];
@@ -480,42 +487,8 @@ class HomeScreen extends StatelessWidget {
             _buildUpcomingMatchCard(context),
             SizedBox(height: 24),
 
-            // Live Matches Header
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _buildSectionHeader(
-                  'مباريات حية ومباشرة',
-                  Icons.circle,
-                  Colors.red,
-                ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => BracketScreen(
-                          tournamentTitle: 'بطولة السودان الكبرى 2025',
-                          tournamentId: '',
-                        ),
-                      ),
-                    );
-                  },
-                  child: Text(
-                    'شجرة المباريات',
-                    style: TextStyle(
-                      color: AppTheme.primaryBlue,
-                      fontSize: 13,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 10),
-
-            // Live Match Card
-            _buildLiveMatchCard(context),
-            SizedBox(height: 24),
+            // Live Matches Section (Shows ONLY when stream is live)
+            _buildLiveMatchesSection(context),
 
             // Top 3 Leaderboard
             Row(
@@ -722,177 +695,234 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildLiveMatchCard(BuildContext context) {
+  Widget _buildLiveMatchesSection(BuildContext context) {
     return StreamBuilder<DocumentSnapshot<Map<String, dynamic>>>(
       stream: FirestoreService().getGlobalLiveStream(),
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Container(
-            height: 120,
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.9),
-              borderRadius: BorderRadius.circular(22),
-              border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)),
-            ),
-            child: Center(
-              child: CircularProgressIndicator(color: AppTheme.primaryBlue),
-            ),
-          );
+        if (!snapshot.hasData || !snapshot.data!.exists) {
+          return const SizedBox.shrink();
         }
 
         final data = snapshot.data?.data();
-        final isLive =
-            (data != null &&
-            data['isLive'] == true &&
-            (data['youtubeVideoId'] ?? '').toString().isNotEmpty);
+        final videoId = (data?['youtubeVideoId'] ?? '').toString().trim();
+        final isLive = data != null &&
+            (data['isLive'] == true || data['status'] == 'live') &&
+            videoId.isNotEmpty;
 
         if (!isLive) {
-          return SizedBox.shrink();
+          return const SizedBox.shrink();
         }
 
         final title = data['title'] ?? 'مباراة مباشرة';
 
-        return Container(
-          width: double.infinity,
-          padding: EdgeInsets.all(18),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: Theme.of(context).brightness == Brightness.dark ? const [Color(0xFF261217), Color(0xFF131822)] : [Colors.red.shade50, Colors.blue.shade50],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(22),
-            border: Border.all(
-              color: Colors.redAccent.withValues(alpha: 0.45),
-              width: 1.2,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.redAccent.withValues(alpha: 0.15),
-                blurRadius: 18,
-                offset: Offset(0, 6),
-              ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 5,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.redAccent,
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.redAccent.withValues(alpha: 0.4),
-                          blurRadius: 8,
-                          offset: Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.circle, color: Theme.of(context).colorScheme.onSurface, size: 7),
-                        SizedBox(width: 5),
-                        Text(
-                          'مباشر الآن',
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface,
-                            fontSize: 11,
-                            fontWeight: FontWeight.bold,
+        return Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    TweenAnimationBuilder<double>(
+                      tween: Tween(begin: 0.3, end: 1.0),
+                      duration: const Duration(milliseconds: 1000),
+                      curve: Curves.easeInOut,
+                      builder: (context, val, child) {
+                        return Container(
+                          width: 10,
+                          height: 10,
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.red.withValues(alpha: 0.8 * val),
+                                blurRadius: 8 * val,
+                                spreadRadius: 3 * val,
+                              ),
+                            ],
                           ),
+                        );
+                      },
+                    ),
+                    const SizedBox(width: 8),
+                    const Text(
+                      'مباريات حية ومباشرة',
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => BracketScreen(
+                          tournamentTitle: 'بطولة السودان الكبرى 2025',
+                          tournamentId: '',
                         ),
-                      ],
+                      ),
+                    );
+                  },
+                  child: Text(
+                    'شجرة المباريات',
+                    style: TextStyle(
+                      color: AppTheme.primaryBlue,
+                      fontSize: 13,
                     ),
                   ),
-                  Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 3,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.play_circle_fill_rounded,
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(18),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: Theme.of(context).brightness == Brightness.dark
+                      ? const [Color(0xFF261217), Color(0xFF131822)]
+                      : [Colors.red.shade50, Colors.blue.shade50],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(22),
+                border: Border.all(
+                  color: Colors.redAccent.withValues(alpha: 0.45),
+                  width: 1.2,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.redAccent.withValues(alpha: 0.15),
+                    blurRadius: 18,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 5,
+                        ),
+                        decoration: BoxDecoration(
                           color: Colors.redAccent,
-                          size: 14,
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.redAccent.withValues(alpha: 0.4),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
                         ),
-                        SizedBox(width: 4),
-                        Text(
-                          'YouTube Live',
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                          ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.circle, color: Theme.of(context).colorScheme.onSurface, size: 7),
+                            const SizedBox(width: 5),
+                            Text(
+                              'مباشر الآن',
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurface,
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 3,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.play_circle_fill_rounded,
+                              color: Colors.redAccent,
+                              size: 14,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              'YouTube Live',
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 14),
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'البث المباشر الرسمي المعتمد من الاتحاد السوداني للرياضات الإلكترونية',
+                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.60), fontSize: 12),
+                  ),
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        HapticFeedback.lightImpact();
+                        if (onNavigateTab != null) {
+                          onNavigateTab!(2);
+                        } else {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const LiveMatchScreen(matchId: 'sample_live_match'),
+                            ),
+                          );
+                        }
+                      },
+                      icon: const Icon(
+                        Icons.play_arrow_rounded,
+                        color: Colors.black,
+                        size: 20,
+                      ),
+                      label: const Text(
+                        'مشاهدة البث والدردشة الحية الآن',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppTheme.primaryBlue,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
                     ),
                   ),
                 ],
               ),
-              SizedBox(height: 14),
-              Text(
-                title,
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              SizedBox(height: 4),
-              Text(
-                'البث المباشر الرسمي المعتمد من الاتحاد السوداني للرياضات الإلكترونية',
-                style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.60), fontSize: 12),
-              ),
-              SizedBox(height: 16),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    HapticFeedback.lightImpact();
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            LiveMatchScreen(matchId: 'sample_live_match'),
-                      ),
-                    );
-                  },
-                  icon: Icon(
-                    Icons.play_arrow_rounded,
-                    color: Colors.black,
-                    size: 20,
-                  ),
-                  label: Text(
-                    'مشاهدة البث والدردشة الحية الآن',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.primaryBlue,
-                    padding: EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
+            ),
+            const SizedBox(height: 24),
+          ],
         );
       },
     );

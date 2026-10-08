@@ -1,9 +1,7 @@
-import 'package:e_sport_sudan/core/services/notification_service.dart';
-import 'package:e_sport_sudan/core/widgets/esport_toast.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
-import 'package:firebase_storage/firebase_storage.dart';
+import 'package:e_sport_sudan/core/services/storage_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:e_sport_sudan/core/theme/app_theme.dart';
 import 'package:e_sport_sudan/core/services/firestore_service.dart';
@@ -59,10 +57,13 @@ class _RefereeDashboardState extends State<RefereeDashboard> with SingleTickerPr
     }
     setState(() => _isSubmitting = true);
     try {
-      final fileName = '${_refereeUid}_${_selectedMatch!["id"]}_${DateTime.now().millisecondsSinceEpoch}.jpg';
-      final ref = FirebaseStorage.instance.ref().child('match_results/$fileName');
-      await ref.putFile(_screenshotFile!);
-      final screenshotUrl = await ref.getDownloadURL();
+      final screenshotUrl = await StorageService().uploadImage(
+        _screenshotFile!,
+        'match_results',
+      );
+      if (screenshotUrl == null) {
+        throw Exception('فشل في رفع لقطة الشاشة');
+      }
       await _firestoreService.submitMatchResult(
         matchId: _selectedMatch!['id'],
         scoreA: _scoreA,

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/user_model.dart';
 import '../models/news_model.dart';
@@ -104,7 +105,7 @@ class FirestoreService {
   Stream<List<Map<String, dynamic>>> getTournamentsStream({String? game}) {
     return _db.collection('tournaments').snapshots().map((snapshot) {
       var list = snapshot.docs.map((doc) {
-        final data = doc.data() as Map<String, dynamic>;
+        final data = doc.data();
         data['id'] = doc.id;
         return data;
       }).toList();
@@ -209,9 +210,10 @@ class FirestoreService {
   // 6. Leaderboards (التصنيفات والفرق)
   // =========================================================================
   Future<String> createTeam(Map<String, dynamic> teamData, String creatorUid) async {
-    teamData['pendingRequests'] = [];
-    teamData['joinType'] = teamData['joinType'] ?? 'approval'; // 'public' or 'approval'
-    final docRef = await _db.collection('teams').add(teamData);
+    final Map<String, dynamic> data = Map<String, dynamic>.from(teamData);
+    data['pendingRequests'] = [];
+    data['joinType'] = data['joinType'] ?? 'approval'; // 'public' or 'approval'
+    final docRef = await _db.collection('teams').add(data);
     await _db.collection('users').doc(creatorUid).set({
       'teamId': docRef.id,
     }, SetOptions(merge: true));
@@ -399,40 +401,73 @@ class FirestoreService {
     });
   }
 
+  Future<void> clearMatchChat(String matchId) async {
+    try {
+      final messagesSnapshot = await _db
+          .collection('matches')
+          .doc(matchId)
+          .collection('chat_messages')
+          .get();
+
+      final docs = messagesSnapshot.docs;
+      for (int i = 0; i < docs.length; i += 400) {
+        final batch = _db.batch();
+        final end = (i + 400 < docs.length) ? i + 400 : docs.length;
+        for (int j = i; j < end; j++) {
+          batch.delete(docs[j].reference);
+        }
+        await batch.commit();
+      }
+    } catch (e) {
+      debugPrint('Error clearing match chat: $e');
+    }
+  }
+
   Future<void> updateLiveStream({
     required String youtubeVideoId,
     required String title,
     required bool isLive,
+    String? teamA,
+    String? teamB,
+    int? scoreA,
+    int? scoreB,
+    bool resetChat = true,
   }) async {
+    final sessionId = 'live_${DateTime.now().millisecondsSinceEpoch}';
+    if (resetChat && isLive) {
+      await clearMatchChat('sample_live_match');
+    }
     final data = {
       'id': 'sample_live_match',
-      'youtubeVideoId': youtubeVideoId,
+      'youtubeVideoId': isLive ? youtubeVideoId : '',
       'title': title,
       'isLive': isLive,
       'status': isLive ? 'live' : 'offline',
-      'teamA': 'بث مباشر',
-      'teamB': 'E-Sport Sudan',
-      'scoreA': 0,
-      'scoreB': 0,
+      'teamA': teamA ?? 'بث مباشر',
+      'teamB': teamB ?? 'E-Sport Sudan',
+      'scoreA': scoreA ?? 0,
+      'scoreB': scoreB ?? 0,
       'time': isLive ? 'مباشر الآن' : 'متوقف',
+      'sessionId': sessionId,
       'updatedAt': FieldValue.serverTimestamp(),
     };
     await _db.collection('matches').doc('sample_live_match').set(data, SetOptions(merge: true));
     await _db.collection('settings').doc('live_stream').set(data, SetOptions(merge: true));
   }
 
-  Future<void> stopLiveStream() async {
-    await _db.collection('matches').doc('sample_live_match').set({
+  Future<void> stopLiveStream({bool resetChat = true}) async {
+    if (resetChat) {
+      await clearMatchChat('sample_live_match');
+    }
+    final data = {
       'isLive': false,
       'status': 'offline',
       'youtubeVideoId': '',
+      'time': 'متوقف',
       'updatedAt': FieldValue.serverTimestamp(),
-    }, SetOptions(merge: true));
-    await _db.collection('settings').doc('live_stream').set({
-      'isLive': false,
-      'youtubeVideoId': '',
-      'updatedAt': FieldValue.serverTimestamp(),
-    }, SetOptions(merge: true));
+    };
+    await _db.collection('matches').doc('sample_live_match').set(data, SetOptions(merge: true));
+    await _db.collection('settings').doc('live_stream').set(data, SetOptions(merge: true));
   }
 
   Stream<DocumentSnapshot<Map<String, dynamic>>> getGlobalLiveStream() {
@@ -465,15 +500,21 @@ class FirestoreService {
             }).toList());
   }
 
-  Stream<List<Map<String, dynamic>>> getMatchChatStream(String matchId) {
+  Stream<List<Map<String, dynamic>>> getMatchChatStream(String matchId, {String? sessionId}) {
     return _db
         .collection('matches')
         .doc(matchId)
         .collection('chat_messages')
         .orderBy('timestamp', descending: false)
-        .limitToLast(50)
+        .limitToLast(60)
         .snapshots()
-        .map((snapshot) => snapshot.docs.map((doc) => doc.data()).toList());
+        .map((snapshot) {
+          final list = snapshot.docs.map((doc) => doc.data()).toList();
+          if (sessionId != null && sessionId.isNotEmpty) {
+            return list.where((m) => m['sessionId'] == null || m['sessionId'] == sessionId).toList();
+          }
+          return list;
+        });
   }
 
   Stream<List<Map<String, dynamic>>> getTeamMatchesStream(String teamId) {
@@ -495,12 +536,14 @@ class FirestoreService {
     required String senderId,
     required String senderName,
     required String message,
+    String? sessionId,
     bool isModerator = false,
   }) async {
     await _db.collection('matches').doc(matchId).collection('chat_messages').add({
       'senderId': senderId,
       'senderName': senderName,
       'message': message,
+      if (sessionId != null && sessionId.isNotEmpty) 'sessionId': sessionId,
       'timestamp': FieldValue.serverTimestamp(),
       'isModerator': isModerator,
     });
@@ -711,21 +754,6 @@ class FirestoreService {
       'currency': 'ج.س',
       'updatedAt': FieldValue.serverTimestamp(),
     }, SetOptions(merge: true));
-  }
-
-  Future<Map<String, dynamic>> getAppConfig() async {
-    try {
-      final doc = await _db.collection('settings').doc('app_config').get();
-      if (doc.exists && doc.data() != null) {
-        return doc.data()!;
-      }
-    } catch (_) {}
-    // Fallback if not found
-    return {
-      'supportPhone': '+249123456789',
-      'telegramUsername': 'EsportSudanSupport',
-      'facebookUrl': 'https://facebook.com/EsportSudan',
-    };
 
     // 4. Game Stats
     final games = [
@@ -735,7 +763,6 @@ class FirestoreService {
       {'id': 'valorant', 'name': 'Valorant', 'activePlayers': 430, 'tournamentsCount': 1},
     ];
 
-    final batch = _db.batch();
     for (var g in games) {
       final docRef = _db.collection('game_stats').doc(g['id'] as String);
       batch.set(docRef, {
@@ -783,6 +810,20 @@ class FirestoreService {
     }
   }
 
+  Future<Map<String, dynamic>> getAppConfig() async {
+    try {
+      final doc = await _db.collection('settings').doc('app_config').get();
+      if (doc.exists && doc.data() != null) {
+        return doc.data()!;
+      }
+    } catch (_) {}
+    return {
+      'supportPhone': '+249123456789',
+      'telegramUsername': 'EsportSudanSupport',
+      'facebookUrl': 'https://facebook.com/EsportSudan',
+    };
+  }
+
   // =========================================================================
   // 8. Complaints (الشكاوى والاعتراضات)
   // =========================================================================
@@ -801,8 +842,9 @@ class FirestoreService {
   }
 
   Future<void> addComplaint(Map<String, dynamic> data) async {
-    data['createdAt'] = FieldValue.serverTimestamp();
-    await _db.collection('complaints').add(data);
+    final Map<String, dynamic> complaint = Map<String, dynamic>.from(data);
+    complaint['createdAt'] = FieldValue.serverTimestamp();
+    await _db.collection('complaints').add(complaint);
   }
 
   Future<void> deleteComplaint(String complaintId) async {

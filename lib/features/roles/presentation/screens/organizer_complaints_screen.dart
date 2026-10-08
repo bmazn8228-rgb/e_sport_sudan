@@ -1,5 +1,3 @@
-import 'package:e_sport_sudan/core/services/notification_service.dart';
-import 'package:e_sport_sudan/core/widgets/esport_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:e_sport_sudan/core/theme/app_theme.dart';
 import 'package:e_sport_sudan/core/services/firestore_service.dart';
@@ -198,7 +196,7 @@ class OrganizerComplaintsScreen extends StatelessWidget {
               onPressed: () async {
                 if (titleController.text.isNotEmpty && descController.text.isNotEmpty) {
                   try {
-                    await FirestoreService().addComplaint({
+                    await FirestoreService().addComplaint(<String, dynamic>{
                       'title': titleController.text,
                       'description': descController.text,
                       'status': 'pending',

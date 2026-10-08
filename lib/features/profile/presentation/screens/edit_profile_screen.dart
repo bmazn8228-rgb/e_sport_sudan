@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:firebase_storage/firebase_storage.dart';
+import 'package:e_sport_sudan/core/services/storage_service.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:e_sport_sudan/core/theme/app_theme.dart';
 import 'package:e_sport_sudan/core/services/auth_service.dart';
@@ -124,13 +124,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       String? uploadedPhotoUrl = _currentPhotoUrl;
 
       if (_imageFile != null) {
-        final storageRef = FirebaseStorage.instance
-            .ref()
-            .child('user_avatars')
-            .child('${user.uid}_${DateTime.now().millisecondsSinceEpoch}.jpg');
-            
-        final uploadTask = await storageRef.putFile(_imageFile!);
-        uploadedPhotoUrl = await uploadTask.ref.getDownloadURL();
+        uploadedPhotoUrl = await StorageService().uploadImage(
+          _imageFile!,
+          'user_avatars',
+        );
       }
 
       final updatedModel = UserModel(

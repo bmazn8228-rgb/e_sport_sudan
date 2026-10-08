@@ -1,8 +1,6 @@
 import 'package:e_sport_sudan/core/services/notification_service.dart';
 import 'package:e_sport_sudan/core/widgets/esport_toast.dart';
 import 'package:flutter/material.dart';
-import 'package:e_sport_sudan/core/services/notification_service.dart';
-import 'package:e_sport_sudan/core/widgets/esport_toast.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import '../../../../core/theme/app_theme.dart';
@@ -377,7 +375,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-              color: isLive ? Colors.redAccent.withOpacity(0.6) : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12),
+              color: isLive ? Colors.redAccent.withValues(alpha: 0.6) : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12),
               width: isLive ? 1.5 : 1,
             ),
           ),
@@ -454,6 +452,16 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                   ),
                   if (isLive) ...[
                     SizedBox(width: 8),
+                    IconButton(
+                      tooltip: 'مسح دردشة البث',
+                      onPressed: () => _confirmClearChat(context),
+                      icon: Icon(Icons.delete_sweep_rounded, color: Colors.orangeAccent),
+                      style: IconButton.styleFrom(
+                        backgroundColor: Colors.orangeAccent.withValues(alpha: 0.12),
+                        padding: EdgeInsets.all(12),
+                      ),
+                    ),
+                    SizedBox(width: 8),
                     OutlinedButton.icon(
                       onPressed: () => _confirmStopLiveStream(context),
                       icon: Icon(Icons.stop_circle_outlined, color: Colors.redAccent, size: 18),
@@ -477,6 +485,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     final urlController = TextEditingController(text: currentUrl ?? '');
     final titleController = TextEditingController(text: currentTitle ?? 'البث المباشر لمنافسات اليوم');
     bool isLive = currentIsLive;
+    bool resetChat = true;
     bool isSaving = false;
 
     showModalBottomSheet(
@@ -544,6 +553,14 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                   value: isLive,
                   onChanged: (val) => setModalState(() => isLive = val),
                 ),
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  activeThumbColor: Colors.orangeAccent,
+                  title: Text('تصفير الدردشة وبدء محادثة نظيفة جديدة لهذا البث', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+                  subtitle: Text('يحذف أي رسائل سابقة حتى تبدأ الدردشة فارغة للبث الحالي', style: TextStyle(fontSize: 11, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54))),
+                  value: resetChat,
+                  onChanged: (val) => setModalState(() => resetChat = val),
+                ),
                 SizedBox(height: 20),
                 SizedBox(
                   width: double.infinity,
@@ -572,12 +589,13 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                                 youtubeVideoId: videoId,
                                 title: titleController.text.trim().isEmpty ? 'البث المباشر' : titleController.text.trim(),
                                 isLive: isLive,
+                                resetChat: resetChat,
                               );
                               if (ctx.mounted) Navigator.pop(ctx);
                               if (context.mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
-                                    content: Text('تم تحديث ونشر رابط البث المباشر للمستخدمين بنجاح ✅', style: TextStyle(color: Colors.black)),
+                                    content: Text('تم نشر وتحديث البث المباشر بنجاح 🚀', style: TextStyle(color: Colors.black)),
                                     backgroundColor: AppTheme.primaryBlue,
                                   ),
                                 );
@@ -607,13 +625,58 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     );
   }
 
+  void _confirmClearChat(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        title: Row(
+          children: [
+            Icon(Icons.delete_sweep_rounded, color: Colors.orangeAccent),
+            SizedBox(width: 8),
+            Text('مسح محادثة البث', style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16)),
+          ],
+        ),
+        content: Text('هل أنت متأكد من رغبتك في مسح كافة رسائل الدردشة الحالية؟ سيتم تفريغ المحادثة فوراً لجميع المستخدمين.', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 13)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text('إلغاء', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54))),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.orangeAccent),
+            onPressed: () async {
+              Navigator.pop(ctx);
+              try {
+                await FirestoreService().clearMatchChat('sample_live_match');
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('تم مسح محادثة البث المباشر بنجاح 🗑️', style: TextStyle(color: Colors.black)),
+                      backgroundColor: Colors.orangeAccent,
+                    ),
+                  );
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  NotificationService.showCustomToast(context, title: 'تنبيه النظام', message: 'فشل مسح المحادثة ❌', type: ToastType.urgent);
+                }
+              }
+            },
+            child: Text('مسح الدردشة', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _confirmStopLiveStream(BuildContext context) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: Theme.of(context).colorScheme.surface,
         title: Text('إيقاف البث المباشر', style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
-        content: Text('هل أنت متأكد من رغبتك في إيقاف البث المباشر الحالي؟ سيظهر للمستخدمين أن البث متوقف.', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7))),
+        content: Text('هل أنت متأكد من رغبتك في إيقاف البث المباشر الحالي؟ سيختفي البث من الواجهة الرئيسية وسيظهر للمستخدمين أن البث متوقف مع تنظيف المحادثة.', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7))),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
@@ -624,11 +687,11 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             onPressed: () async {
               Navigator.pop(ctx);
               try {
-                await FirestoreService().stopLiveStream();
+                await FirestoreService().stopLiveStream(resetChat: true);
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('تم إيقاف البث المباشر بنجاح 🛑', style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+                      content: Text('تم إيقاف البث المباشر وتصفير الجلسة بنجاح 🛑', style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
                       backgroundColor: Colors.red,
                     ),
                   );

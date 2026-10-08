@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
-import 'package:firebase_storage/firebase_storage.dart';
+import 'package:e_sport_sudan/core/services/storage_service.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:e_sport_sudan/core/theme/app_theme.dart';
@@ -481,10 +481,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
       if (user == null || _userModel == null) throw Exception('المستخدم غير مسجل');
       
       final file = File(pickedFile.path);
-      final ref = FirebaseStorage.instance.ref().child('profile_images/${user.uid}.jpg');
-      
-      await ref.putFile(file);
-      final downloadUrl = await ref.getDownloadURL();
+      final downloadUrl = await StorageService().uploadImage(
+        file,
+        'profile_images',
+      );
+      if (downloadUrl == null) throw Exception('فشل في رفع الصورة');
       
       await user.updatePhotoURL(downloadUrl);
       

@@ -16,7 +16,6 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   final _formKey = GlobalKey<FormState>();
-  String _selectedRole = 'player'; // 'player' or 'spectator'
   final _fullNameController = TextEditingController();
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
@@ -79,8 +78,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
         password: _passwordController.text,
         displayName: _fullNameController.text.trim(),
         phone: _phoneController.text.trim(),
-        ign: _selectedRole == 'player' ? _ignController.text.trim() : null,
-        gameId: _selectedRole == 'player' ? _selectedGame : null,
+        ign: _ignController.text.trim(),
+        gameId: _selectedGame,
       );
 
       if (mounted) {
@@ -283,38 +282,45 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
-                              // Role Selector
-                              Text('المسار التنافسي', style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface, fontSize: 16)),
-                              SizedBox(height: 16),
-                              Row(
-                                children: [
-                                  Expanded(child: _buildRoleSelector('player', 'لاعب منافس', Icons.sports_esports)),
-                                  SizedBox(width: 12),
-                                  Expanded(child: _buildRoleSelector('spectator', 'مشاهد ومتابع', Icons.visibility)),
-                                ],
-                              ),
-                              SizedBox(height: 16),
+                              // Competitive Player Account Badge
                               Container(
-                                padding: EdgeInsets.all(12),
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                                 decoration: BoxDecoration(
-                                  color: AppTheme.primaryBlue.withValues(alpha: 0.1),
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(color: AppTheme.primaryBlue.withValues(alpha: 0.3)),
+                                  color: AppTheme.primaryBlue.withValues(alpha: 0.12),
+                                  borderRadius: BorderRadius.circular(18),
+                                  border: Border.all(color: AppTheme.primaryBlue.withValues(alpha: 0.35), width: 1.2),
                                 ),
                                 child: Row(
                                   children: [
-                                    Icon(Icons.info_outline, size: 18, color: AppTheme.primaryBlue),
-                                    SizedBox(width: 8),
+                                    Container(
+                                      padding: const EdgeInsets.all(10),
+                                      decoration: BoxDecoration(
+                                        color: AppTheme.primaryBlue,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: const Icon(Icons.sports_esports_rounded, color: Colors.black, size: 22),
+                                    ),
+                                    const SizedBox(width: 14),
                                     Expanded(
-                                      child: Text(
-                                        'صلاحيات التنظيم، التحكيم، وإدارة الفرق تعتمد بعد التحقق من الهوية.',
-                                        style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          const Text(
+                                            'نوع الحساب: لاعب منافس 🎮',
+                                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                                          ),
+                                          const SizedBox(height: 2),
+                                          Text(
+                                            'رخصة تنافسية للمشاركة في البطولات والتصنيف الوطني',
+                                            style: TextStyle(fontSize: 11, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.65)),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   ],
                                 ),
                               ),
-                              SizedBox(height: 32),
+                              const SizedBox(height: 24),
 
                               // Form Fields
                               _buildModernTextField(
@@ -346,26 +352,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               ),
                               SizedBox(height: 20),
 
-                              if (_selectedRole == 'player') ...[
-                                _buildModernTextField(
-                                  controller: _ignController,
-                                  label: 'الاسم داخل اللعبة (In-Game Name)',
-                                  hint: 'مثال: SUDAN_NINJA',
-                                  icon: Icons.gamepad_outlined,
-                                  validator: (v) => Validators.validateName(v, fieldName: 'الاسم داخل اللعبة'),
-                                ),
-                                SizedBox(height: 20),
-                                Text('اللعبة المفضلة / الأساسية', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 13, fontWeight: FontWeight.w600)),
-                                SizedBox(height: 8),
-                                _buildModernDropdown(
-                                  value: _selectedGame,
-                                  hint: 'اختر اللعبة',
-                                  icon: Icons.sports_esports,
-                                  items: _popularGames,
-                                  onChanged: (val) => setState(() => _selectedGame = val),
-                                ),
-                                SizedBox(height: 20),
-                              ],
+                              _buildModernTextField(
+                                controller: _ignController,
+                                label: 'الاسم داخل اللعبة (In-Game Name)',
+                                hint: 'مثال: SUDAN_NINJA',
+                                icon: Icons.gamepad_outlined,
+                                validator: (v) => Validators.validateName(v, fieldName: 'الاسم داخل اللعبة'),
+                              ),
+                              SizedBox(height: 20),
+                              Text('اللعبة المفضلة / الأساسية', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 13, fontWeight: FontWeight.w600)),
+                              SizedBox(height: 8),
+                              _buildModernDropdown(
+                                value: _selectedGame,
+                                hint: 'اختر اللعبة',
+                                icon: Icons.sports_esports,
+                                items: _popularGames,
+                                onChanged: (val) => setState(() => _selectedGame = val),
+                              ),
+                              SizedBox(height: 20),
 
                               Text('الولاية / المدينة', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 13, fontWeight: FontWeight.w600)),
                               SizedBox(height: 8),
@@ -419,37 +423,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildRoleSelector(String role, String title, IconData icon) {
-    final isSelected = _selectedRole == role;
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          _selectedRole = role;
-          if (role == 'spectator') _ignController.clear();
-        });
-      },
-      child: AnimatedContainer(
-        duration: Duration(milliseconds: 300),
-        padding: EdgeInsets.symmetric(vertical: 16),
-        decoration: BoxDecoration(
-          color: isSelected ? AppTheme.primaryBlue : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: isSelected ? AppTheme.primaryBlue : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1)),
-          boxShadow: isSelected
-              ? [BoxShadow(color: AppTheme.primaryBlue.withValues(alpha: 0.3), blurRadius: 12, offset: Offset(0, 4))]
-              : [],
-        ),
-        child: Column(
-          children: [
-            Icon(icon, color: isSelected ? Colors.black : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), size: 28),
-            SizedBox(height: 8),
-            Text(title, style: TextStyle(color: isSelected ? Colors.black : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontWeight: FontWeight.bold, fontSize: 13)),
-          ],
-        ),
       ),
     );
   }

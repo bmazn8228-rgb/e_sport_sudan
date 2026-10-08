@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
+import 'package:e_sport_sudan/core/services/storage_service.dart';
 import 'package:intl/intl.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:e_sport_sudan/core/theme/app_theme.dart';
@@ -754,10 +754,14 @@ class _WalletScreenState extends State<WalletScreen> {
               final messenger = ScaffoldMessenger.of(context);
 
               try {
-                final String fileName = '${_userId}_${DateTime.now().millisecondsSinceEpoch}.jpg';
-                final ref = FirebaseStorage.instance.ref().child('receipts/$fileName');
-                await ref.putFile(_receiptFile!);
-                final String downloadUrl = await ref.getDownloadURL();
+                final String? downloadUrl = await StorageService().uploadImage(
+                  _receiptFile!,
+                  'receipts',
+                );
+
+                if (downloadUrl == null) {
+                  throw Exception('فشل في رفع صورة إشعار التحويل');
+                }
 
                 await _firestoreService.submitDepositRequest(
                   userId: _userId,
