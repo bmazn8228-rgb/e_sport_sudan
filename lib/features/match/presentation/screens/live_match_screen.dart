@@ -181,6 +181,24 @@ class _LiveMatchScreenState extends State<LiveMatchScreen> {
 
           final matchData = snapshot.data!.data()!;
           final isLive = matchData['isLive'] == true;
+          
+          if (!isLive) {
+            return Center(
+              child: Padding(
+                padding: EdgeInsets.all(24.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.tv_off, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), size: 64),
+                    SizedBox(height: 16),
+                    Text('لا يوجد بث مباشر نشط حالياً', style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 18, fontWeight: FontWeight.bold)),
+                    SizedBox(height: 8),
+                    Text('سيبدأ البث فور قيام إدارة البطولة بنقل المباريات', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 13), textAlign: TextAlign.center),
+                  ],
+                ),
+              ),
+            );
+          }
           final rawVideoId = (matchData['youtubeVideoId'] ?? '').toString().trim();
           
           String videoId = rawVideoId;
