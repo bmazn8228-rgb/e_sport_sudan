@@ -41,7 +41,7 @@ class _LiveMatchScreenState extends State<LiveMatchScreen> {
           flags: YoutubePlayerFlags(
             isLive: true,
             autoPlay: true,
-            mute: true, // Muted by default to prevent sudden noise
+            mute: false,
             forceHD: false,
           ),
         );

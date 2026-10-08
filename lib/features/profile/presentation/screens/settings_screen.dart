@@ -9,7 +9,7 @@ import 'package:e_sport_sudan/features/profile/presentation/screens/edit_profile
 import 'package:e_sport_sudan/features/profile/presentation/screens/security_settings_screen.dart';
 import 'package:e_sport_sudan/features/profile/presentation/screens/bank_accounts_screen.dart';
 import 'package:e_sport_sudan/features/profile/presentation/screens/financial_transactions_screen.dart';
-
+import 'package:url_launcher/url_launcher.dart';
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
 
@@ -69,6 +69,116 @@ class _SettingsScreenState extends State<SettingsScreen> {
       SnackBar(
         content: Text('هذه الميزة ستتوفر قريباً!', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
         backgroundColor: AppTheme.primaryBlue,
+      ),
+    );
+  }
+
+  void _showHelpCenter(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        title: Text('مركز المساعدة والأسئلة الشائعة', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('س: كيف يمكنني سحب أرباحي؟', style: TextStyle(fontWeight: FontWeight.bold, color: AppTheme.primaryBlue)),
+              Text('ج: من خلال قسم المحفظة، يمكنك طلب سحب الأرباح إلى حسابك البنكي المضاف، وتستغرق العملية من 1 إلى 3 أيام عمل.', style: TextStyle(fontSize: 13)),
+              SizedBox(height: 12),
+              Text('س: ما هي قوانين البطولات؟', style: TextStyle(fontWeight: FontWeight.bold, color: AppTheme.primaryBlue)),
+              Text('ج: يمنع استخدام أي برامج غش (هاكات)، ويجب احترام مواعيد المباريات. سيتم استبعاد أي فريق يخالف القوانين مباشرة.', style: TextStyle(fontSize: 13)),
+              SizedBox(height: 12),
+              Text('س: كيف أسجل فريقي في بطولة؟', style: TextStyle(fontWeight: FontWeight.bold, color: AppTheme.primaryBlue)),
+              Text('ج: ادخل لصفحة البطولة واضغط على "التسجيل في البطولة"، يجب أن يحتوي فريقك على العدد المطلوب وأن يكون لديك رصيد كافٍ.', style: TextStyle(fontSize: 13)),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text('إغلاق')),
+        ],
+      ),
+    );
+  }
+
+  void _showSupportOptions(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('التواصل مع الدعم الفني', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            SizedBox(height: 8),
+            Text('اختر وسيلة التواصل المناسبة لك للحصول على المساعدة:', style: TextStyle(fontSize: 14, color: Colors.grey)),
+            SizedBox(height: 20),
+            ListTile(
+              leading: Icon(Icons.facebook, color: Colors.blue, size: 36),
+              title: Text('فيسبوك', style: TextStyle(fontWeight: FontWeight.bold)),
+              onTap: () async {
+                final url = Uri.parse('https://www.facebook.com/share/1HjaqDEnWm/?mibextid=wwXIfr');
+                if (await canLaunchUrl(url)) {
+                  await launchUrl(url, mode: LaunchMode.externalApplication);
+                }
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.chat, color: Colors.green, size: 36),
+              title: Text('واتساب', style: TextStyle(fontWeight: FontWeight.bold)),
+              onTap: () async {
+                final url = Uri.parse('https://wa.me/249124177296?s=p');
+                if (await canLaunchUrl(url)) {
+                  await launchUrl(url, mode: LaunchMode.externalApplication);
+                }
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.telegram, color: Colors.blueAccent, size: 36),
+              title: Text('تيليجرام', style: TextStyle(fontWeight: FontWeight.bold)),
+              onTap: () async {
+                final url = Uri.parse('https://t.me/yamizoz');
+                if (await canLaunchUrl(url)) {
+                  await launchUrl(url, mode: LaunchMode.externalApplication);
+                }
+              },
+            ),
+            SizedBox(height: 10),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showTermsAndConditions(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        title: Text('الشروط والأحكام / الخصوصية', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('1. الخصوصية:', style: TextStyle(fontWeight: FontWeight.bold, color: AppTheme.primaryBlue)),
+              Text('نحن نحرص على حماية بياناتك الشخصية وحسابك البنكي ولن تتم مشاركتها مع أي جهة خارجية.', style: TextStyle(fontSize: 13)),
+              SizedBox(height: 12),
+              Text('2. البطولات والمحفظة:', style: TextStyle(fontWeight: FontWeight.bold, color: AppTheme.primaryBlue)),
+              Text('لا يمكن استرداد رسوم الاشتراك بعد بدء البطولة. عمليات سحب الأرباح تتطلب التأكد من هوية اللاعب وتستغرق بعض الوقت.', style: TextStyle(fontSize: 13)),
+              SizedBox(height: 12),
+              Text('3. قوانين المنصة:', style: TextStyle(fontWeight: FontWeight.bold, color: AppTheme.primaryBlue)),
+              Text('يلتزم جميع اللاعبين بالروح الرياضية، وأي سلوك مسيء أو استخدام لبرامج غير قانونية سيعرض الحساب للحظر النهائي.', style: TextStyle(fontSize: 13)),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text('موافق')),
+        ],
       ),
     );
   }
@@ -307,21 +417,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 title: 'مركز المساعدة والأسئلة الشائعة',
                 subtitle: 'قوانين البطولات وطرق السحب',
                 icon: Icons.question_answer,
-                onTap: _showComingSoon,
+                onTap: () => _showHelpCenter(context),
               ),
               _buildDivider(),
               _buildListTile(
                 title: 'التواصل مع الدعم الفني',
-                subtitle: 'رفع تذكرة لمشكلة فنية',
+                subtitle: 'تواصل معنا لحل أي مشكلة فنية',
                 icon: Icons.support_agent,
-                onTap: _showComingSoon,
+                onTap: () => _showSupportOptions(context),
               ),
               _buildDivider(),
               _buildListTile(
                 title: 'الشروط والأحكام / الخصوصية',
                 subtitle: 'اقرأ سياسات الاستخدام',
                 icon: Icons.article,
-                onTap: _showComingSoon,
+                onTap: () => _showTermsAndConditions(context),
               ),
             ]),
             SizedBox(height: 24),

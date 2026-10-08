@@ -88,9 +88,17 @@ class _AdminNewsManagementScreenState extends State<AdminNewsManagementScreen> {
                   authorName: user?.displayName ?? 'الإدارة',
                 );
 
-                await _firestoreService.addNews(news);
-                Navigator.pop(context);
-                NotificationService.showCustomToast(context, title: 'نجاح', message: 'تم نشر الخبر بنجاح', type: ToastType.success);
+                try {
+                  await _firestoreService.addNews(news);
+                  if (context.mounted) {
+                    Navigator.pop(context);
+                    NotificationService.showCustomToast(context, title: 'نجاح', message: 'تم نشر الخبر بنجاح', type: ToastType.success);
+                  }
+                } catch (e) {
+                  if (context.mounted) {
+                    NotificationService.showCustomToast(context, title: 'خطأ', message: 'فشل في نشر الخبر، تحقق من الصلاحيات أو الاتصال', type: ToastType.urgent);
+                  }
+                }
               },
               child: Text('نشر الخبر'),
             ),
@@ -153,8 +161,16 @@ class _AdminNewsManagementScreenState extends State<AdminNewsManagementScreen> {
                   trailing: IconButton(
                     icon: Icon(Icons.delete, color: Colors.redAccent),
                     onPressed: () async {
-                      await _firestoreService.deleteNews(news.id);
-                      NotificationService.showCustomToast(context, title: 'حذف', message: 'تم حذف الخبر', type: ToastType.success);
+                      try {
+                        await _firestoreService.deleteNews(news.id);
+                        if (context.mounted) {
+                          NotificationService.showCustomToast(context, title: 'حذف', message: 'تم حذف الخبر بنجاح', type: ToastType.success);
+                        }
+                      } catch (e) {
+                        if (context.mounted) {
+                          NotificationService.showCustomToast(context, title: 'خطأ', message: 'فشل في حذف الخبر', type: ToastType.urgent);
+                        }
+                      }
                     },
                   ),
                 ),

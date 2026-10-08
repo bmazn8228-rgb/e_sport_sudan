@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:ui';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:e_sport_sudan/core/theme/app_theme.dart';
 import 'package:e_sport_sudan/core/utils/validators.dart';
 import 'package:e_sport_sudan/core/utils/connectivity_helper.dart';
@@ -103,9 +104,21 @@ class _LoginScreenState extends State<LoginScreen> {
         } catch (e) {
           if (mounted) {
             setState(() => _isLoading = false);
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(SnackBar(content: Text('حدث خطأ: ${e.toString()}')));
+            String errorMessage = 'حدث خطأ: ${e.toString()}';
+            if (e is FirebaseAuthException) {
+              if (e.code == 'user-not-found' || e.code == 'wrong-password' || e.code == 'invalid-credential') {
+                errorMessage = 'البريد الإلكتروني أو كلمة المرور غير صحيحة';
+              } else {
+                errorMessage = e.message ?? errorMessage;
+              }
+            }
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(errorMessage),
+                behavior: SnackBarBehavior.floating,
+                backgroundColor: Colors.red,
+              ),
+            );
           }
         }
       }
@@ -165,9 +178,21 @@ class _LoginScreenState extends State<LoginScreen> {
     } catch (e) {
       if (mounted) {
         setState(() => _isLoading = false);
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('حدث خطأ: ${e.toString()}')));
+        String errorMessage = 'حدث خطأ: ${e.toString()}';
+        if (e is FirebaseAuthException) {
+          if (e.code == 'user-not-found' || e.code == 'wrong-password' || e.code == 'invalid-credential') {
+            errorMessage = 'البريد الإلكتروني أو كلمة المرور غير صحيحة';
+          } else {
+            errorMessage = e.message ?? errorMessage;
+          }
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(errorMessage),
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: Colors.red,
+          ),
+        );
       }
     }
   }

@@ -237,7 +237,7 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard> {
               onChanged: (val) => setState(() => _searchQuery = val.trim()),
               style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
               decoration: InputDecoration(
-                hintText: 'ابحث باسم المستخدم أو البريد الإلكتروني...',
+                hintText: 'ابحث بالاسم، البريد الإلكتروني، أو آيدي التطبيق...',
                 hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 13),
                 prefixIcon: Icon(Icons.search, color: AppTheme.primaryBlue),
                 filled: true,
@@ -263,8 +263,8 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard> {
                   users = users.where((u) {
                     final name = (u['displayName'] ?? '').toString().toLowerCase();
                     final email = (u['email'] ?? '').toString().toLowerCase();
-                    final role = (u['role'] ?? '').toString().toLowerCase();
-                    return name.contains(q) || email.contains(q) || role.contains(q);
+                    final playerId = (u['playerId'] ?? '').toString().toLowerCase();
+                    return name.contains(q) || email.contains(q) || playerId.contains(q);
                   }).toList();
                 }
 
@@ -385,6 +385,7 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard> {
     final role = user['role'] ?? 'player';
     final name = user['displayName'] ?? 'مستخدم بدون اسم';
     final email = user['email'] ?? '';
+    final playerId = user['playerId'] ?? '';
 
     Color roleColor = AppTheme.primaryBlue;
     if (role == 'super_admin') roleColor = Colors.purpleAccent;
@@ -392,49 +393,60 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard> {
     if (role == 'referee') roleColor = Colors.blue;
     if (role == 'finance_admin') roleColor = Colors.teal;
 
-    return Container(
-      margin: EdgeInsets.only(bottom: 12),
-      padding: EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.10)),
-      ),
-      child: Row(
-        children: [
-          CircleAvatar(
-            backgroundColor: roleColor.withValues(alpha: 0.2),
-            child: Icon(Icons.person, color: roleColor),
-          ),
-          SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(name, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                SizedBox(height: 4),
-                Text(email.isNotEmpty ? email : 'لا يوجد بريد مسجل', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.60), fontSize: 11)),
-              ],
+    return GestureDetector(
+      onTap: () => _showRoleChangeBottomSheet(context, user),
+      child: Container(
+        margin: EdgeInsets.only(bottom: 12),
+        padding: EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.10)),
+        ),
+        child: Row(
+          children: [
+            CircleAvatar(
+              backgroundColor: roleColor.withValues(alpha: 0.2),
+              child: Icon(Icons.person, color: roleColor),
             ),
-          ),
-          ElevatedButton(
-            onPressed: () => _showRoleChangeBottomSheet(context, user),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: roleColor.withValues(alpha: 0.15),
-              foregroundColor: roleColor,
-              elevation: 0,
-              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(name, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                  if (playerId.toString().isNotEmpty)
+                    Text('الآيدي: $playerId', style: TextStyle(color: AppTheme.primaryBlue, fontSize: 12, fontWeight: FontWeight.bold)),
+                  SizedBox(height: 4),
+                  Text(email.isNotEmpty ? email : 'لا يوجد بريد مسجل', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.60), fontSize: 11)),
+                ],
+              ),
             ),
-            child: Text(role, style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
-          ),
-        ],
+            ElevatedButton(
+              onPressed: () => _showRoleChangeBottomSheet(context, user),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: roleColor.withValues(alpha: 0.15),
+                foregroundColor: roleColor,
+                elevation: 0,
+                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              ),
+              child: Text(role, style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+            ),
+          ],
+        ),
       ),
     );
   }
 
   void _showRoleChangeBottomSheet(BuildContext context, Map<String, dynamic> user) {
     final currentRole = user['role'] ?? 'player';
+    final userId = (user['uid'] ?? user['id'] ?? '').toString();
+
+    if (userId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('خطأ: لا يوجد معرّف للمستخدم')));
+      return;
+    }
 
     showModalBottomSheet(
       context: context,
@@ -451,11 +463,11 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard> {
               SizedBox(height: 6),
               Text('اختر الدور الجديد لهذا المستخدم. سيتم تحديث الصلاحية فوراً في Firebase.', style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54))),
               SizedBox(height: 16),
-              _buildRoleOption(ctx, user['id'], 'super_admin', 'مدير نظام أعلى (Super Admin)', Icons.security, Colors.purple, currentRole),
-              _buildRoleOption(ctx, user['id'], 'tournament_admin', 'منظم بطولات (Tournament Admin)', Icons.emoji_events, Colors.orange, currentRole),
-              _buildRoleOption(ctx, user['id'], 'referee', 'حكم معتمد (Referee)', Icons.sports, Colors.blue, currentRole),
-              _buildRoleOption(ctx, user['id'], 'finance_admin', 'مسؤول مالي (Finance Admin)', Icons.account_balance, Colors.teal, currentRole),
-              _buildRoleOption(ctx, user['id'], 'player', 'لاعب عادي (Player)', Icons.person, AppTheme.primaryBlue, currentRole),
+              _buildRoleOption(ctx, userId, 'super_admin', 'مدير نظام أعلى (Super Admin)', Icons.security, Colors.purple, currentRole),
+              _buildRoleOption(ctx, userId, 'tournament_admin', 'منظم بطولات (Tournament Admin)', Icons.emoji_events, Colors.orange, currentRole),
+              _buildRoleOption(ctx, userId, 'referee', 'حكم معتمد (Referee)', Icons.sports, Colors.blue, currentRole),
+              _buildRoleOption(ctx, userId, 'finance_admin', 'مسؤول مالي (Finance Admin)', Icons.account_balance, Colors.teal, currentRole),
+              _buildRoleOption(ctx, userId, 'player', 'لاعب عادي (Player)', Icons.person, AppTheme.primaryBlue, currentRole),
             ],
           ),
         );

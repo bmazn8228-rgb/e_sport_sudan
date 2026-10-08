@@ -928,7 +928,7 @@ class FirestoreService {
   Stream<List<Map<String, dynamic>>> getAllUsersStream({int limit = 50}) {
     return _db.collection('users').limit(limit).snapshots().map(
       (snapshot) => snapshot.docs.map((doc) {
-        final data = doc.data();
+        final data = Map<String, dynamic>.from(doc.data());
         data['id'] = doc.id;
         return data;
       }).toList(),

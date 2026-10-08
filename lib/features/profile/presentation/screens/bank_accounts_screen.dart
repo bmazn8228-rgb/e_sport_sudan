@@ -68,7 +68,7 @@ class _BankAccountsScreenState extends State<BankAccountsScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('حدث خطأ: $e'), backgroundColor: Colors.red),
+          SnackBar(content: Text('فشل في إضافة الحساب، يرجى المحاولة مرة أخرى ❌'), backgroundColor: Colors.red),
         );
       }
     }
@@ -184,7 +184,20 @@ class _BankAccountsScreenState extends State<BankAccountsScreen> {
                                 ),
                               );
                               if (confirm == true) {
-                                await _firestoreService.deleteBankAccount(_userId, account['id']);
+                                try {
+                                  await _firestoreService.deleteBankAccount(_userId, account['id']);
+                                  if (mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text('تم حذف الحساب بنجاح ✅'), backgroundColor: AppTheme.primaryBlue),
+                                    );
+                                  }
+                                } catch (e) {
+                                  if (mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text('فشل في حذف الحساب، يرجى المحاولة مرة أخرى ❌'), backgroundColor: Colors.red),
+                                    );
+                                  }
+                                }
                               }
                             },
                           ),

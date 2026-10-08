@@ -7,6 +7,7 @@ import 'package:e_sport_sudan/core/services/storage_service.dart';
 import 'package:e_sport_sudan/core/utils/validators.dart';
 import 'package:e_sport_sudan/core/utils/connectivity_helper.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:e_sport_sudan/features/auth/presentation/screens/login_screen.dart';
 import 'package:e_sport_sudan/core/services/auth_service.dart';
 
@@ -405,6 +406,31 @@ class _TournamentAdminDashboardScreenState extends State<TournamentAdminDashboar
     );
   }
 
+  String? _userRole;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserRole();
+  }
+
+  Future<void> _fetchUserRole() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      final doc = await FirebaseFirestore.instance.collection('users').doc(user.uid).get();
+      if (mounted) {
+        setState(() {
+          _userRole = doc.data()?['role'] as String?;
+        });
+      }
+    }
+  }
+
+  bool get _isSuperAdmin {
+    final email = FirebaseAuth.instance.currentUser?.email;
+    return _userRole == 'super_admin' || email == 'superadmin@esportsudan.sd' || email == 'admin@esportsudan.sd';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -419,11 +445,13 @@ class _TournamentAdminDashboardScreenState extends State<TournamentAdminDashboar
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _showAddTournamentDialog(context),
-        backgroundColor: AppTheme.primaryBlue,
-        child: Icon(Icons.add, color: Colors.black),
-      ),
+      floatingActionButton: _isSuperAdmin
+          ? FloatingActionButton(
+              onPressed: () => _showAddTournamentDialog(context),
+              backgroundColor: AppTheme.primaryBlue,
+              child: Icon(Icons.add, color: Colors.black),
+            )
+          : null,
       body: StreamBuilder<List<Map<String, dynamic>>>(
         stream: _firestoreService.getTournamentsStream(),
         builder: (context, snapshot) {

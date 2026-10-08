@@ -76,6 +76,11 @@ service cloud.firestore {
         allow create: if isAuthenticated();
       }
 
+      // Bank Accounts Subcollection
+      match /bank_accounts/{accountId} {
+        allow read, write: if isOwner(userId) || isSuperAdmin() || isFinanceAdmin();
+      }
+
     }
 
     // =========================================================================
@@ -177,6 +182,14 @@ service cloud.firestore {
         allow read: if isAuthenticated();
         allow write: if isSuperAdmin();
       }
+    }
+
+    // =========================================================================
+    // 9. News Collection
+    // =========================================================================
+    match /news/{newsId} {
+      allow read: if true;
+      allow write: if isTournamentAdmin();
     }
   }
 }
