@@ -196,12 +196,6 @@ class _LiveMatchScreenState extends State<LiveMatchScreen> with SingleTickerProv
 
         final isLive = isLiveFlag && videoId.isNotEmpty;
 
-        final streamTitle = (matchData['title'] ?? 'E-Sport Sudan Live').toString();
-        final sessionId = matchData['sessionId'] as String?;
-        final teamA = matchData['teamA'] as String?;
-        final teamB = matchData['teamB'] as String?;
-        final hasMatchScore = teamA != null && teamB != null && (matchData['scoreA'] != null || matchData['scoreB'] != null);
-
         if (!isLive) {
           _controller?.pause();
           return Scaffold(
@@ -211,6 +205,12 @@ class _LiveMatchScreenState extends State<LiveMatchScreen> with SingleTickerProv
         }
 
         _initializeOrUpdateYoutubePlayer(videoId);
+        final streamTitle = (matchData['title'] ?? 'E-Sport Sudan Live').toString();
+        final sessionId = matchData['sessionId'] as String?;
+        final teamA = matchData['teamA'] as String?;
+        final teamB = matchData['teamB'] as String?;
+        final hasMatchScore = teamA != null && teamB != null && (matchData['scoreA'] != null || matchData['scoreB'] != null);
+
         return YoutubePlayerBuilder(
           player: YoutubePlayer(
             controller: _controller!,
@@ -309,235 +309,230 @@ class _LiveMatchScreenState extends State<LiveMatchScreen> with SingleTickerProv
                     ),
 
                   // Real-Time Live Chat Section
-                  // Real-Time Live Chat Section
-                  _buildChatSection(sessionId, context),
+                  Expanded(
+                    child: Container(
+                      margin: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.surface,
+                        borderRadius: BorderRadius.circular(18),
+                        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.08)),
+                      ),
+                      child: Column(
+                        children: [
+                          // Chat Header
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.04),
+                              borderRadius: const BorderRadius.vertical(top: Radius.circular(18)),
+                              border: Border(bottom: BorderSide(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.06))),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(Icons.forum_rounded, color: AppTheme.primaryBlue, size: 18),
+                                const SizedBox(width: 8),
+                                const Text('الدردشة المباشرة', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                                const Spacer(),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: Colors.green.withOpacity(0.15),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: const Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(Icons.circle, color: Colors.green, size: 6),
+                                      SizedBox(width: 4),
+                                      Text('نشطة', style: TextStyle(color: Colors.green, fontSize: 10, fontWeight: FontWeight.bold)),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          // Chat Messages List
+                          Expanded(
+                            child: StreamBuilder<List<Map<String, dynamic>>>(
+                              stream: FirestoreService().getMatchChatStream(widget.matchId, sessionId: sessionId),
+                              builder: (context, chatSnapshot) {
+                                if (!chatSnapshot.hasData) {
+                                  return const Center(child: CircularProgressIndicator());
+                                }
+
+                                final messages = chatSnapshot.data!.reversed.toList();
+
+                                if (messages.isEmpty) {
+                                  return Center(
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Icon(Icons.chat_bubble_outline_rounded, size: 36, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3)),
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          'كن أول من يشارك في محادثة البث! 👋',
+                                          style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5)),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                }
+
+                                return ListView.builder(
+                                  controller: _scrollController,
+                                  reverse: true,
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                  itemCount: messages.length,
+                                  itemBuilder: (context, index) {
+                                    final msg = messages[index];
+                                    final isModerator = msg['isModerator'] ?? false;
+                                    final senderName = (msg['senderName'] ?? 'لاعب').toString();
+
+                                    return Padding(
+                                      padding: const EdgeInsets.only(bottom: 10),
+                                      child: Row(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          CircleAvatar(
+                                            radius: 14,
+                                            backgroundColor: isModerator
+                                                ? Colors.amber.withOpacity(0.25)
+                                                : AppTheme.primaryBlue.withOpacity(0.18),
+                                            child: Text(
+                                              senderName.isNotEmpty ? senderName[0].toUpperCase() : '?',
+                                              style: TextStyle(
+                                                color: isModerator ? Colors.amber : AppTheme.primaryBlue,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 11,
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(width: 10),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+                                                Row(
+                                                  children: [
+                                                    Text(
+                                                      senderName,
+                                                      style: TextStyle(
+                                                        fontWeight: FontWeight.bold,
+                                                        fontSize: 12,
+                                                        color: isModerator ? Colors.amber : Colors.orangeAccent,
+                                                      ),
+                                                    ),
+                                                    if (isModerator) ...[
+                                                      const SizedBox(width: 4),
+                                                      Container(
+                                                        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                                                        decoration: BoxDecoration(
+                                                          color: Colors.amber.withOpacity(0.2),
+                                                          borderRadius: BorderRadius.circular(4),
+                                                        ),
+                                                        child: const Row(
+                                                          mainAxisSize: MainAxisSize.min,
+                                                          children: [
+                                                            Icon(Icons.shield, color: Colors.amber, size: 9),
+                                                            SizedBox(width: 2),
+                                                            Text('مشرف', style: TextStyle(color: Colors.amber, fontSize: 9, fontWeight: FontWeight.bold)),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ],
+                                                ),
+                                                const SizedBox(height: 2),
+                                                Text(
+                                                  msg['message'] ?? '',
+                                                  style: TextStyle(
+                                                    fontSize: 13,
+                                                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.9),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                );
+                              },
+                            ),
+                          ),
+
+                          // Chat Input Bar (Highly Visible)
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).colorScheme.surface,
+                              border: Border(top: BorderSide(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.08))),
+                              borderRadius: const BorderRadius.vertical(bottom: Radius.circular(18)),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.1),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, -2),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: TextField(
+                                    controller: _chatController,
+                                    style: const TextStyle(fontSize: 14),
+                                    onSubmitted: (_) => _sendMessage(sessionId),
+                                    textInputAction: TextInputAction.send,
+                                    decoration: InputDecoration(
+                                      hintText: 'أضف تعليقاً...',
+                                      hintStyle: TextStyle(fontSize: 13, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.45)),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(24),
+                                        borderSide: BorderSide.none,
+                                      ),
+                                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                      filled: true,
+                                      fillColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.06),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                InkWell(
+                                  onTap: _isSending ? null : () => _sendMessage(sessionId),
+                                  borderRadius: BorderRadius.circular(24),
+                                  child: Container(
+                                    padding: const EdgeInsets.all(12),
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        colors: [AppTheme.primaryBlue, Colors.blueAccent],
+                                      ),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: _isSending
+                                        ? const SizedBox(
+                                            width: 18,
+                                            height: 18,
+                                            child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                                          )
+                                        : const Icon(Icons.send_rounded, color: Colors.white, size: 18),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ],
               ),
             );
           },
         );
       },
-    );
-  }
-
-  Widget _buildChatSection(String? sessionId, BuildContext context) {
-    return Expanded(
-      child: Container(
-        margin: const EdgeInsets.fromLTRB(16, 8, 16, 12),
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.08)),
-        ),
-        child: Column(
-          children: [
-            // Chat Header
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.04),
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(18)),
-                border: Border(bottom: BorderSide(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.06))),
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.forum_rounded, color: AppTheme.primaryBlue, size: 18),
-                  const SizedBox(width: 8),
-                  const Text('الدردشة المباشرة', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                  const Spacer(),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: Colors.green.withOpacity(0.15),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.circle, color: Colors.green, size: 6),
-                        SizedBox(width: 4),
-                        Text('نشطة', style: TextStyle(color: Colors.green, fontSize: 10, fontWeight: FontWeight.bold)),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // Chat Messages List
-            Expanded(
-              child: StreamBuilder<List<Map<String, dynamic>>>(
-                stream: FirestoreService().getMatchChatStream(widget.matchId, sessionId: sessionId),
-                builder: (context, chatSnapshot) {
-                  if (!chatSnapshot.hasData) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-
-                  final messages = chatSnapshot.data!.reversed.toList();
-
-                  if (messages.isEmpty) {
-                    return Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.chat_bubble_outline_rounded, size: 36, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3)),
-                          const SizedBox(height: 8),
-                          Text(
-                            'كن أول من يشارك في محادثة البث! 👋',
-                            style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5)),
-                          ),
-                        ],
-                      ),
-                    );
-                  }
-
-                  return ListView.builder(
-                    controller: _scrollController,
-                    reverse: true,
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    itemCount: messages.length,
-                    itemBuilder: (context, index) {
-                      final msg = messages[index];
-                      final isModerator = msg['isModerator'] ?? false;
-                      final senderName = (msg['senderName'] ?? 'لاعب').toString();
-
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 10),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            CircleAvatar(
-                              radius: 14,
-                              backgroundColor: isModerator
-                                  ? Colors.amber.withOpacity(0.25)
-                                  : AppTheme.primaryBlue.withOpacity(0.18),
-                              child: Text(
-                                senderName.isNotEmpty ? senderName[0].toUpperCase() : '?',
-                                style: TextStyle(
-                                  color: isModerator ? Colors.amber : AppTheme.primaryBlue,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 11,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Text(
-                                        senderName,
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 12,
-                                          color: isModerator ? Colors.amber : Colors.orangeAccent,
-                                        ),
-                                      ),
-                                      if (isModerator) ...[
-                                        const SizedBox(width: 4),
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-                                          decoration: BoxDecoration(
-                                            color: Colors.amber.withOpacity(0.2),
-                                            borderRadius: BorderRadius.circular(4),
-                                          ),
-                                          child: const Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              Icon(Icons.shield, color: Colors.amber, size: 9),
-                                              SizedBox(width: 2),
-                                              Text('مشرف', style: TextStyle(color: Colors.amber, fontSize: 9, fontWeight: FontWeight.bold)),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ],
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    msg['message'] ?? '',
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.9),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  );
-                },
-              ),
-            ),
-
-            // Chat Input Bar (Highly Visible)
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surface,
-                border: Border(top: BorderSide(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.08))),
-                borderRadius: const BorderRadius.vertical(bottom: Radius.circular(18)),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 10,
-                    offset: const Offset(0, -2),
-                  ),
-                ],
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _chatController,
-                      style: const TextStyle(fontSize: 14),
-                      onSubmitted: (_) => _sendMessage(sessionId),
-                      textInputAction: TextInputAction.send,
-                      decoration: InputDecoration(
-                        hintText: 'أضف تعليقاً...',
-                        hintStyle: TextStyle(fontSize: 13, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.45)),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(24),
-                          borderSide: BorderSide.none,
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        filled: true,
-                        fillColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.06),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  InkWell(
-                    onTap: _isSending ? null : () => _sendMessage(sessionId),
-                    borderRadius: BorderRadius.circular(24),
-                    child: Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [AppTheme.primaryBlue, Colors.blueAccent],
-                        ),
-                        shape: BoxShape.circle,
-                      ),
-                      child: _isSending
-                          ? const SizedBox(
-                              width: 18,
-                              height: 18,
-                              child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
-                            )
-                          : const Icon(Icons.send_rounded, color: Colors.white, size: 18),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 

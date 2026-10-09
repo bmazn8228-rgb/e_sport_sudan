@@ -34,6 +34,7 @@ class _TournamentAdminDashboardScreenState extends State<TournamentAdminDashboar
 
   void _showAddTournamentDialog(BuildContext context) {
     final titleController = TextEditingController();
+    final descriptionController = TextEditingController();
     final prizeController = TextEditingController();
     final feeController = TextEditingController();
     final maxTeamsController = TextEditingController();
@@ -115,6 +116,13 @@ class _TournamentAdminDashboardScreenState extends State<TournamentAdminDashboar
                       controller: titleController,
                       validator: (v) => Validators.validateRequired(v, fieldName: 'اسم البطولة'),
                       decoration: InputDecoration(labelText: 'اسم البطولة'),
+                    ),
+                    SizedBox(height: 8),
+                    TextFormField(
+                      controller: descriptionController,
+                      validator: (v) => Validators.validateRequired(v, fieldName: 'وصف البطولة'),
+                      decoration: InputDecoration(labelText: 'وصف البطولة (نبذة، قوانين، شروط)'),
+                      maxLines: 3,
                     ),
                     SizedBox(height: 8),
                     DropdownButtonFormField<String>(
@@ -202,6 +210,7 @@ class _TournamentAdminDashboardScreenState extends State<TournamentAdminDashboar
 
                     final tournamentData = {
                       'title': titleController.text.trim(),
+                      'description': descriptionController.text.trim(),
                       'game': selectedGame,
                       'prizePool': prizeController.text.trim(),
                       'entryFee': int.tryParse(feeController.text.trim()) ?? 0,
@@ -406,6 +415,285 @@ class _TournamentAdminDashboardScreenState extends State<TournamentAdminDashboar
     );
   }
 
+  void _showPrizeDistributionDialog(BuildContext context, String tournamentId, String title) {
+    String? selectedLeaderId;
+    final amountController = TextEditingController();
+    bool isSubmitting = false;
+    int selectedRank = 1; // 1: First, 2: Second, 3: Third
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setState) {
+          final isKeyboardOpen = MediaQuery.of(ctx).viewInsets.bottom > 0;
+          return Container(
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surface,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.amber.withValues(alpha: 0.15),
+                  blurRadius: 20,
+                  spreadRadius: 5,
+                )
+              ]
+            ),
+            padding: EdgeInsets.only(
+              left: 24,
+              right: 24,
+              top: 24,
+              bottom: MediaQuery.of(ctx).viewInsets.bottom + 24,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 5,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20),
+                Row(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.amber.withValues(alpha: 0.15),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(Icons.emoji_events, color: Colors.amber, size: 28),
+                    ),
+                    SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('منصة التتويج والجوائز', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                          Text(title, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), fontSize: 13)),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 24),
+                
+                // Rank Selection
+                Text('اختر المركز (الرتبة)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                SizedBox(height: 12),
+                Row(
+                  children: [
+                    _buildRankSelector(1, 'الأول', Colors.amber, selectedRank, () => setState(() => selectedRank = 1)),
+                    SizedBox(width: 12),
+                    _buildRankSelector(2, 'الثاني', Colors.grey[400]!, selectedRank, () => setState(() => selectedRank = 2)),
+                    SizedBox(width: 12),
+                    _buildRankSelector(3, 'الثالث', Colors.brown[300]!, selectedRank, () => setState(() => selectedRank = 3)),
+                  ],
+                ),
+                SizedBox(height: 24),
+
+                StreamBuilder<List<Map<String, dynamic>>>(
+                  stream: _firestoreService.getTournamentRegistrationsStream(tournamentId),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(child: CircularProgressIndicator(color: AppTheme.primaryBlue));
+                    }
+                    final registrations = snapshot.data ?? [];
+                    if (registrations.isEmpty) {
+                      return Container(
+                        padding: EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Center(
+                          child: Text('لا توجد فرق مسجلة لمنحهم الجائزة', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54))),
+                        ),
+                      );
+                    }
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('الفريق الفائز بالمركز', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                        SizedBox(height: 8),
+                        DropdownButtonFormField<String>(
+                          value: selectedLeaderId,
+                          icon: Icon(Icons.arrow_drop_down_circle, color: AppTheme.primaryBlue),
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.04),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              borderSide: BorderSide.none,
+                            ),
+                            prefixIcon: Icon(Icons.shield, color: _getRankColor(selectedRank)),
+                          ),
+                          hint: Text('اختر الفريق لتتويجه...'),
+                          items: registrations.map((reg) {
+                            return DropdownMenuItem<String>(
+                              value: reg['leaderId'] as String?,
+                              child: Text('${reg['teamName']} (كابتن: ${reg['leaderName']})', overflow: TextOverflow.ellipsis),
+                            );
+                          }).toList(),
+                          onChanged: (val) {
+                            setState(() => selectedLeaderId = val);
+                          },
+                        ),
+                      ],
+                    );
+                  },
+                ),
+                SizedBox(height: 24),
+
+                Text('مبلغ الجائزة المخصص (ج.س)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                SizedBox(height: 8),
+                TextField(
+                  controller: amountController,
+                  keyboardType: TextInputType.number,
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  decoration: InputDecoration(
+                    hintText: 'مثال: 250,000',
+                    filled: true,
+                    fillColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.04),
+                    prefixIcon: Container(
+                      margin: EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.green.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Icon(Icons.payments, color: Colors.green),
+                    ),
+                    suffixText: 'ج.س',
+                    suffixStyle: TextStyle(fontWeight: FontWeight.bold, color: Colors.green),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                ),
+                
+                if (!isKeyboardOpen) SizedBox(height: 32) else SizedBox(height: 16),
+                
+                ElevatedButton(
+                  onPressed: isSubmitting ? null : () async {
+                    final amount = double.tryParse(amountController.text.trim()) ?? 0.0;
+                    if (selectedLeaderId == null || amount <= 0) {
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('الرجاء اختيار الفريق الفائز وتحديد مبلغ مالي صحيح ⚠️'), backgroundColor: Colors.red));
+                      return;
+                    }
+
+                    setState(() => isSubmitting = true);
+                    try {
+                      String rankName = selectedRank == 1 ? 'الأول' : selectedRank == 2 ? 'الثاني' : 'الثالث';
+                      await _firestoreService.distributePrizeManually(
+                        targetUserId: selectedLeaderId!,
+                        amount: amount,
+                        tournamentName: '$title (المركز $rankName)',
+                      );
+                      if (context.mounted) {
+                        Navigator.pop(ctx);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Row(
+                              children: [
+                                Icon(Icons.check_circle, color: Colors.white),
+                                SizedBox(width: 8),
+                                Expanded(child: Text('تم إيداع مبلغ $amount ج.س بنجاح في محفظة القائد! 🏆', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold))),
+                              ],
+                            ),
+                            backgroundColor: Colors.green,
+                            behavior: SnackBarBehavior.floating,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            margin: EdgeInsets.all(16),
+                          ),
+                        );
+                      }
+                    } catch (e) {
+                      if (context.mounted) {
+                        setState(() => isSubmitting = false);
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('فشل التوزيع: $e'), backgroundColor: Colors.red));
+                      }
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: _getRankColor(selectedRank),
+                    foregroundColor: selectedRank == 2 ? Colors.black : Colors.white,
+                    elevation: 0,
+                    minimumSize: Size(double.infinity, 56),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  ),
+                  child: isSubmitting
+                      ? CircularProgressIndicator(color: selectedRank == 2 ? Colors.black : Colors.white)
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.send_rounded),
+                            SizedBox(width: 8),
+                            Text('اعتماد وتحويل الجائزة للمحفظة', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                          ],
+                        ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Color _getRankColor(int rank) {
+    switch (rank) {
+      case 1: return Colors.amber;
+      case 2: return Colors.grey[400]!;
+      case 3: return Colors.brown[400]!;
+      default: return AppTheme.primaryBlue;
+    }
+  }
+
+  Widget _buildRankSelector(int rank, String label, Color color, int selectedRank, VoidCallback onTap) {
+    bool isSelected = rank == selectedRank;
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: Duration(milliseconds: 200),
+          padding: EdgeInsets.symmetric(vertical: 12),
+          decoration: BoxDecoration(
+            color: isSelected ? color : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: isSelected ? color.withValues(alpha: 0.5) : Colors.transparent,
+              width: 2,
+            ),
+            boxShadow: isSelected ? [
+              BoxShadow(color: color.withValues(alpha: 0.3), blurRadius: 8, spreadRadius: 1, offset: Offset(0, 4))
+            ] : [],
+          ),
+          child: Column(
+            children: [
+              Icon(Icons.military_tech, color: isSelected ? (rank == 2 ? Colors.black87 : Colors.white) : color, size: 28),
+              SizedBox(height: 4),
+              Text(
+                label,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: isSelected ? (rank == 2 ? Colors.black87 : Colors.white) : Theme.of(context).colorScheme.onSurface,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   String? _userRole;
 
   @override
@@ -516,23 +804,35 @@ class _TournamentAdminDashboardScreenState extends State<TournamentAdminDashboar
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          TextButton.icon(
-                            onPressed: () => _showRegistrationsDialog(context, t['id'], t['title'] ?? 'البطولة'),
-                            icon: Icon(Icons.people_outline, size: 18, color: AppTheme.primaryBlue),
-                            label: Text('المسجلين', style: TextStyle(color: AppTheme.primaryBlue)),
-                          ),
-                          SizedBox(width: 6),
-                          TextButton.icon(
-                            onPressed: () => _confirmDeleteTournament(t['id'], t['title'] ?? 'البطولة'),
-                            icon: Icon(Icons.delete_outline, size: 18, color: Colors.redAccent),
-                            label: Text('حذف', style: TextStyle(color: Colors.redAccent)),
-                          ),
-                          SizedBox(width: 6),
-                          TextButton.icon(
-                            onPressed: () => _updateStatus(t['id'], status),
-                            icon: Icon(Icons.edit, size: 18),
-                            label: Text('تغيير الحالة'),
-                            style: TextButton.styleFrom(foregroundColor: Colors.orange),
+                          Expanded(
+                            child: Wrap(
+                              alignment: WrapAlignment.end,
+                              spacing: 8,
+                              runSpacing: 8,
+                              children: [
+                                TextButton.icon(
+                                  onPressed: () => _showRegistrationsDialog(context, t['id'], t['title'] ?? 'البطولة'),
+                                  icon: Icon(Icons.people_outline, size: 16, color: AppTheme.primaryBlue),
+                                  label: Text('المسجلين', style: TextStyle(color: AppTheme.primaryBlue, fontSize: 12)),
+                                ),
+                                TextButton.icon(
+                                  onPressed: () => _showPrizeDistributionDialog(context, t['id'], t['title'] ?? 'البطولة'),
+                                  icon: Icon(Icons.monetization_on, size: 16, color: Colors.amber),
+                                  label: Text('توزيع الجائزة', style: TextStyle(color: Colors.amber, fontSize: 12)),
+                                ),
+                                TextButton.icon(
+                                  onPressed: () => _updateStatus(t['id'], status),
+                                  icon: Icon(Icons.edit, size: 16),
+                                  label: Text('الحالة', style: TextStyle(fontSize: 12)),
+                                  style: TextButton.styleFrom(foregroundColor: Colors.orange),
+                                ),
+                                TextButton.icon(
+                                  onPressed: () => _confirmDeleteTournament(t['id'], t['title'] ?? 'البطولة'),
+                                  icon: Icon(Icons.delete_outline, size: 16, color: Colors.redAccent),
+                                  label: Text('حذف', style: TextStyle(color: Colors.redAccent, fontSize: 12)),
+                                ),
+                              ],
+                            ),
                           ),
                         ],
                       )

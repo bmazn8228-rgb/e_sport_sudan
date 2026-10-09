@@ -58,9 +58,9 @@ class _RootScreenState extends State<RootScreen> {
           }
         }
 
-        // Regular players or custom-role users: fetch from Firestore
-        return FutureBuilder<UserModel?>(
-          future: _firestoreService.getUser(user.uid),
+        // Regular players or custom-role users: listen to real-time role changes from Firestore
+        return StreamBuilder<UserModel?>(
+          stream: _firestoreService.getUserStream(user.uid),
           builder: (context, userSnapshot) {
             if (userSnapshot.connectionState == ConnectionState.waiting) {
               return Scaffold(
@@ -73,7 +73,7 @@ class _RootScreenState extends State<RootScreen> {
             final userModel = userSnapshot.data;
             final effectiveRole = userModel?.role ?? UserRole.player;
 
-            // Route each role to its dedicated dashboard
+            // Route each role to its dedicated dashboard in real time
             switch (effectiveRole) {
               case UserRole.player:
                 return MainScreen();

@@ -1,3 +1,5 @@
+import 'stats_models.dart';
+
 enum UserRole {
   superAdmin,
   tournamentAdmin,
@@ -35,6 +37,21 @@ enum UserRole {
     }
   }
 
+  int get rank {
+    switch (this) {
+      case UserRole.superAdmin:
+        return 100;
+      case UserRole.tournamentAdmin:
+        return 80;
+      case UserRole.financeAdmin:
+        return 60;
+      case UserRole.referee:
+        return 40;
+      case UserRole.player:
+        return 10;
+    }
+  }
+
   String get displayNameArabic {
     switch (this) {
       case UserRole.superAdmin:
@@ -48,6 +65,38 @@ enum UserRole {
       case UserRole.player:
         return 'لاعب / قائد فريق 🎮';
     }
+  }
+
+  String get roleTitleArabic {
+    switch (this) {
+      case UserRole.superAdmin:
+        return 'مدير نظام أعلى (Super Admin)';
+      case UserRole.tournamentAdmin:
+        return 'منظم بطولات (Tournament Admin)';
+      case UserRole.financeAdmin:
+        return 'مسؤول مالي (Finance Admin)';
+      case UserRole.referee:
+        return 'حكم معتمد (Referee)';
+      case UserRole.player:
+        return 'لاعب عادي (Player)';
+    }
+  }
+
+  /// Whether this role has higher rank than [targetUserRole]
+  /// Strict rule: Only the Super Admin can promote or modify roles.
+  bool canPromoteUser(UserRole targetUserRole) {
+    return this == UserRole.superAdmin;
+  }
+
+  /// Whether this role is authorized to assign [candidateRole]
+  /// Strict rule: Only the Super Admin can assign roles.
+  bool canAssignRole(UserRole candidateRole) {
+    return this == UserRole.superAdmin;
+  }
+
+  /// Returns the list of roles that this admin is authorized to assign
+  List<UserRole> get availableRolesToAssign {
+    return UserRole.values.where((r) => canAssignRole(r)).toList();
   }
 }
 
@@ -108,6 +157,7 @@ class UserModel {
   final UserRole role;
   final String? teamId;
   final UserSettings settings;
+  final PlayerStats stats;
 
   UserModel({
     required this.uid,
@@ -121,7 +171,9 @@ class UserModel {
     this.role = UserRole.player,
     this.teamId,
     UserSettings? settings,
-  }) : settings = settings ?? UserSettings();
+    PlayerStats? stats,
+  }) : settings = settings ?? UserSettings(),
+       stats = stats ?? PlayerStats();
 
   Map<String, dynamic> toMap() {
     return {
@@ -136,6 +188,7 @@ class UserModel {
       'role': role.toValue(),
       'teamId': teamId,
       'settings': settings.toMap(),
+      'stats': stats.toMap(),
     };
   }
 
@@ -152,6 +205,7 @@ class UserModel {
       role: UserRole.fromValue(map['role']),
       teamId: map['teamId'],
       settings: UserSettings.fromMap(map['settings'] as Map<String, dynamic>?),
+      stats: PlayerStats.fromMap(map['stats'] as Map<String, dynamic>?),
     );
   }
 }

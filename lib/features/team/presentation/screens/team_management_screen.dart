@@ -3,11 +3,16 @@ import 'package:e_sport_sudan/core/widgets/esport_toast.dart';
 import 'package:e_sport_sudan/features/team/presentation/screens/team_search_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/services.dart';
 import 'package:e_sport_sudan/core/theme/app_theme.dart';
 import 'package:e_sport_sudan/core/services/firestore_service.dart';
+import 'package:e_sport_sudan/core/services/storage_service.dart';
 import 'package:e_sport_sudan/core/models/user_model.dart';
 import 'package:e_sport_sudan/features/profile/presentation/screens/player_search_screen.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'dart:io';
 
 class TeamManagementScreen extends StatefulWidget {
   const TeamManagementScreen({super.key});
@@ -80,12 +85,97 @@ class _TeamManagementScreenState extends State<TeamManagementScreen> {
     }
   }
 
+  Future<void> _updateTeamBio() async {
+    final bioController = TextEditingController(text: _teamData?['bio'] ?? '');
+    await showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        title: Text('السيرة الذاتية للفريق', style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+        content: TextField(
+          controller: bioController,
+          maxLines: 3,
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+          decoration: InputDecoration(
+            hintText: 'اكتب وصفاً أو سيرة ذاتية للفريق...',
+            hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)),
+            enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2))),
+            focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: AppTheme.primaryBlue)),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text('إلغاء', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6))),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryBlue),
+            onPressed: () async {
+              Navigator.pop(ctx);
+              setState(() => _isLoading = true);
+              try {
+                await FirebaseFirestore.instance.collection('teams').doc(_teamData!['id']).update({
+                  'bio': bioController.text.trim(),
+                });
+                await _loadData();
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('تم تحديث السيرة الذاتية بنجاح')));
+                }
+              } catch (e) {
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('حدث خطأ أثناء التحديث')));
+                  setState(() => _isLoading = false);
+                }
+              }
+            },
+            child: const Text('حفظ', style: TextStyle(color: Colors.black)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _updateTeamLogo() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery, maxWidth: 800, maxHeight: 800);
+    
+    if (pickedFile != null) {
+      setState(() => _isLoading = true);
+      try {
+        final File file = File(pickedFile.path);
+        final String? logoUrl = await StorageService().uploadImage(file, 'teams_logos');
+        if (logoUrl != null) {
+          await FirebaseFirestore.instance.collection('teams').doc(_teamData!['id']).update({
+            'logoUrl': logoUrl,
+          });
+          await _loadData();
+          if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('تم تحديث شعار الفريق بنجاح')));
+        } else {
+          throw Exception("Failed to upload image");
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('حدث خطأ أثناء رفع الشعار')));
+          setState(() => _isLoading = false);
+        }
+      }
+    }
+  }
+
   Future<void> _showCreateTeamDialog() async {
     final nameController = TextEditingController();
     final gameController = TextEditingController();
     final formKey = GlobalKey<FormState>();
     bool isCreating = false;
     String _joinType = 'approval';
+    String _selectedState = 'الخرطوم';
+    
+    final List<String> _sudanStates = [
+      'الخرطوم', 'الجزيرة', 'البحر الأحمر', 'كسلا', 'القضارف', 
+      'نهر النيل', 'الشمالية', 'شمال كردفان', 'جنوب كردفان', 'غرب كردفان', 
+      'شمال دارفور', 'جنوب دارفور', 'غرب دارفور', 'شرق دارفور', 'وسط دارفور', 
+      'سنار', 'النيل الأبيض', 'النيل الأزرق'
+    ];
 
     final authUser = FirebaseAuth.instance.currentUser;
     if (authUser == null) {
@@ -105,52 +195,72 @@ class _TeamManagementScreenState extends State<TeamManagementScreen> {
             title: Text('إنشاء فريق جديد', style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
             content: Form(
               key: formKey,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextFormField(
-                    controller: nameController,
-                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
-                    decoration: InputDecoration(
-                      labelText: 'اسم الفريق',
-                      labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54)),
-                      enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.24))),
-                      focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: AppTheme.primaryBlue)),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextFormField(
+                      controller: nameController,
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+                      decoration: InputDecoration(
+                        labelText: 'اسم الفريق',
+                        labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54)),
+                        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.24))),
+                        focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: AppTheme.primaryBlue)),
+                      ),
+                      validator: (v) => v == null || v.trim().isEmpty ? 'يرجى إدخال اسم الفريق' : null,
                     ),
-                    validator: (v) => v == null || v.trim().isEmpty ? 'يرجى إدخال اسم الفريق' : null,
-                  ),
-                  SizedBox(height: 12),
-                  TextFormField(
-                    controller: gameController,
-                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
-                    decoration: InputDecoration(
-                      labelText: 'اللعبة (مثال: PUBG, Free Fire)',
-                      labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54)),
-                      enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.24))),
-                      focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: AppTheme.primaryBlue)),
+                    SizedBox(height: 12),
+                    TextFormField(
+                      controller: gameController,
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+                      decoration: InputDecoration(
+                        labelText: 'اللعبة (مثال: PUBG, Free Fire)',
+                        labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54)),
+                        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.24))),
+                        focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: AppTheme.primaryBlue)),
+                      ),
+                      validator: (v) => v == null || v.trim().isEmpty ? 'يرجى إدخال اسم اللعبة' : null,
                     ),
-                    validator: (v) => v == null || v.trim().isEmpty ? 'يرجى إدخال اسم اللعبة' : null,
-                  ),
-                  SizedBox(height: 16),
-                  DropdownButtonFormField<String>(
-                    value: _joinType,
-                    dropdownColor: Theme.of(context).colorScheme.surface,
-                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
-                    decoration: InputDecoration(
-                      labelText: 'نوع الانضمام للفريق',
-                      labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54)),
-                      enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.24))),
-                      focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: AppTheme.primaryBlue)),
+                    SizedBox(height: 16),
+                    DropdownButtonFormField<String>(
+                      value: _joinType,
+                      dropdownColor: Theme.of(context).colorScheme.surface,
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+                      decoration: InputDecoration(
+                        labelText: 'نوع الانضمام للفريق',
+                        labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54)),
+                        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.24))),
+                        focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: AppTheme.primaryBlue)),
+                      ),
+                      items: [
+                        DropdownMenuItem(value: 'approval', child: Text('بموافقة القائد فقط 🔒')),
+                        DropdownMenuItem(value: 'public', child: Text('مفتوح للجميع 🌍')),
+                      ],
+                      onChanged: (val) {
+                        if (val != null) setStateDialog(() => _joinType = val);
+                      },
                     ),
-                    items: [
-                      DropdownMenuItem(value: 'approval', child: Text('بموافقة القائد فقط 🔒')),
-                      DropdownMenuItem(value: 'public', child: Text('مفتوح للجميع 🌍')),
-                    ],
-                    onChanged: (val) {
-                      if (val != null) setStateDialog(() => _joinType = val);
-                    },
-                  ),
-                ],
+                    SizedBox(height: 16),
+                    DropdownButtonFormField<String>(
+                      value: _selectedState,
+                      dropdownColor: Theme.of(context).colorScheme.surface,
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+                      decoration: InputDecoration(
+                        labelText: 'ولاية الفريق',
+                        labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54)),
+                        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.24))),
+                        focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: AppTheme.primaryBlue)),
+                      ),
+                      items: _sudanStates.map((state) {
+                        return DropdownMenuItem(value: state, child: Text(state));
+                      }).toList(),
+                      onChanged: (val) {
+                        if (val != null) setStateDialog(() => _selectedState = val);
+                      },
+                    ),
+                  ],
+                ),
               ),
             ),
             actions: [
@@ -190,6 +300,7 @@ class _TeamManagementScreenState extends State<TeamManagementScreen> {
                         'leaderId': authUser.uid,
                         'roster': [leaderData],
                         'joinType': _joinType,
+                        'state': _selectedState,
                         'pendingRequests': [],
                         'createdAt': DateTime.now().toIso8601String(),
                       };
@@ -376,6 +487,11 @@ class _TeamManagementScreenState extends State<TeamManagementScreen> {
     final points = _teamData?['points'] ?? 0;
     final game = _teamData?['game'] ?? 'غير محدد';
     final roster = _teamData?['roster'] as List<dynamic>? ?? [];
+    final bio = _teamData?['bio']?.toString() ?? '';
+    final logoUrl = _teamData?['logoUrl']?.toString() ?? '';
+    
+    final currentUserId = FirebaseAuth.instance.currentUser?.uid;
+    bool isLeader = _teamData?['leaderId'] == currentUserId;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -394,10 +510,29 @@ class _TeamManagementScreenState extends State<TeamManagementScreen> {
           ),
           child: Column(
             children: [
-              CircleAvatar(
-                radius: 40,
-                backgroundColor: Colors.black26,
-                child: Icon(Icons.shield, size: 40, color: AppTheme.primaryBlue),
+              Stack(
+                alignment: Alignment.bottomRight,
+                children: [
+                  CircleAvatar(
+                    radius: 40,
+                    backgroundColor: Colors.black26,
+                    backgroundImage: logoUrl.isNotEmpty ? CachedNetworkImageProvider(logoUrl) : null,
+                    child: logoUrl.isEmpty ? Icon(Icons.shield, size: 40, color: AppTheme.primaryBlue) : null,
+                  ),
+                  if (isLeader)
+                    GestureDetector(
+                      onTap: _updateTeamLogo,
+                      child: Container(
+                        padding: EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: AppTheme.primaryBlue,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Theme.of(context).colorScheme.surface, width: 2),
+                        ),
+                        child: Icon(Icons.edit, size: 14, color: Colors.black),
+                      ),
+                    ),
+                ],
               ),
               SizedBox(height: 16),
               Text(teamName, style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface)),
@@ -427,6 +562,25 @@ class _TeamManagementScreenState extends State<TeamManagementScreen> {
               ),
               SizedBox(height: 10),
               Text('لعبة: $game', style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7))),
+              if (bio.isNotEmpty) ...[
+                SizedBox(height: 12),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  child: Text(
+                    bio, 
+                    textAlign: TextAlign.center, 
+                    style: TextStyle(fontSize: 13, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.8), fontStyle: FontStyle.italic),
+                  ),
+                ),
+              ],
+              if (isLeader) ...[
+                SizedBox(height: 12),
+                TextButton.icon(
+                  onPressed: _updateTeamBio,
+                  icon: Icon(Icons.edit_note_rounded, size: 18, color: AppTheme.primaryBlue),
+                  label: Text(bio.isEmpty ? 'إضافة سيرة ذاتية' : 'تعديل السيرة الذاتية', style: TextStyle(color: AppTheme.primaryBlue)),
+                ),
+              ],
               SizedBox(height: 16),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,

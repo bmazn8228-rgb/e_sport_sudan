@@ -16,16 +16,7 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Configure Status bar and Navigation bar for all Android skins (One UI, HyperOS, HiOS, ColorOS, etc.)
-  SystemChrome.setSystemUIOverlayStyle(
-    SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.light,
-      statusBarBrightness: Brightness.dark,
-      systemNavigationBarColor: const Color(0xFF0A0E17),
-      systemNavigationBarIconBrightness: Brightness.light,
-    ),
-  );
+  // System UI overlay is now handled inside _buildApp based on the current theme mode
 
   // Initialize Firebase with the connected project configuration
   try {
@@ -51,7 +42,7 @@ class ESportSudanApp extends StatelessWidget {
         if (authSnapshot.connectionState == ConnectionState.waiting) {
           return MaterialApp(
             home: Scaffold(
-              backgroundColor: const Color(0xFF0A0E17),
+              backgroundColor: const Color(0xFF0F172A),
               body: Center(child: CircularProgressIndicator(color: AppTheme.primaryBlue)),
             ),
           );
@@ -71,11 +62,22 @@ class ESportSudanApp extends StatelessWidget {
   }
 
   Widget _buildApp(BuildContext context, UserSettings settings) {
+    final themeMode = settings.isDarkMode ? AppTheme.darkTheme : AppTheme.lightTheme;
+    SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: settings.isDarkMode ? Brightness.light : Brightness.dark,
+        statusBarBrightness: settings.isDarkMode ? Brightness.dark : Brightness.light,
+        systemNavigationBarColor: themeMode.scaffoldBackgroundColor,
+        systemNavigationBarIconBrightness: settings.isDarkMode ? Brightness.light : Brightness.dark,
+      ),
+    );
+
     return MaterialApp(
       title: 'E-Sport Sudan',
       navigatorKey: navigatorKey,
       debugShowCheckedModeBanner: false,
-      theme: settings.isDarkMode ? AppTheme.darkTheme : AppTheme.lightTheme,
+      theme: themeMode,
       builder: (context, child) {
         return NetworkAwareWidget(
           child: Directionality(

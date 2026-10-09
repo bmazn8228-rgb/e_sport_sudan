@@ -34,7 +34,7 @@ class TournamentDetailsScreen extends StatelessWidget {
     final fee = tournament['registrationFee'] ?? tournament['entryFee'] ?? '';
     final status = tournament['status'] ?? 'open';
     final description = tournament['description'] ?? 'لا يوجد وصف متاح.';
-    final imageUrl = tournament['imageUrl'] ?? '';
+    final imageUrl = tournament['imageUrl'] ?? tournament['posterUrl'] ?? '';
 
     return Scaffold(
       body: CustomScrollView(
@@ -72,11 +72,11 @@ class TournamentDetailsScreen extends StatelessWidget {
                       const SizedBox(width: 10),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                        decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.06), borderRadius: BorderRadius.circular(8)),
+                        decoration: BoxDecoration(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.06), borderRadius: BorderRadius.circular(8)),
                         child: Row(children: [
-                          const Icon(Icons.sports_esports, color: Colors.white54, size: 14),
+                          Icon(Icons.sports_esports, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), size: 14),
                           const SizedBox(width: 6),
-                          Text(game, style: const TextStyle(color: Colors.white70, fontSize: 12)),
+                          Text(game, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.70), fontSize: 12)),
                         ]),
                       ),
                     ],
@@ -98,8 +98,8 @@ class TournamentDetailsScreen extends StatelessWidget {
                   const SizedBox(height: 8),
                   Container(
                     padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(color: AppTheme.cardDark, borderRadius: BorderRadius.circular(12)),
-                    child: Text(description, style: const TextStyle(color: Colors.white70, height: 1.6)),
+                    decoration: BoxDecoration(color: Theme.of(context).colorScheme.surface, borderRadius: BorderRadius.circular(12)),
+                    child: Text(description, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.70), height: 1.6)),
                   ),
                   const SizedBox(height: 24),
 
@@ -117,8 +117,8 @@ class TournamentDetailsScreen extends StatelessWidget {
                         if (regs.isEmpty) {
                           return Container(
                             padding: const EdgeInsets.all(20),
-                            decoration: BoxDecoration(color: AppTheme.cardDark, borderRadius: BorderRadius.circular(12)),
-                            child: const Center(child: Text('لم يتسجل أحد بعد. كن الأول!', style: TextStyle(color: Colors.white54))),
+                            decoration: BoxDecoration(color: Theme.of(context).colorScheme.surface, borderRadius: BorderRadius.circular(12)),
+                            child: Center(child: Text('لم يتسجل أحد بعد. كن الأول!', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54)))),
                           );
                         }
                         return Column(
@@ -130,7 +130,7 @@ class TournamentDetailsScreen extends StatelessWidget {
                                   style: const TextStyle(color: AppTheme.primaryBlue, fontWeight: FontWeight.bold)),
                             ),
                             title: Text(reg['teamName'] ?? 'فريق', style: const TextStyle(fontWeight: FontWeight.bold)),
-                            subtitle: Text('الكابتن: ${reg['leaderName'] ?? 'غير معروف'}', style: const TextStyle(color: Colors.white54, fontSize: 12)),
+                            subtitle: Text('الكابتن: ${reg['leaderName'] ?? 'غير معروف'}', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 12)),
                             trailing: const Icon(Icons.check_circle, color: AppTheme.primaryBlue, size: 16),
                           )).toList(),
                         );

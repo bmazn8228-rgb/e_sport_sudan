@@ -52,7 +52,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     try {
       final user = AuthService().currentUser;
       if (user != null) {
-        UserModel? userModel = await FirestoreService().getUser(user.uid);
+        UserModel? userModel = await FirestoreService().getUser(user.uid, forceRefresh: true);
         
         final adminRole = AuthService().getRoleForEmail(user.email ?? '');
 

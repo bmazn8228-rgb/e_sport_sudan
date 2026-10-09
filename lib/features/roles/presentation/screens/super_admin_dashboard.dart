@@ -1,9 +1,6 @@
-import 'package:e_sport_sudan/core/services/notification_service.dart';
-import 'package:e_sport_sudan/core/widgets/esport_toast.dart';
 import 'package:flutter/material.dart';
-import 'package:e_sport_sudan/core/services/notification_service.dart';
-import 'package:e_sport_sudan/core/widgets/esport_toast.dart';
 import 'package:e_sport_sudan/core/theme/app_theme.dart';
+import 'package:e_sport_sudan/core/models/user_model.dart';
 import 'package:e_sport_sudan/core/services/auth_service.dart';
 import 'package:e_sport_sudan/features/auth/presentation/screens/login_screen.dart';
 import 'package:e_sport_sudan/core/services/firestore_service.dart';
@@ -14,7 +11,7 @@ import 'package:e_sport_sudan/features/roles/presentation/screens/organizer_dash
 import 'package:e_sport_sudan/features/roles/presentation/screens/organizer_complaints_screen.dart';
 import 'package:e_sport_sudan/features/roles/presentation/screens/organizer_teams_screen.dart';
 import 'package:e_sport_sudan/features/roles/presentation/screens/admin_news_management_screen.dart';
-import 'package:e_sport_sudan/features/roles/presentation/screens/admin_news_management_screen.dart';
+import 'package:e_sport_sudan/features/roles/presentation/screens/registered_players_screen.dart';
 import 'referee_dashboard.dart';
 import 'package:e_sport_sudan/features/team/presentation/screens/team_management_screen.dart';
 
@@ -145,7 +142,9 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard> {
             SizedBox(height: 12),
             Row(
               children: [
-                _buildMetricBox('اللاعبين المسجلين', '${_metrics?['usersCount'] ?? 0}', Icons.person, AppTheme.primaryBlue, () {}),
+                _buildMetricBox('اللاعبين المسجلين', '${_metrics?['usersCount'] ?? 0}', Icons.person, AppTheme.primaryBlue, () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => const RegisteredPlayersScreen()));
+                }),
                 SizedBox(width: 10),
                 _buildMetricBox('الفرق المعتمدة', '${_metrics?['teamsCount'] ?? 0} فريق', Icons.shield, Colors.blue, () {
                   Navigator.push(context, MaterialPageRoute(builder: (context) => OrganizerTeamsScreen()));
@@ -177,6 +176,14 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard> {
               ),
               child: Column(
                 children: [
+                  ListTile(
+                    leading: Icon(Icons.people_alt_rounded, color: AppTheme.primaryBlue),
+                    title: Text('دليل اللاعبين المسجلين ونظام الترقيات', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                    subtitle: Text('عرض كافة اللاعبين المسجلين وترقية الصلاحيات وفق الهيكل الرتبي', style: TextStyle(fontSize: 11, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54))),
+                    trailing: Icon(Icons.arrow_forward_ios, size: 14),
+                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const RegisteredPlayersScreen())),
+                  ),
+                  Divider(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05), height: 1),
                   ListTile(
                     leading: Icon(Icons.account_balance, color: Colors.greenAccent),
                     title: Text('مراجعة طلبات شحن الرصيد والإيداعات', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
@@ -226,9 +233,13 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text('إدارة المستخدمين والصلاحيات', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                Text(
-                  'بحث وترقية فورية',
-                  style: TextStyle(fontSize: 11, color: AppTheme.primaryBlue.withValues(alpha: 0.8)),
+                TextButton.icon(
+                  onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const RegisteredPlayersScreen())),
+                  icon: Icon(Icons.open_in_new_rounded, size: 14, color: AppTheme.primaryBlue),
+                  label: Text(
+                    'عرض كل اللاعبين (${_metrics?['usersCount'] ?? ''})',
+                    style: TextStyle(fontSize: 12, color: AppTheme.primaryBlue, fontWeight: FontWeight.bold),
+                  ),
                 ),
               ],
             ),
@@ -440,11 +451,23 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard> {
   }
 
   void _showRoleChangeBottomSheet(BuildContext context, Map<String, dynamic> user) {
-    final currentRole = user['role'] ?? 'player';
+    final rawRole = user['role'] as String?;
+    final targetUserRole = UserRole.fromValue(rawRole);
     final userId = (user['uid'] ?? user['id'] ?? '').toString();
+    const adminRole = UserRole.superAdmin;
 
     if (userId.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('خطأ: لا يوجد معرّف للمستخدم')));
+      return;
+    }
+
+    if (!adminRole.canPromoteUser(targetUserRole)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('لا تملك صلاحية تعديل رتبة مساوية أو أعلى من رتبتك الحالية (${targetUserRole.displayNameArabic}) 🔒'),
+          backgroundColor: Colors.deepOrangeAccent,
+        ),
+      );
       return;
     }
 
@@ -459,15 +482,26 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('تغيير صلاحيات: ${user['displayName'] ?? 'المستخدم'}', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              Text('ترقية صلاحيات: ${user['displayName'] ?? 'المستخدم'}', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               SizedBox(height: 6),
-              Text('اختر الدور الجديد لهذا المستخدم. سيتم تحديث الصلاحية فوراً في Firebase.', style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54))),
+              Text(
+                'الرتبة الحالية: ${targetUserRole.displayNameArabic} (مستوى ${targetUserRole.rank}). اختر الرتبة الجديدة وفق الصلاحيات المتاحة:',
+                style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54)),
+              ),
               SizedBox(height: 16),
-              _buildRoleOption(ctx, userId, 'super_admin', 'مدير نظام أعلى (Super Admin)', Icons.security, Colors.purple, currentRole),
-              _buildRoleOption(ctx, userId, 'tournament_admin', 'منظم بطولات (Tournament Admin)', Icons.emoji_events, Colors.orange, currentRole),
-              _buildRoleOption(ctx, userId, 'referee', 'حكم معتمد (Referee)', Icons.sports, Colors.blue, currentRole),
-              _buildRoleOption(ctx, userId, 'finance_admin', 'مسؤول مالي (Finance Admin)', Icons.account_balance, Colors.teal, currentRole),
-              _buildRoleOption(ctx, userId, 'player', 'لاعب عادي (Player)', Icons.person, AppTheme.primaryBlue, currentRole),
+              ...UserRole.values.map((role) {
+                final isEligible = adminRole.canAssignRole(role);
+                return _buildRoleOption(
+                  ctx,
+                  userId,
+                  role.toValue(),
+                  role.roleTitleArabic,
+                  _getRoleIconForDashboard(role),
+                  _getRoleColorForDashboard(role),
+                  targetUserRole.toValue(),
+                  isEligible: isEligible,
+                );
+              }),
             ],
           ),
         );
@@ -475,29 +509,78 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard> {
     );
   }
 
-  Widget _buildRoleOption(BuildContext context, String userId, String roleValue, String roleName, IconData icon, Color color, String currentRole) {
+  IconData _getRoleIconForDashboard(UserRole role) {
+    switch (role) {
+      case UserRole.superAdmin:
+        return Icons.security;
+      case UserRole.tournamentAdmin:
+        return Icons.emoji_events;
+      case UserRole.referee:
+        return Icons.sports;
+      case UserRole.financeAdmin:
+        return Icons.account_balance;
+      case UserRole.player:
+        return Icons.person;
+    }
+  }
+
+  Color _getRoleColorForDashboard(UserRole role) {
+    switch (role) {
+      case UserRole.superAdmin:
+        return Colors.purpleAccent;
+      case UserRole.tournamentAdmin:
+        return Colors.orange;
+      case UserRole.referee:
+        return Colors.blue;
+      case UserRole.financeAdmin:
+        return Colors.teal;
+      case UserRole.player:
+        return AppTheme.primaryBlue;
+    }
+  }
+
+  Widget _buildRoleOption(
+    BuildContext context,
+    String userId,
+    String roleValue,
+    String roleName,
+    IconData icon,
+    Color color,
+    String currentRole, {
+    bool isEligible = true,
+  }) {
     final isSelected = currentRole == roleValue;
     return ListTile(
-      leading: Icon(icon, color: color),
-      title: Text(roleName, style: TextStyle(color: isSelected ? color : Theme.of(context).colorScheme.onSurface, fontWeight: isSelected ? FontWeight.bold : FontWeight.normal)),
-      trailing: isSelected ? Icon(Icons.check_circle, color: color) : null,
-      onTap: () async {
-        final messenger = ScaffoldMessenger.of(context);
-        Navigator.pop(context);
-        try {
-          await FirestoreService().updateUserRole(userId, roleValue);
-          messenger.showSnackBar(
-            SnackBar(
-              content: Text('تم تغيير الصلاحية إلى $roleName بنجاح ✅', style: TextStyle(color: Colors.black)),
-              backgroundColor: AppTheme.primaryBlue,
-            ),
-          );
-        } catch (e) {
-          messenger.showSnackBar(
-            SnackBar(content: Text('فشل تغيير الصلاحية: $e ❌'), backgroundColor: Colors.red),
-          );
-        }
-      },
+      enabled: isEligible,
+      leading: Icon(icon, color: isEligible ? color : Colors.grey),
+      title: Text(
+        roleName,
+        style: TextStyle(
+          color: isEligible ? (isSelected ? color : Theme.of(context).colorScheme.onSurface) : Colors.grey,
+          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+        ),
+      ),
+      subtitle: !isEligible ? Text('غير متاح (يتطلب رتبة أعلى)', style: TextStyle(color: Colors.redAccent, fontSize: 10)) : null,
+      trailing: isSelected ? Icon(Icons.check_circle, color: color) : (!isEligible ? Icon(Icons.lock, size: 16, color: Colors.grey) : null),
+      onTap: (!isEligible || isSelected)
+          ? null
+          : () async {
+              final messenger = ScaffoldMessenger.of(context);
+              Navigator.pop(context);
+              try {
+                await FirestoreService().updateUserRole(userId, roleValue);
+                messenger.showSnackBar(
+                  SnackBar(
+                    content: Text('تم تغيير الصلاحية إلى $roleName بنجاح ✅', style: TextStyle(color: Colors.black)),
+                    backgroundColor: AppTheme.primaryBlue,
+                  ),
+                );
+              } catch (e) {
+                messenger.showSnackBar(
+                  SnackBar(content: Text('فشل تغيير الصلاحية: $e ❌'), backgroundColor: Colors.red),
+                );
+              }
+            },
     );
   }
 }

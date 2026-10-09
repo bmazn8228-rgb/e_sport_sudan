@@ -132,3 +132,69 @@ exports.onMatchScheduled = functions.firestore
     }
   });
 
+// ─────────────────────────────────────────────────────────────────────────────
+// 4. إشعار عند نشر خبر جديد (News)
+// ─────────────────────────────────────────────────────────────────────────────
+exports.onNewsAdded = functions.firestore
+  .document("news/{newsId}")
+  .onCreate(async (snap, context) => {
+    const newsData = snap.data();
+    
+    const payload = {
+      notification: {
+        title: "خبر جديد! 📰",
+        body: newsData.title || "تم نشر خبر جديد في التطبيق.",
+      },
+      data: {
+        type: "news",
+        newsId: context.params.newsId,
+      }
+    };
+
+    try {
+      const response = await admin.messaging().sendToTopic("general", payload);
+      console.log("News notification sent:", response);
+      return null;
+    } catch (error) {
+      console.error("Error sending news notification:", error);
+      return null;
+    }
+  });
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 5. إشعار تلقائي لأي تنبيه شخصي في التطبيق
+// ─────────────────────────────────────────────────────────────────────────────
+exports.onUserNotificationAdded = functions.firestore
+  .document("users/{userId}/notifications/{notificationId}")
+  .onCreate(async (snap, context) => {
+    const notifData = snap.data();
+    const userId = context.params.userId;
+
+    try {
+      const userDoc = await admin.firestore().collection("users").doc(userId).get();
+      const fcmToken = userDoc.data()?.fcmToken;
+
+      if (!fcmToken) {
+        console.log(`No FCM token for user ${userId}, skipping push notification.`);
+        return null;
+      }
+
+      const message = {
+        notification: {
+          title: notifData.title || "إشعار جديد",
+          body: notifData.body || "لديك تنبيه جديد في التطبيق.",
+        },
+        data: {
+          type: notifData.type || "general",
+        },
+        token: fcmToken,
+      };
+
+      const response = await admin.messaging().send(message);
+      console.log(`Push notification sent to user ${userId}:`, response);
+      return null;
+    } catch (error) {
+      console.error(`Error sending push notification to user ${userId}:`, error);
+      return null;
+    }
+  });

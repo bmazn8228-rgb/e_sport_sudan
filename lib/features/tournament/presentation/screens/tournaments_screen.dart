@@ -347,10 +347,25 @@ class _TournamentsScreenState extends State<TournamentsScreen> {
           ),
           SizedBox(height: 14),
 
-          // Title
-          Text(
-            title,
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, height: 1.2),
+          Row(
+            children: [
+              if ((t['logoUrl'] ?? '').isNotEmpty) ...[
+                CircleAvatar(
+                  radius: 20,
+                  backgroundImage: NetworkImage(t['logoUrl']),
+                  backgroundColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
+                ),
+                SizedBox(width: 12),
+              ],
+              Expanded(
+                child: Text(
+                  title,
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, height: 1.2),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
           ),
           SizedBox(height: 10),
 

@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:top_snackbar_flutter/top_snack_bar.dart';
 import '../widgets/esport_toast.dart';
 import '../../main.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -32,11 +34,28 @@ class NotificationService {
     // Get FCM Token
     String? token = await _fcm.getToken();
     debugPrint("FCM Token: $token");
-    // Optionally: Update token in Firestore User document here
+    
+    // Save token to Firestore if user is logged in
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null && token != null) {
+      await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+        'fcmToken': token,
+      }, SetOptions(merge: true));
+    }
+
+    // Subscribe to general topic for global news and announcements
+    await _fcm.subscribeToTopic('general');
+    debugPrint('Subscribed to general topic');
 
     // Listen to token refresh
-    _fcm.onTokenRefresh.listen((newToken) {
+    _fcm.onTokenRefresh.listen((newToken) async {
       debugPrint("FCM Token refreshed: $newToken");
+      final currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser != null) {
+        await FirebaseFirestore.instance.collection('users').doc(currentUser.uid).set({
+          'fcmToken': newToken,
+        }, SetOptions(merge: true));
+      }
     });
 
     // Background handler

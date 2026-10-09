@@ -131,13 +131,7 @@ class _MatchControlRoomState extends State<MatchControlRoom> {
 
   Future<void> _updateStreamUrl() async {
     final rawInput = _youtubeController.text.trim();
-    if (rawInput.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('يرجى إدخال رابط أو معرّف فيديو YouTube ⚠️'), backgroundColor: Colors.red),
-      );
-      return;
-    }
-    final videoId = YoutubePlayer.convertUrlToId(rawInput) ?? rawInput;
+    final videoId = rawInput.isEmpty ? '' : (YoutubePlayer.convertUrlToId(rawInput) ?? rawInput);
 
     setState(() => _isLoading = true);
     try {
@@ -146,7 +140,8 @@ class _MatchControlRoomState extends State<MatchControlRoom> {
         videoId,
       );
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('تم تحديث رابط البث المباشر بنجاح ✅', style: TextStyle(color: Colors.black)), backgroundColor: AppTheme.primaryBlue));
+        final message = videoId.isEmpty ? 'تم إنهاء البث المباشر بنجاح 🛑' : 'تم تحديث رابط البث المباشر بنجاح ✅';
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)), backgroundColor: videoId.isEmpty ? Colors.orange : AppTheme.primaryBlue));
       }
     } catch (e) {
       if (mounted) {
@@ -277,10 +272,27 @@ class _MatchControlRoomState extends State<MatchControlRoom> {
                   SizedBox(height: 16),
                   SizedBox(
                     width: double.infinity,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
+                    child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent, padding: EdgeInsets.symmetric(vertical: 12)),
                       onPressed: _isLoading ? null : _updateStreamUrl,
-                      child: Text('تحديث رابط البث المباشر', style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+                      icon: Icon(Icons.live_tv, color: Theme.of(context).colorScheme.onSurface),
+                      label: Text('تحديث رابط البث المباشر 📡', style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold)),
+                    ),
+                  ),
+                  SizedBox(height: 12),
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(color: Colors.redAccent),
+                        padding: EdgeInsets.symmetric(vertical: 12),
+                      ),
+                      onPressed: _isLoading ? null : () {
+                        _youtubeController.clear();
+                        _updateStreamUrl();
+                      },
+                      icon: Icon(Icons.stop_circle, color: Colors.redAccent),
+                      label: Text('إنهاء البث 🛑', style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold)),
                     ),
                   ),
                 ],

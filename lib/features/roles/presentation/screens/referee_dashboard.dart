@@ -8,6 +8,7 @@ import 'package:e_sport_sudan/core/services/firestore_service.dart';
 import 'package:e_sport_sudan/features/admin/presentation/screens/referee_dashboard_screen.dart';
 import 'package:e_sport_sudan/core/services/auth_service.dart';
 import 'package:e_sport_sudan/features/auth/presentation/screens/login_screen.dart';
+import 'package:e_sport_sudan/core/widgets/live_matches_section.dart';
 
 class RefereeDashboard extends StatefulWidget {
   RefereeDashboard({super.key});
@@ -285,8 +286,15 @@ class _RefereeDashboardState extends State<RefereeDashboard> with SingleTickerPr
   }
 
   Widget _buildLiveControlRoomView() {
-    return StreamBuilder<List<Map<String, dynamic>>>(
-      stream: _firestoreService.getAllMatchesStream(),
+    return Column(
+      children: [
+        const Padding(
+          padding: EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
+          child: LiveMatchesSection(),
+        ),
+        Expanded(
+          child: StreamBuilder<List<Map<String, dynamic>>>(
+            stream: _firestoreService.getAllMatchesStream(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator(color: AppTheme.primaryBlue));
@@ -330,6 +338,9 @@ class _RefereeDashboardState extends State<RefereeDashboard> with SingleTickerPr
           },
         );
       },
+    ),
+    ), // This closes Expanded
+    ],
     );
   }
 

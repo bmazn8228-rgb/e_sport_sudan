@@ -14,7 +14,30 @@ class RankingsScreen extends StatefulWidget {
 class _RankingsScreenState extends State<RankingsScreen> {
   int _selectedTabIndex = 0; // 0: الفرق, 1: اللاعبين, 2: الألعاب/الإحصائيات
   String _selectedGame = 'PUBG Mobile';
+  String _selectedState = 'السودان'; // Default is all of Sudan
   final List<String> _games = ['PUBG Mobile', 'EA FC 25', 'Free Fire', 'Valorant'];
+  
+  final List<String> _sudanStates = [
+    'السودان', // General
+    'الخرطوم',
+    'الجزيرة',
+    'البحر الأحمر',
+    'كسلا',
+    'القضارف',
+    'نهر النيل',
+    'الشمالية',
+    'شمال كردفان',
+    'جنوب كردفان',
+    'غرب كردفان',
+    'شمال دارفور',
+    'جنوب دارفور',
+    'غرب دارفور',
+    'شرق دارفور',
+    'وسط دارفور',
+    'سنار',
+    'النيل الأبيض',
+    'النيل الأزرق',
+  ];
 
   final FirestoreService _firestoreService = FirestoreService();
 
@@ -22,6 +45,12 @@ class _RankingsScreenState extends State<RankingsScreen> {
     if (_selectedTabIndex == index) return;
     HapticFeedback.lightImpact();
     setState(() => _selectedTabIndex = index);
+  }
+
+  void _onStateChanged(String? state) {
+    if (state == null || _selectedState == state) return;
+    HapticFeedback.lightImpact();
+    setState(() => _selectedState = state);
   }
 
   void _onGameChanged(String game) {
@@ -140,6 +169,49 @@ class _RankingsScreenState extends State<RankingsScreen> {
               ),
             ),
           ),
+          
+          if (_selectedTabIndex != 2) ...[
+            SizedBox(height: 12),
+            // State Selector
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.0),
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1)),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.location_on_rounded, size: 18, color: AppTheme.primaryBlue),
+                    SizedBox(width: 8),
+                    Text('المنطقة:', style: TextStyle(fontSize: 13, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7))),
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<String>(
+                          value: _selectedState,
+                          isExpanded: true,
+                          icon: Icon(Icons.keyboard_arrow_down_rounded, color: AppTheme.primaryBlue),
+                          dropdownColor: Theme.of(context).colorScheme.surface,
+                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
+                          items: _sudanStates.map((state) {
+                            return DropdownMenuItem(
+                              value: state,
+                              child: Text(state == 'السودان' ? 'على مستوى السودان' : 'ولاية $state'),
+                            );
+                          }).toList(),
+                          onChanged: _onStateChanged,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+          
           SizedBox(height: 14),
 
           // 3. Main Dynamic Content Area
@@ -197,11 +269,9 @@ class _RankingsScreenState extends State<RankingsScreen> {
     }
 
     return StreamBuilder<List<Map<String, dynamic>>>(
-      stream: _firestoreService.getRankingsStream(
-        game: _selectedGame,
-        type: _selectedTabIndex == 0 ? 'teams' : 'players',
-        season: 'Season 1',
-      ),
+      stream: _selectedTabIndex == 0
+          ? _firestoreService.getTeamsStream(game: _selectedGame)
+          : _firestoreService.getPlayersStream(game: _selectedGame),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(
@@ -215,7 +285,27 @@ class _RankingsScreenState extends State<RankingsScreen> {
           );
         }
 
-        final list = snapshot.data ?? [];
+        var list = snapshot.data ?? [];
+        
+        // Filter by state if not 'السودان'
+        if (_selectedState != 'السودان') {
+          list = list.where((item) {
+            final city = item['city']?.toString() ?? item['state']?.toString() ?? '';
+            return city.contains(_selectedState);
+          }).toList();
+        }
+        
+        // Sort by Elo
+        list.sort((a, b) {
+          final eloA = (a['stats']?['elo'] as num?)?.toInt() ?? 1000;
+          final eloB = (b['stats']?['elo'] as num?)?.toInt() ?? 1000;
+          return eloB.compareTo(eloA);
+        });
+
+        // Add Rank dynamically
+        for (int i = 0; i < list.length; i++) {
+          list[i]['rank'] = i + 1;
+        }
 
         if (list.isEmpty) {
           return Center(
@@ -232,7 +322,7 @@ class _RankingsScreenState extends State<RankingsScreen> {
                 ),
                 SizedBox(height: 16),
                 Text(
-                  'يتوفر قريباً',
+                  _selectedState == 'السودان' ? 'لا يوجد تصنيفات حالياً' : 'لا يوجد تصنيفات في ولاية $_selectedState',
                   style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
                 ),
                 SizedBox(height: 6),
@@ -274,7 +364,7 @@ class _RankingsScreenState extends State<RankingsScreen> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
-                      'الموسم 1 - $_selectedGame',
+                      _selectedState == 'السودان' ? 'الموسم 1 - $_selectedGame' : '$_selectedState - $_selectedGame',
                       style: TextStyle(fontSize: 11, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.60)),
                     ),
                   ),
@@ -312,8 +402,8 @@ class _RankingsScreenState extends State<RankingsScreen> {
   }
 
   Widget _buildPodiumColumn(Map<String, dynamic> item, double height, Color medalColor, int rank, {bool isGold = false}) {
-    final mmr = (item['mmr'] is int) ? item['mmr'] as int : int.tryParse(item['mmr']?.toString() ?? '1000') ?? 1000;
-    final name = item['name']?.toString() ?? '';
+    final mmr = (item['stats']?['elo'] as num?)?.toInt() ?? 1000;
+    final name = (item['name'] ?? item['displayName'])?.toString() ?? '';
 
     return Column(
       children: [
@@ -444,9 +534,9 @@ class _RankingsScreenState extends State<RankingsScreen> {
 
   Widget _buildListItem(Map<String, dynamic> item) {
     final rank = item['rank'] ?? '-';
-    final name = item['name']?.toString() ?? '';
-    final mmr = (item['mmr'] is int) ? item['mmr'] as int : int.tryParse(item['mmr']?.toString() ?? '1000') ?? 1000;
-    final wins = item['wins'] ?? 0;
+    final name = (item['name'] ?? item['displayName'])?.toString() ?? '';
+    final mmr = (item['stats']?['elo'] as num?)?.toInt() ?? 1000;
+    final wins = item['stats']?['wins'] ?? 0;
     final city = item['city']?.toString() ?? 'السودان';
 
     return GestureDetector(

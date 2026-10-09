@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/user_model.dart';
@@ -213,11 +214,21 @@ class FirestoreService {
     final Map<String, dynamic> data = Map<String, dynamic>.from(teamData);
     data['pendingRequests'] = [];
     data['joinType'] = data['joinType'] ?? 'approval'; // 'public' or 'approval'
-    final docRef = await _db.collection('teams').add(data);
+    
+    // Generate an 8-digit numeric ID
+    String teamId = '';
+    bool idExists = true;
+    while(idExists) {
+      teamId = (10000000 + Random().nextInt(90000000)).toString(); // 8 digits
+      final doc = await _db.collection('teams').doc(teamId).get();
+      if (!doc.exists) idExists = false;
+    }
+    
+    await _db.collection('teams').doc(teamId).set(data);
     await _db.collection('users').doc(creatorUid).set({
-      'teamId': docRef.id,
+      'teamId': teamId,
     }, SetOptions(merge: true));
-    return docRef.id;
+    return teamId;
   }
 
   Future<void> joinTeam(String teamId, String uid, Map<String, dynamic> playerRosterData) async {
@@ -291,13 +302,29 @@ class FirestoreService {
     return _db
         .collection('teams')
         .where('game', isEqualTo: game)
-        .orderBy('points', descending: true)
         .snapshots()
         .map((snapshot) => snapshot.docs.map((doc) {
               final data = doc.data();
               data['id'] = doc.id;
               return data;
             }).toList());
+  }
+
+  Stream<List<Map<String, dynamic>>> getPlayersStream({required String game}) {
+    return _db
+        .collection('users')
+        .snapshots()
+        .map((snapshot) {
+          var players = snapshot.docs.map((doc) {
+            final data = doc.data();
+            data['id'] = doc.id;
+            return data;
+          }).toList();
+          
+          // Note: Realistically, you would want to query by game preference or only include players who play this game.
+          // For now, we return all users and sort them by Elo.
+          return players;
+        });
   }
 
   Stream<List<Map<String, dynamic>>> getAllTeamsStream() {
@@ -852,7 +879,7 @@ class FirestoreService {
   }
 
   // =========================================================================
-  // 9. Wallet Balance Stream
+  // 9. Wallet Balance Stream & Manual Prize Distribution
   // =========================================================================
   Stream<double> getUserWalletStream(String uid) {
     return _db.collection('users').doc(uid).snapshots().map((doc) {
@@ -860,6 +887,46 @@ class FirestoreService {
       return (doc.data()?['walletBalance'] as num?)?.toDouble() ?? 0.0;
     });
   }
+
+  Future<void> distributePrizeManually({
+    required String targetUserId,
+    required double amount,
+    required String tournamentName,
+  }) async {
+    final userRef = _db.collection('users').doc(targetUserId);
+    final txRef = _db.collection('transactions').doc();
+
+    await _db.runTransaction((transaction) async {
+      final userDoc = await transaction.get(userRef);
+      if (!userDoc.exists) throw Exception('المستخدم غير موجود');
+
+      double currentBalance = (userDoc.data()?['walletBalance'] as num?)?.toDouble() ?? 0.0;
+      double newBalance = currentBalance + amount;
+
+      // Update balance
+      transaction.update(userRef, {'walletBalance': newBalance});
+
+      // Record transaction
+      transaction.set(txRef, {
+        'userId': targetUserId,
+        'amount': amount,
+        'type': 'prize_reward',
+        'status': 'approved', // instantly approved
+        'date': FieldValue.serverTimestamp(),
+        'description': 'جائزة مالية: $tournamentName',
+      });
+    });
+
+    // Notify user
+    await addNotification(
+      targetUserId,
+      '🎉 مبروك الجائزة!',
+      'تم إيداع مبلغ $amount ج.س في محفظتك كجائزة عن بطولة $tournamentName.',
+      type: 'wallet',
+    );
+  }
+
+
 
   // =========================================================================
   // 10. Referee — Match Management
@@ -882,14 +949,131 @@ class FirestoreService {
     required String screenshotUrl,
     required String refereeId,
   }) async {
-    await _db.collection('matches').doc(matchId).update({
-      'scoreA': scoreA,
-      'scoreB': scoreB,
-      'screenshotUrl': screenshotUrl,
-      'status': 'completed',
-      'refereeId': refereeId,
-      'completedAt': FieldValue.serverTimestamp(),
+    List<Map<String, dynamic>> pendingNotifications = [];
+
+    await _db.runTransaction((transaction) async {
+      pendingNotifications.clear();
+
+      final matchRef = _db.collection('matches').doc(matchId);
+      final matchDoc = await transaction.get(matchRef);
+      if (!matchDoc.exists) throw Exception('المباراة غير موجودة');
+      
+      final data = matchDoc.data()!;
+      if (data['status'] == 'completed') throw Exception('تم اعتماد النتيجة مسبقاً');
+
+      transaction.update(matchRef, {
+        'scoreA': scoreA,
+        'scoreB': scoreB,
+        'screenshotUrl': screenshotUrl,
+        'status': 'completed',
+        'refereeId': refereeId,
+        'completedAt': FieldValue.serverTimestamp(),
+      });
+
+      // Stats Update Engine (Phase 2)
+      final String? teamAId = data['teamAId'];
+      final String? teamBId = data['teamBId'];
+
+      if (teamAId != null && teamBId != null) {
+        final teamARef = _db.collection('teams').doc(teamAId);
+        final teamBRef = _db.collection('teams').doc(teamBId);
+        
+        final teamADoc = await transaction.get(teamARef);
+        final teamBDoc = await transaction.get(teamBRef);
+
+        if (teamADoc.exists && teamBDoc.exists) {
+          final teamAData = teamADoc.data()!;
+          final teamBData = teamBDoc.data()!;
+          
+          final teamAStats = teamAData['stats'] ?? {};
+          final teamBStats = teamBData['stats'] ?? {};
+          
+          int eloA = (teamAStats['elo'] as num?)?.toInt() ?? 1000;
+          int eloB = (teamBStats['elo'] as num?)?.toInt() ?? 1000;
+          String oldTierA = teamAStats['tier'] ?? 'Bronze';
+          String oldTierB = teamBStats['tier'] ?? 'Bronze';
+          
+          // Elo calculation (K-factor = 32)
+          double expectedA = 1 / (1 + pow(10, (eloB - eloA) / 400));
+          double expectedB = 1 / (1 + pow(10, (eloA - eloB) / 400));
+          
+          double actualA = scoreA > scoreB ? 1.0 : (scoreA == scoreB ? 0.5 : 0.0);
+          double actualB = scoreB > scoreA ? 1.0 : (scoreA == scoreB ? 0.5 : 0.0);
+          
+          int newEloA = eloA + (32 * (actualA - expectedA)).round();
+          int newEloB = eloB + (32 * (actualB - expectedB)).round();
+          
+          String tierA = _calculateTier(newEloA);
+          String tierB = _calculateTier(newEloB);
+
+          // Prepare Notifications for Tier Changes
+          if (tierA != oldTierA) {
+            final rosterA = (teamAData['roster'] as List<dynamic>?) ?? [];
+            for (var player in rosterA) {
+              if (player['uid'] != null) {
+                pendingNotifications.add({
+                  'uid': player['uid'],
+                  'title': newEloA > eloA ? 'ترقية جديدة! 🏆' : 'تراجع التصنيف ⚠️',
+                  'body': newEloA > eloA
+                      ? 'مبروك! أداء فريقك الرائع أدى لترقيته إلى التصنيف $tierA.'
+                      : 'تم تخفيض تصنيف فريقك إلى $tierA. حان وقت التعويض في المباريات القادمة!',
+                  'type': 'social',
+                });
+              }
+            }
+          }
+
+          if (tierB != oldTierB) {
+            final rosterB = (teamBData['roster'] as List<dynamic>?) ?? [];
+            for (var player in rosterB) {
+              if (player['uid'] != null) {
+                pendingNotifications.add({
+                  'uid': player['uid'],
+                  'title': newEloB > eloB ? 'ترقية جديدة! 🏆' : 'تراجع التصنيف ⚠️',
+                  'body': newEloB > eloB
+                      ? 'مبروك! أداء فريقك الرائع أدى لترقيته إلى التصنيف $tierB.'
+                      : 'تم تخفيض تصنيف فريقك إلى $tierB. حان وقت التعويض في المباريات القادمة!',
+                  'type': 'social',
+                });
+              }
+            }
+          }
+
+          transaction.update(teamARef, {
+            'stats.elo': newEloA,
+            'stats.tier': tierA,
+            'stats.matchesPlayed': FieldValue.increment(1),
+            'stats.wins': scoreA > scoreB ? FieldValue.increment(1) : FieldValue.increment(0),
+            'stats.losses': scoreA < scoreB ? FieldValue.increment(1) : FieldValue.increment(0),
+            'stats.totalPoints': scoreA > scoreB ? FieldValue.increment(3) : (scoreA == scoreB ? FieldValue.increment(1) : FieldValue.increment(0)),
+          });
+
+          transaction.update(teamBRef, {
+            'stats.elo': newEloB,
+            'stats.tier': tierB,
+            'stats.matchesPlayed': FieldValue.increment(1),
+            'stats.wins': scoreB > scoreA ? FieldValue.increment(1) : FieldValue.increment(0),
+            'stats.losses': scoreB < scoreA ? FieldValue.increment(1) : FieldValue.increment(0),
+            'stats.totalPoints': scoreB > scoreA ? FieldValue.increment(3) : (scoreA == scoreB ? FieldValue.increment(1) : FieldValue.increment(0)),
+          });
+        }
+      }
     });
+
+    // Send the notifications outside the transaction to avoid side-effects on retry
+    for (var notif in pendingNotifications) {
+      try {
+        await addNotification(notif['uid'], notif['title'], notif['body'], type: notif['type']);
+      } catch (_) {}
+    }
+  }
+
+  String _calculateTier(int elo) {
+    if (elo < 1000) return 'Bronze';
+    if (elo < 1500) return 'Silver';
+    if (elo < 2000) return 'Gold';
+    if (elo < 2500) return 'Diamond';
+    return 'Challenger';
   }
 
   // =========================================================================
@@ -905,6 +1089,41 @@ class FirestoreService {
               return data;
             }).toList());
   }
+
+  Future<void> registerTeamForTournament({
+    required String tournamentId,
+    required String teamName,
+    required String leaderName,
+    required String leaderId,
+    required List<Map<String, dynamic>> members,
+    required String paymentMethod,
+    String? transactionId,
+  }) async {
+    final tournamentRef = _db.collection('tournaments').doc(tournamentId);
+    final regRef = tournamentRef.collection('registrations').doc();
+
+    await _db.runTransaction((transaction) async {
+      // Create registration document
+      transaction.set(regRef, {
+        'id': regRef.id,
+        'teamName': teamName,
+        'leaderName': leaderName,
+        'leaderId': leaderId,
+        'members': members,
+        'paymentMethod': paymentMethod,
+        'transactionId': transactionId,
+        'status': 'pending',
+        'registeredAt': FieldValue.serverTimestamp(),
+      });
+
+      // Increment registered teams count
+      transaction.update(tournamentRef, {
+        'registeredTeamsCount': FieldValue.increment(1),
+      });
+    });
+  }
+
+
 
   // =========================================================================
   // 12. Players Search
@@ -940,7 +1159,19 @@ class FirestoreService {
   }
 
   Future<void> updateUserRole(String userId, String roleValue) async {
+    _cachedUser = null;
     await _db.collection('users').doc(userId).set({'role': roleValue}, SetOptions(merge: true));
+    try {
+      final roleModel = UserRole.fromValue(roleValue);
+      await addNotification(
+        userId,
+        'ترقية الصلاحيات والرتبة 🎖️',
+        'تم تحديث رتبتك وصلاحياتك في المنظومة إلى: ${roleModel.roleTitleArabic}',
+        type: 'role_upgrade',
+      );
+    } catch (e) {
+      debugPrint('Notice: could not push role upgrade notification: $e');
+    }
   }
 
   // =========================================================================
@@ -967,11 +1198,16 @@ class FirestoreService {
   // =========================================================================
   // 14. Admin User Management & General Queries
   // =========================================================================
-  Stream<List<Map<String, dynamic>>> getAllUsersStream({int limit = 50}) {
-    return _db.collection('users').limit(limit).snapshots().map(
+  Stream<List<Map<String, dynamic>>> getAllUsersStream({int limit = 500}) {
+    Query query = _db.collection('users');
+    if (limit > 0) {
+      query = query.limit(limit);
+    }
+    return query.snapshots().map(
       (snapshot) => snapshot.docs.map((doc) {
-        final data = Map<String, dynamic>.from(doc.data());
+        final data = Map<String, dynamic>.from(doc.data() as Map<String, dynamic>);
         data['id'] = doc.id;
+        data['uid'] = doc.id;
         return data;
       }).toList(),
     );
@@ -1013,24 +1249,18 @@ class FirestoreService {
     required String tournamentName,
     required String game,
   }) async {
-    final teamsSnap = await _db.collection('teams')
-        .where('game', isEqualTo: game)
+    // Fetch registered teams from the specific tournament's registrations subcollection
+    final registrationsSnap = await _db
+        .collection('tournaments')
+        .doc(tournamentId)
+        .collection('registrations')
         .get();
 
-    List<Map<String, dynamic>> teams = teamsSnap.docs.map((d) {
+    List<Map<String, dynamic>> teams = registrationsSnap.docs.map((d) {
       final data = d.data();
       data['id'] = d.id;
       return data;
     }).toList();
-
-    if (teams.length < 2) {
-      final allTeamsSnap = await _db.collection('teams').limit(16).get();
-      teams = allTeamsSnap.docs.map((d) {
-        final data = d.data();
-        data['id'] = d.id;
-        return data;
-      }).toList();
-    }
 
     if (teams.length < 2) {
       throw Exception('لا يوجد عدد كافٍ من الفرق (الحد الأدنى فريقان) لتوليد القرعة');

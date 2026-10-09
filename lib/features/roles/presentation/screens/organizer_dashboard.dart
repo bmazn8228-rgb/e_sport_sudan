@@ -1,5 +1,3 @@
-import 'package:e_sport_sudan/core/services/notification_service.dart';
-import 'package:e_sport_sudan/core/widgets/esport_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:e_sport_sudan/core/theme/app_theme.dart';
@@ -8,13 +6,14 @@ import 'organizer_referees_screen.dart';
 import 'organizer_matches_screen.dart';
 import 'organizer_complaints_screen.dart';
 import 'organizer_teams_screen.dart';
+import 'registered_players_screen.dart';
 
 import 'package:e_sport_sudan/features/admin/presentation/screens/tournament_admin_dashboard_screen.dart';
 import 'package:e_sport_sudan/core/services/auth_service.dart';
 import 'package:e_sport_sudan/features/auth/presentation/screens/login_screen.dart';
 
 class OrganizerDashboard extends StatefulWidget {
-  OrganizerDashboard({super.key});
+  const OrganizerDashboard({super.key});
 
   @override
   State<OrganizerDashboard> createState() => _OrganizerDashboardState();
@@ -375,7 +374,7 @@ class _OrganizerDashboardState extends State<OrganizerDashboard> {
               tileColor: Theme.of(context).colorScheme.surface,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: BorderSide(color: Colors.amber.withValues(alpha: 0.3))),
               leading: Icon(Icons.add_circle_outline, color: Colors.amber, size: 26),
-              title: Text('إدارة البطولات وإضافة بطولة جديدة', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+              title: Text('إدارة بطولة', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
               subtitle: Text('إنشاء بطولات جديدة، تعديل الحالات، وحذف البطولات', style: TextStyle(fontSize: 11, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54))),
               trailing: Icon(Icons.arrow_forward_ios, size: 14, color: Colors.amber),
               onTap: () {
@@ -417,6 +416,10 @@ class _OrganizerDashboardState extends State<OrganizerDashboard> {
                 }),
               ],
             ),
+            SizedBox(height: 10),
+            _buildStreamStatTile('اللاعبين والمستخدمين المسجلين', FirestoreService().getAllUsersStream(), Icons.people_alt_rounded, Colors.cyanAccent, () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const RegisteredPlayersScreen()));
+            }),
             SizedBox(height: 24),
 
             // TME Engine Actions

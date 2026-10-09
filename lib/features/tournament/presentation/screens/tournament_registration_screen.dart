@@ -3,6 +3,8 @@ import 'package:e_sport_sudan/core/theme/app_theme.dart';
 import 'package:e_sport_sudan/features/tournament/presentation/screens/payment_failure_screen.dart';
 import 'package:e_sport_sudan/core/utils/validators.dart';
 import 'package:e_sport_sudan/core/utils/connectivity_helper.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:e_sport_sudan/core/services/firestore_service.dart';
 
 class TournamentRegistrationScreen extends StatefulWidget {
   final Map<String, dynamic> tournamentData;
@@ -86,6 +88,24 @@ class _TournamentRegistrationScreenState extends State<TournamentRegistrationScr
             );
             return; // Don't proceed to step 5
           }
+        }
+
+        // Call Firestore to save registration
+        try {
+          await FirestoreService().registerTeamForTournament(
+            tournamentId: widget.tournamentData['id'],
+            teamName: _teamNameController.text.trim(),
+            leaderName: _leaderIgnController.text.trim(),
+            leaderId: FirebaseAuth.instance.currentUser?.uid ?? 'unknown',
+            members: _teamMembers,
+            paymentMethod: _selectedPaymentMethod,
+            transactionId: _transactionIdController.text.trim(),
+          );
+        } catch (e) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('فشل التسجيل: $e'), backgroundColor: Colors.red));
+          }
+          return;
         }
       }
       setState(() => _currentStep++);
