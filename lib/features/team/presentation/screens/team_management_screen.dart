@@ -26,6 +26,8 @@ class _TeamManagementScreenState extends State<TeamManagementScreen> {
   final String _userId = FirebaseAuth.instance.currentUser?.uid ?? '';
   UserModel? _currentUser;
   bool _isLoading = true;
+  bool _isUploadingLogo = false;
+  File? _localLogoPreviewFile;
   Map<String, dynamic>? _teamData;
 
   @override
@@ -42,7 +44,15 @@ class _TeamManagementScreenState extends State<TeamManagementScreen> {
     }
 
     try {
-      UserModel? user = await _firestoreService.getUser(authUser.uid, forceRefresh: true);
+      UserModel? user;
+      try {
+        user = await _firestoreService
+            .getUser(authUser.uid, forceRefresh: false)
+            .timeout(const Duration(seconds: 6));
+      } catch (_) {
+        user = await _firestoreService.getUser(authUser.uid);
+      }
+
       if (user == null) {
         final fallbackName = (authUser.displayName != null && authUser.displayName!.trim().isNotEmpty)
             ? authUser.displayName!.trim()
@@ -63,7 +73,7 @@ class _TeamManagementScreenState extends State<TeamManagementScreen> {
       }
 
       if (user.teamId != null && user.teamId!.isNotEmpty) {
-        final team = await _firestoreService.getTeam(user.teamId!);
+        final team = await _firestoreService.getTeam(user.teamId!).timeout(const Duration(seconds: 6));
         if (mounted) {
           setState(() {
             _currentUser = user;
@@ -81,7 +91,11 @@ class _TeamManagementScreenState extends State<TeamManagementScreen> {
         }
       }
     } catch (e) {
-      if (mounted) setState(() => _isLoading = false);
+      debugPrint('[TeamManagementScreen] Error in _loadData: $e');
+    } finally {
+      if (mounted && _isLoading) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
@@ -111,20 +125,31 @@ class _TeamManagementScreenState extends State<TeamManagementScreen> {
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryBlue),
             onPressed: () async {
+              final newBio = bioController.text.trim();
               Navigator.pop(ctx);
-              setState(() => _isLoading = true);
               try {
                 await FirebaseFirestore.instance.collection('teams').doc(_teamData!['id']).update({
-                  'bio': bioController.text.trim(),
+                  'bio': newBio,
                 });
-                await _loadData();
                 if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('تم تحديث السيرة الذاتية بنجاح')));
+                  setState(() {
+                    _teamData?['bio'] = newBio;
+                  });
+                  NotificationService.showCustomToast(
+                    context,
+                    title: 'تم التحديث',
+                    message: 'تم تحديث السيرة الذاتية بنجاح ✅',
+                    type: ToastType.success,
+                  );
                 }
               } catch (e) {
                 if (mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('حدث خطأ أثناء التحديث')));
-                  setState(() => _isLoading = false);
+                  NotificationService.showCustomToast(
+                    context,
+                    title: 'خطأ',
+                    message: 'حدث خطأ أثناء تحديث السيرة الذاتية',
+                    type: ToastType.urgent,
+                  );
                 }
               }
             },
@@ -136,28 +161,208 @@ class _TeamManagementScreenState extends State<TeamManagementScreen> {
   }
 
   Future<void> _updateTeamLogo() async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery, maxWidth: 800, maxHeight: 800);
-    
-    if (pickedFile != null) {
-      setState(() => _isLoading = true);
-      try {
-        final File file = File(pickedFile.path);
-        final String? logoUrl = await StorageService().uploadImage(file, 'teams_logos');
-        if (logoUrl != null) {
-          await FirebaseFirestore.instance.collection('teams').doc(_teamData!['id']).update({
-            'logoUrl': logoUrl,
-          });
-          await _loadData();
-          if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('تم تحديث شعار الفريق بنجاح')));
-        } else {
-          throw Exception("Failed to upload image");
-        }
-      } catch (e) {
+    if (_teamData == null || _teamData!['id'] == null) return;
+    if (_isUploadingLogo) return;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (sheetContext) {
+        final currentLogo = _teamData?['logoUrl']?.toString() ?? '';
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 20.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'تحديث شعار الفريق',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                ListTile(
+                  leading: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: AppTheme.primaryBlue.withValues(alpha: 0.15),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(Icons.photo_library_rounded, color: AppTheme.primaryBlue),
+                  ),
+                  title: const Text('اختيار من المعرض'),
+                  subtitle: const Text('اختر صورة من استوديو هاتفك', style: TextStyle(fontSize: 12)),
+                  onTap: () {
+                    Navigator.pop(sheetContext);
+                    _pickAndUploadLogo(ImageSource.gallery);
+                  },
+                ),
+                ListTile(
+                  leading: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: AppTheme.primaryBlue.withValues(alpha: 0.15),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(Icons.camera_alt_rounded, color: AppTheme.primaryBlue),
+                  ),
+                  title: const Text('التقاط بالكاميرا'),
+                  subtitle: const Text('التقط صورة جديدة بالكاميرا', style: TextStyle(fontSize: 12)),
+                  onTap: () {
+                    Navigator.pop(sheetContext);
+                    _pickAndUploadLogo(ImageSource.camera);
+                  },
+                ),
+                if (currentLogo.isNotEmpty)
+                  ListTile(
+                    leading: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.redAccent.withValues(alpha: 0.15),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.delete_outline_rounded, color: Colors.redAccent),
+                    ),
+                    title: const Text('حذف الشعار الحالي', style: TextStyle(color: Colors.redAccent)),
+                    onTap: () {
+                      Navigator.pop(sheetContext);
+                      _removeTeamLogo();
+                    },
+                  ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _pickAndUploadLogo(ImageSource source) async {
+    try {
+      final picker = ImagePicker();
+      final pickedFile = await picker.pickImage(
+        source: source,
+        maxWidth: 600,
+        maxHeight: 600,
+        imageQuality: 75,
+      );
+
+      if (pickedFile == null) return;
+
+      final File file = File(pickedFile.path);
+
+      // Instant optimistic local preview without blocking the screen
+      setState(() {
+        _localLogoPreviewFile = file;
+        _isUploadingLogo = true;
+      });
+
+      if (mounted) {
+        NotificationService.showCustomToast(
+          context,
+          title: 'جاري الرفع',
+          message: 'يتم رفع شعار الفريق الآن...',
+          type: ToastType.social,
+        );
+      }
+
+      final String? logoUrl = await StorageService().uploadImage(file, 'teams_logos');
+
+      if (logoUrl != null && logoUrl.isNotEmpty) {
+        final teamId = _teamData!['id'];
+        await FirebaseFirestore.instance.collection('teams').doc(teamId).update({
+          'logoUrl': logoUrl,
+        });
+
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('حدث خطأ أثناء رفع الشعار')));
-          setState(() => _isLoading = false);
+          setState(() {
+            _teamData?['logoUrl'] = logoUrl;
+            _localLogoPreviewFile = null;
+            _isUploadingLogo = false;
+          });
+
+          NotificationService.showCustomToast(
+            context,
+            title: 'نجاح',
+            message: 'تم تحديث شعار الفريق بنجاح! 🛡️',
+            type: ToastType.success,
+          );
         }
+      } else {
+        throw Exception("Failed to upload image");
+      }
+    } catch (e) {
+      debugPrint('[TeamManagementScreen] Error uploading logo: $e');
+      if (mounted) {
+        setState(() {
+          _localLogoPreviewFile = null;
+          _isUploadingLogo = false;
+        });
+
+        NotificationService.showCustomToast(
+          context,
+          title: 'فشل الرفع',
+          message: 'حدث خطأ أثناء رفع الشعار. تحقق من الإنترنت وحاول ثانية.',
+          type: ToastType.urgent,
+        );
+      }
+    } finally {
+      if (mounted && _isUploadingLogo) {
+        setState(() => _isUploadingLogo = false);
+      }
+    }
+  }
+
+  Future<void> _removeTeamLogo() async {
+    if (_teamData == null || _teamData!['id'] == null) return;
+    try {
+      setState(() => _isUploadingLogo = true);
+      final teamId = _teamData!['id'];
+      await FirebaseFirestore.instance.collection('teams').doc(teamId).update({
+        'logoUrl': '',
+      });
+
+      if (mounted) {
+        setState(() {
+          _teamData?['logoUrl'] = '';
+          _localLogoPreviewFile = null;
+          _isUploadingLogo = false;
+        });
+
+        NotificationService.showCustomToast(
+          context,
+          title: 'تم الحذف',
+          message: 'تم حذف شعار الفريق بنجاح',
+          type: ToastType.success,
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isUploadingLogo = false);
+        NotificationService.showCustomToast(
+          context,
+          title: 'خطأ',
+          message: 'فشل حذف الشعار',
+          type: ToastType.urgent,
+        );
       }
     }
   }
@@ -167,10 +372,11 @@ class _TeamManagementScreenState extends State<TeamManagementScreen> {
     final gameController = TextEditingController();
     final formKey = GlobalKey<FormState>();
     bool isCreating = false;
-    String _joinType = 'approval';
-    String _selectedState = 'الخرطوم';
+    File? newTeamLogoFile;
+    String joinType = 'approval';
+    String selectedState = 'الخرطوم';
     
-    final List<String> _sudanStates = [
+    final List<String> sudanStates = [
       'الخرطوم', 'الجزيرة', 'البحر الأحمر', 'كسلا', 'القضارف', 
       'نهر النيل', 'الشمالية', 'شمال كردفان', 'جنوب كردفان', 'غرب كردفان', 
       'شمال دارفور', 'جنوب دارفور', 'غرب دارفور', 'شرق دارفور', 'وسط دارفور', 
@@ -180,7 +386,7 @@ class _TeamManagementScreenState extends State<TeamManagementScreen> {
     final authUser = FirebaseAuth.instance.currentUser;
     if (authUser == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('يجب تسجيل الدخول أولاً لإنشاء فريق')),
+        const SnackBar(content: Text('يجب تسجيل الدخول أولاً لإنشاء فريق')),
       );
       return;
     }
@@ -192,13 +398,62 @@ class _TeamManagementScreenState extends State<TeamManagementScreen> {
         return StatefulBuilder(builder: (context, setStateDialog) {
           return AlertDialog(
             backgroundColor: Theme.of(context).colorScheme.surface,
-            title: Text('إنشاء فريق جديد', style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+            title: Text('إنشاء فريق جديد', style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold)),
             content: Form(
               key: formKey,
               child: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    // Team Logo Picker in dialog
+                    GestureDetector(
+                      onTap: () async {
+                        final picker = ImagePicker();
+                        final picked = await picker.pickImage(
+                          source: ImageSource.gallery,
+                          maxWidth: 600,
+                          maxHeight: 600,
+                          imageQuality: 75,
+                        );
+                        if (picked != null) {
+                          setStateDialog(() {
+                            newTeamLogoFile = File(picked.path);
+                          });
+                        }
+                      },
+                      child: Stack(
+                        alignment: Alignment.bottomRight,
+                        children: [
+                          CircleAvatar(
+                            radius: 36,
+                            backgroundColor: AppTheme.primaryBlue.withValues(alpha: 0.15),
+                            backgroundImage: newTeamLogoFile != null ? FileImage(newTeamLogoFile!) : null,
+                            child: newTeamLogoFile == null
+                                ? Icon(Icons.shield, size: 36, color: AppTheme.primaryBlue)
+                                : null,
+                          ),
+                          Container(
+                            padding: const EdgeInsets.all(5),
+                            decoration: BoxDecoration(
+                              color: AppTheme.primaryBlue,
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Theme.of(context).colorScheme.surface, width: 2),
+                            ),
+                            child: const Icon(Icons.camera_alt_rounded, size: 13, color: Colors.black),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      newTeamLogoFile != null ? 'تم اختيار الشعار ✅' : 'إضافة شعار الفريق (اختياري)',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: newTeamLogoFile != null ? AppTheme.primaryBlue : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                        fontWeight: newTeamLogoFile != null ? FontWeight.bold : FontWeight.normal,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
                     TextFormField(
                       controller: nameController,
                       style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
@@ -210,7 +465,7 @@ class _TeamManagementScreenState extends State<TeamManagementScreen> {
                       ),
                       validator: (v) => v == null || v.trim().isEmpty ? 'يرجى إدخال اسم الفريق' : null,
                     ),
-                    SizedBox(height: 12),
+                    const SizedBox(height: 12),
                     TextFormField(
                       controller: gameController,
                       style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
@@ -222,9 +477,9 @@ class _TeamManagementScreenState extends State<TeamManagementScreen> {
                       ),
                       validator: (v) => v == null || v.trim().isEmpty ? 'يرجى إدخال اسم اللعبة' : null,
                     ),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
                     DropdownButtonFormField<String>(
-                      value: _joinType,
+                      initialValue: joinType,
                       dropdownColor: Theme.of(context).colorScheme.surface,
                       style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                       decoration: InputDecoration(
@@ -233,17 +488,17 @@ class _TeamManagementScreenState extends State<TeamManagementScreen> {
                         enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.24))),
                         focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: AppTheme.primaryBlue)),
                       ),
-                      items: [
+                      items: const [
                         DropdownMenuItem(value: 'approval', child: Text('بموافقة القائد فقط 🔒')),
                         DropdownMenuItem(value: 'public', child: Text('مفتوح للجميع 🌍')),
                       ],
                       onChanged: (val) {
-                        if (val != null) setStateDialog(() => _joinType = val);
+                        if (val != null) setStateDialog(() => joinType = val);
                       },
                     ),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
                     DropdownButtonFormField<String>(
-                      value: _selectedState,
+                      initialValue: selectedState,
                       dropdownColor: Theme.of(context).colorScheme.surface,
                       style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                       decoration: InputDecoration(
@@ -252,11 +507,11 @@ class _TeamManagementScreenState extends State<TeamManagementScreen> {
                         enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.24))),
                         focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: AppTheme.primaryBlue)),
                       ),
-                      items: _sudanStates.map((state) {
+                      items: sudanStates.map((state) {
                         return DropdownMenuItem(value: state, child: Text(state));
                       }).toList(),
                       onChanged: (val) {
-                        if (val != null) setStateDialog(() => _selectedState = val);
+                        if (val != null) setStateDialog(() => selectedState = val);
                       },
                     ),
                   ],
@@ -273,6 +528,15 @@ class _TeamManagementScreenState extends State<TeamManagementScreen> {
                   if (formKey.currentState!.validate()) {
                     setStateDialog(() => isCreating = true);
                     try {
+                      String logoUrl = '';
+                      if (newTeamLogoFile != null) {
+                        try {
+                          logoUrl = await StorageService().uploadImage(newTeamLogoFile!, 'teams_logos') ?? '';
+                        } catch (e) {
+                          debugPrint('Error uploading initial team logo: $e');
+                        }
+                      }
+
                       final leaderName = (_currentUser?.displayName != null && _currentUser!.displayName.isNotEmpty)
                           ? _currentUser!.displayName
                           : (authUser.displayName != null && authUser.displayName!.isNotEmpty)
@@ -296,11 +560,12 @@ class _TeamManagementScreenState extends State<TeamManagementScreen> {
                       final teamData = {
                         'name': nameController.text.trim(),
                         'game': gameController.text.trim(),
+                        'logoUrl': logoUrl,
                         'points': 0,
                         'leaderId': authUser.uid,
                         'roster': [leaderData],
-                        'joinType': _joinType,
-                        'state': _selectedState,
+                        'joinType': joinType,
+                        'state': selectedState,
                         'pendingRequests': [],
                         'createdAt': DateTime.now().toIso8601String(),
                       };
@@ -309,11 +574,11 @@ class _TeamManagementScreenState extends State<TeamManagementScreen> {
                       
                       if (context.mounted) {
                         Navigator.pop(ctx);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('تم إنشاء الفريق بنجاح! 🏆'),
-                            backgroundColor: AppTheme.primaryBlue,
-                          ),
+                        NotificationService.showCustomToast(
+                          context,
+                          title: 'تم بنجاح',
+                          message: 'تم إنشاء الفريق بنجاح! 🏆',
+                          type: ToastType.success,
                         );
                       }
                       await _loadData();
@@ -321,11 +586,11 @@ class _TeamManagementScreenState extends State<TeamManagementScreen> {
                       debugPrint('Error creating team: $e');
                       setStateDialog(() => isCreating = false);
                       if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('حدث خطأ: ${e.toString()}'),
-                            backgroundColor: Colors.redAccent,
-                          ),
+                        NotificationService.showCustomToast(
+                          context,
+                          title: 'خطأ',
+                          message: 'حدث خطأ: ${e.toString()}',
+                          type: ToastType.urgent,
                         );
                       }
                     }
@@ -337,7 +602,7 @@ class _TeamManagementScreenState extends State<TeamManagementScreen> {
                 ),
                 child: isCreating
                     ? SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Theme.of(context).colorScheme.onSurface))
-                    : Text('إنشاء', style: TextStyle(fontWeight: FontWeight.bold)),
+                    : const Text('إنشاء', style: TextStyle(fontWeight: FontWeight.bold)),
               ),
             ],
           );
@@ -443,7 +708,7 @@ class _TeamManagementScreenState extends State<TeamManagementScreen> {
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppTheme.primaryBlue.withOpacity(0.3)),
+        border: Border.all(color: AppTheme.primaryBlue.withValues(alpha: 0.3)),
       ),
       child: Column(
         children: [
@@ -498,42 +763,116 @@ class _TeamManagementScreenState extends State<TeamManagementScreen> {
       children: [
         Container(
           width: double.infinity,
-          padding: EdgeInsets.all(24),
+          padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [AppTheme.primaryBlue.withOpacity(0.8), Theme.of(context).colorScheme.surface],
+              colors: [AppTheme.primaryBlue.withValues(alpha: 0.8), Theme.of(context).colorScheme.surface],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppTheme.primaryBlue.withOpacity(0.5)),
+            border: Border.all(color: AppTheme.primaryBlue.withValues(alpha: 0.5)),
           ),
           child: Column(
             children: [
               Stack(
                 alignment: Alignment.bottomRight,
                 children: [
-                  CircleAvatar(
-                    radius: 40,
-                    backgroundColor: Colors.black26,
-                    backgroundImage: logoUrl.isNotEmpty ? CachedNetworkImageProvider(logoUrl) : null,
-                    child: logoUrl.isEmpty ? Icon(Icons.shield, size: 40, color: AppTheme.primaryBlue) : null,
+                  Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: _isUploadingLogo ? AppTheme.primaryBlue : AppTheme.primaryBlue.withValues(alpha: 0.4),
+                        width: 2.5,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppTheme.primaryBlue.withValues(alpha: 0.2),
+                          blurRadius: 10,
+                          spreadRadius: 2,
+                        ),
+                      ],
+                    ),
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        CircleAvatar(
+                          radius: 42,
+                          backgroundColor: Colors.black38,
+                          backgroundImage: _localLogoPreviewFile != null
+                              ? FileImage(_localLogoPreviewFile!) as ImageProvider
+                              : (logoUrl.isNotEmpty ? CachedNetworkImageProvider(logoUrl) : null),
+                          child: (_localLogoPreviewFile == null && logoUrl.isEmpty)
+                              ? Icon(Icons.shield, size: 42, color: AppTheme.primaryBlue)
+                              : null,
+                        ),
+                        if (_isUploadingLogo)
+                          Container(
+                            width: 84,
+                            height: 84,
+                            decoration: const BoxDecoration(
+                              color: Colors.black54,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Center(
+                              child: SizedBox(
+                                width: 28,
+                                height: 28,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2.8,
+                                  valueColor: AlwaysStoppedAnimation<Color>(AppTheme.primaryBlue),
+                                ),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
                   ),
                   if (isLeader)
                     GestureDetector(
-                      onTap: _updateTeamLogo,
+                      onTap: _isUploadingLogo ? null : _updateTeamLogo,
                       child: Container(
-                        padding: EdgeInsets.all(6),
+                        padding: const EdgeInsets.all(7),
                         decoration: BoxDecoration(
-                          color: AppTheme.primaryBlue,
+                          color: _isUploadingLogo ? Colors.grey.shade700 : AppTheme.primaryBlue,
                           shape: BoxShape.circle,
                           border: Border.all(color: Theme.of(context).colorScheme.surface, width: 2),
                         ),
-                        child: Icon(Icons.edit, size: 14, color: Colors.black),
+                        child: Icon(
+                          _isUploadingLogo ? Icons.hourglass_top_rounded : Icons.camera_alt_rounded,
+                          size: 14,
+                          color: Colors.black,
+                        ),
                       ),
                     ),
                 ],
               ),
+              if (_isUploadingLogo) ...[
+                const SizedBox(height: 10),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: Colors.black45,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: AppTheme.primaryBlue.withValues(alpha: 0.5)),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SizedBox(
+                        width: 12,
+                        height: 12,
+                        child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.primaryBlue),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'جاري رفع الشعار وحفظه...',
+                        style: TextStyle(fontSize: 11, color: AppTheme.primaryBlue, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
               SizedBox(height: 16),
               Text(teamName, style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface)),
               SizedBox(height: 4),
@@ -647,9 +986,9 @@ class _TeamManagementScreenState extends State<TeamManagementScreen> {
             Text('طلبات الانضمام المعلقة', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             SizedBox(width: 8),
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(color: Colors.red, borderRadius: BorderRadius.circular(12)),
-              child: Text('', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
+              child: Text('${pendingRequests.length}', style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
             ),
           ],
         ),

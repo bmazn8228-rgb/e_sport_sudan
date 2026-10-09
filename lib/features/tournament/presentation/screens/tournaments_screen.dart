@@ -278,7 +278,10 @@ class _TournamentsScreenState extends State<TournamentsScreen> {
       margin: EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [Color(0xFF161D2B), Color(0xFF101520)],
+          colors: [
+            Theme.of(context).colorScheme.surface,
+            Theme.of(context).scaffoldBackgroundColor,
+          ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),

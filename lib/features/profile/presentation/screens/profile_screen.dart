@@ -543,7 +543,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
       padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [Color(0xFF1E293B), Color(0xFF0F172A)],
+          colors: [
+            Theme.of(context).colorScheme.surface,
+            Theme.of(context).scaffoldBackgroundColor,
+          ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -730,7 +733,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
       padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [Color(0xFF0F172A), Color(0xFF1E293B)],
+          colors: [
+            Theme.of(context).scaffoldBackgroundColor,
+            Theme.of(context).colorScheme.surface,
+          ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),

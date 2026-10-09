@@ -207,7 +207,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
           Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [Color(0xFF0F172A), Color(0xFF000000)],
+                colors: [
+                  Theme.of(context).scaffoldBackgroundColor,
+                  Theme.of(context).colorScheme.surface,
+                ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -495,7 +498,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return DropdownButtonFormField<String>(
       initialValue: value,
       hint: Text(hint, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3), fontSize: 14)),
-      dropdownColor: Color(0xFF1E293B), // Dark slate
+      dropdownColor: Theme.of(context).colorScheme.surface, // Matches theme
       icon: Icon(Icons.arrow_drop_down, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
       validator: (v) => v == null ? 'الرجاء اختيار خيار' : null,
       items: items.map((item) => DropdownMenuItem(value: item, child: Text(item, style: TextStyle(color: Theme.of(context).colorScheme.onSurface)))).toList(),

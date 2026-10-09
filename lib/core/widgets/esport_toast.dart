@@ -51,7 +51,7 @@ class ESportToast extends StatelessWidget {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        color: Color(0xFF0F172A), // Dark slate
+        color: Theme.of(context).colorScheme.surface, // Adapts to light/dark mode
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: accentColor.withOpacity(0.5), width: 1.5),
         boxShadow: [

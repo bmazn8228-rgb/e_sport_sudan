@@ -42,7 +42,8 @@ class StorageService {
       final doc = await FirebaseFirestore.instance
           .collection('settings')
           .doc('app_config')
-          .get();
+          .get()
+          .timeout(const Duration(seconds: 3));
 
       if (doc.exists && doc.data() != null) {
         final data = doc.data()!;

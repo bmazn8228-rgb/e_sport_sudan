@@ -87,6 +87,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   Image.asset(
                     _pages[index]['image']!,
                     fit: BoxFit.cover,
+                    color: AppTheme.primaryBlue.withValues(alpha: 0.5),
+                    colorBlendMode: BlendMode.color,
                   ),
                   // تدرج لوني عميق متطابق مع هوية التطبيق (Theme.of(context).scaffoldBackgroundColor)
                   Container(

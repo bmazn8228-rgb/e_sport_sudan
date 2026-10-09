@@ -156,7 +156,7 @@ class _RankingsScreenState extends State<RankingsScreen> {
             child: Container(
               padding: EdgeInsets.all(4),
               decoration: BoxDecoration(
-                color: Color(0xFF131822),
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)),
               ),
@@ -500,11 +500,11 @@ class _RankingsScreenState extends State<RankingsScreen> {
               colors: isGold
                   ? [
                       Colors.amber.withValues(alpha: 0.25),
-                      Color(0xFF161D2B),
+                      Theme.of(context).colorScheme.surface,
                     ]
                   : [
                       medalColor.withValues(alpha: 0.15),
-                      Color(0xFF121722),
+                      Theme.of(context).colorScheme.surface,
                     ],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,

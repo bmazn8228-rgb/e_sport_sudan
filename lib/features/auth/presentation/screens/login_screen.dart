@@ -206,7 +206,10 @@ class _LoginScreenState extends State<LoginScreen> {
           Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [Color(0xFF0F172A), Color(0xFF000000)],
+                colors: [
+                  Theme.of(context).scaffoldBackgroundColor,
+                  Theme.of(context).colorScheme.surface,
+                ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),

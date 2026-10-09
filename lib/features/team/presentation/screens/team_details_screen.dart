@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:e_sport_sudan/core/theme/app_theme.dart';
 import 'package:e_sport_sudan/core/services/firestore_service.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class TeamDetailsScreen extends StatelessWidget {
   final Map<String, dynamic> team;
@@ -65,10 +66,18 @@ class TeamDetailsScreen extends StatelessWidget {
               ),
               child: Column(
                 children: [
-                  CircleAvatar(
-                    radius: 40,
-                    backgroundColor: AppTheme.primaryBlue.withValues(alpha: 0.2),
-                    child: Text(teamName.substring(0, 1), style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: AppTheme.primaryBlue)),
+                  Builder(
+                    builder: (context) {
+                      final logoUrl = (team['logoUrl'] ?? '').toString();
+                      return CircleAvatar(
+                        radius: 40,
+                        backgroundColor: AppTheme.primaryBlue.withValues(alpha: 0.2),
+                        backgroundImage: logoUrl.isNotEmpty ? CachedNetworkImageProvider(logoUrl) : null,
+                        child: logoUrl.isEmpty
+                            ? Text(teamName.substring(0, 1), style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: AppTheme.primaryBlue))
+                            : null,
+                      );
+                    },
                   ),
                   SizedBox(height: 12),
                   Text(teamName, style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
