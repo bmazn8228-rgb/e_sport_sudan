@@ -1097,13 +1097,40 @@ class FirestoreService {
     required String leaderId,
     required List<Map<String, dynamic>> members,
     required String paymentMethod,
+    required double entryFee,
     String? transactionId,
+    String? receiptImageUrl,
+    String? teamLogoUrl,
   }) async {
     final tournamentRef = _db.collection('tournaments').doc(tournamentId);
     final regRef = tournamentRef.collection('registrations').doc();
+    final userRef = _db.collection('users').doc(leaderId);
+
+    final isWallet = paymentMethod == 'المحفظة الإلكترونية (الرصيد المتاح)';
+    final initialStatus = isWallet ? 'approved' : 'pending_payment';
 
     await _db.runTransaction((transaction) async {
-      // Create registration document
+      if (isWallet) {
+        final userDoc = await transaction.get(userRef);
+        if (!userDoc.exists) throw Exception('المستخدم غير موجود');
+        double currentBalance = (userDoc.data()?['walletBalance'] as num?)?.toDouble() ?? 0.0;
+        if (currentBalance < entryFee) {
+          throw Exception('الرصيد غير كافٍ. يرجى شحن المحفظة.');
+        }
+        transaction.update(userRef, {'walletBalance': currentBalance - entryFee});
+        
+        final txRef = _db.collection('transactions').doc();
+        transaction.set(txRef, {
+          'userId': leaderId,
+          'amount': -entryFee,
+          'type': 'tournament_fee',
+          'status': 'approved',
+          'createdAt': FieldValue.serverTimestamp(),
+          'description': 'رسوم التسجيل في بطولة',
+          'tournamentId': tournamentId,
+        });
+      }
+
       transaction.set(regRef, {
         'id': regRef.id,
         'teamName': teamName,
@@ -1112,14 +1139,17 @@ class FirestoreService {
         'members': members,
         'paymentMethod': paymentMethod,
         'transactionId': transactionId,
-        'status': 'pending',
+        'receiptImageUrl': receiptImageUrl,
+        'teamLogoUrl': teamLogoUrl,
+        'status': initialStatus,
         'registeredAt': FieldValue.serverTimestamp(),
       });
 
-      // Increment registered teams count
-      transaction.update(tournamentRef, {
-        'registeredTeamsCount': FieldValue.increment(1),
-      });
+      if (isWallet) {
+        transaction.update(tournamentRef, {
+          'registeredTeamsCount': FieldValue.increment(1),
+        });
+      }
     });
   }
 

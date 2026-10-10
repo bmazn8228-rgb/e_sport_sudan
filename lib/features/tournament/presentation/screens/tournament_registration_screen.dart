@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:e_sport_sudan/core/theme/app_theme.dart';
 import 'package:e_sport_sudan/features/tournament/presentation/screens/payment_failure_screen.dart';
@@ -5,6 +6,8 @@ import 'package:e_sport_sudan/core/utils/validators.dart';
 import 'package:e_sport_sudan/core/utils/connectivity_helper.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:e_sport_sudan/core/services/firestore_service.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class TournamentRegistrationScreen extends StatefulWidget {
   final Map<String, dynamic> tournamentData;
@@ -17,24 +20,94 @@ class TournamentRegistrationScreen extends StatefulWidget {
 
 class _TournamentRegistrationScreenState extends State<TournamentRegistrationScreen> {
   int _currentStep = 1; // 1 to 5
-  final _teamNameController = TextEditingController(text: 'صقور النيل (Nile Falcons)');
-  final _leaderIgnController = TextEditingController(text: 'Falcon_Leader');
+  final _teamNameController = TextEditingController();
+  final _leaderIgnController = TextEditingController();
   final _transactionIdController = TextEditingController();
   final _playerIdController = TextEditingController();
   
   String _selectedPaymentMethod = 'بنكك (Bankak - بنك الخرطوم)';
   String? _receiptFileName;
+  String? _receiptFileUrl;
   String? _teamLogoFileName;
+  String? _teamLogoUrl;
+  
+  bool _isLoading = true;
+  bool _termsAccepted = false;
+  String? _registrationStatus;
 
-  final List<Map<String, dynamic>> _teamMembers = [
-    {
-      'id': 'SD-PRO-001',
-      'name': 'أحمد عثمان علي',
-      'ign': 'Falcon_Leader',
-      'role': 'القائد (Assault)',
-      'isLeader': true,
+  List<Map<String, dynamic>> _teamMembers = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadTeamData();
+  }
+
+  Future<void> _loadTeamData() async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) throw Exception('المستخدم غير مسجل الدخول');
+      
+      final userData = await FirestoreService().getUser(user.uid);
+      if (userData?.teamId == null) throw Exception('لا يوجد فريق مقترن بحسابك');
+
+      final teamData = await FirestoreService().getTeam(userData!.teamId!);
+      if (teamData == null) throw Exception('الفريق غير موجود');
+
+      setState(() {
+        _teamNameController.text = teamData['name'] ?? '';
+        
+        final roster = List<Map<String, dynamic>>.from(teamData['roster'] ?? []);
+        _teamMembers = roster;
+        
+        // Find leader IGN
+        final leader = roster.firstWhere((p) => p['isLeader'] == true, orElse: () => {'ign': ''});
+        _leaderIgnController.text = leader['ign'] ?? '';
+        
+        _teamLogoUrl = teamData['logoUrl'];
+        if (_teamLogoUrl != null && _teamLogoUrl!.isNotEmpty) {
+           _teamLogoFileName = 'تم تحديد الشعار من الفريق';
+        }
+
+        _isLoading = false;
+      });
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('فشل تحميل بيانات الفريق: '), backgroundColor: Colors.red));
+        Navigator.pop(context); // Exit if data fails to load
+      }
     }
-  ];
+  }
+
+  Future<String?> _pickAndUploadImage(String pathPrefix) async {
+    try {
+      final picker = ImagePicker();
+      final XFile? image = await picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
+      
+      if (image == null) return null;
+
+      final file = File(image.path);
+      final fileName = '_';
+      final storageRef = FirebaseStorage.instance.ref().child('/');
+      
+      if (mounted) {
+         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('جاري رفع الصورة... ⏳')));
+      }
+
+      await storageRef.putFile(file);
+      final downloadUrl = await storageRef.getDownloadURL();
+      
+      if (mounted) {
+         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('تم رفع الصورة بنجاح ✔️'), backgroundColor: AppTheme.primaryBlue));
+      }
+      return downloadUrl;
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('فشل رفع الصورة: '), backgroundColor: Colors.red));
+      }
+      return null;
+    }
+  }
 
   void _nextStep() async {
     if (_currentStep < 5) {
@@ -59,6 +132,15 @@ class _TournamentRegistrationScreenState extends State<TournamentRegistrationScr
           return;
         }
       }
+      if (_currentStep == 3) {
+        if (!_termsAccepted) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text('يجب الموافقة على القوانين واللوائح للمتابعة ⚠️'),
+            backgroundColor: Colors.red,
+          ));
+          return;
+        }
+      }
       if (_currentStep == 4) {
         if (!await ConnectivityHelper.hasInternetConnection()) {
           if (mounted) {
@@ -71,24 +153,27 @@ class _TournamentRegistrationScreenState extends State<TournamentRegistrationScr
         
         if (!mounted) return;
 
-        if (_selectedPaymentMethod == 'المحفظة الإلكترونية (الرصيد المتاح)') {
-          // Simulate a balance check. Required: 25000, Available: 15000 (Mocked to fail for demonstration)
-          const double requiredAmount = 25000.0;
-          const double availableBalance = 15000.0;
-          
-          if (availableBalance < requiredAmount) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => PaymentFailureScreen(
-                  requiredAmount: requiredAmount,
-                  availableBalance: availableBalance,
-                ),
-              ),
-            );
-            return; // Don't proceed to step 5
+        final isWallet = _selectedPaymentMethod == 'المحفظة الإلكترونية (الرصيد المتاح)';
+        final entryFee = (widget.tournamentData['entryFee'] as num?)?.toDouble() ?? 0.0;
+
+        if (!isWallet) {
+          if (_transactionIdController.text.trim().isEmpty) {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text('يرجى إدخال رقم المعاملة البنكية ⚠️'),
+              backgroundColor: Colors.red,
+            ));
+            return;
+          }
+          if (_receiptFileUrl == null) {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text('يرجى إرفاق صورة إشعار التحويل لتأكيد الدفع ⚠️'),
+              backgroundColor: Colors.red,
+            ));
+            return;
           }
         }
+
+        setState(() { _isLoading = true; });
 
         // Call Firestore to save registration
         try {
@@ -99,14 +184,38 @@ class _TournamentRegistrationScreenState extends State<TournamentRegistrationScr
             leaderId: FirebaseAuth.instance.currentUser?.uid ?? 'unknown',
             members: _teamMembers,
             paymentMethod: _selectedPaymentMethod,
+            entryFee: entryFee,
             transactionId: _transactionIdController.text.trim(),
+            receiptImageUrl: _receiptFileUrl,
+            teamLogoUrl: _teamLogoUrl,
           );
+          
+          setState(() { 
+            _registrationStatus = isWallet ? 'approved' : 'pending_payment';
+            _currentStep++; 
+          });
         } catch (e) {
           if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('فشل التسجيل: $e'), backgroundColor: Colors.red));
+            String errorMsg = e.toString().replaceAll('Exception: ', '');
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('فشل التسجيل: $errorMsg'), backgroundColor: Colors.red));
+            
+            // Show payment failure screen if balance is insufficient
+            if (errorMsg.contains('الرصيد غير كافٍ')) {
+               Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => PaymentFailureScreen(
+                    requiredAmount: entryFee,
+                    availableBalance: 0,
+                  ),
+                ),
+              );
+            }
           }
-          return;
+        } finally {
+          if (mounted) setState(() { _isLoading = false; });
         }
+        return; // Handled state change inside try/catch
       }
       setState(() => _currentStep++);
     } else {
@@ -141,7 +250,7 @@ class _TournamentRegistrationScreenState extends State<TournamentRegistrationScr
         ),
       ),
       body: SafeArea(
-        child: Column(
+        child: _isLoading ? Center(child: CircularProgressIndicator()) : Column(
           children: [
             // Stepper indicator
             _buildStepper(),
@@ -455,7 +564,13 @@ class _TournamentRegistrationScreenState extends State<TournamentRegistrationScr
         SizedBox(height: 20),
         Row(
           children: [
-            Checkbox(value: true, onChanged: (v) {}, activeColor: AppTheme.primaryBlue),
+            Checkbox(
+              value: _termsAccepted, 
+              onChanged: (v) {
+                if (v != null) setState(() => _termsAccepted = v);
+              }, 
+              activeColor: AppTheme.primaryBlue
+            ),
             Expanded(
               child: Text(
                 'أقر أنا قائد الفريق بالالتزام بجميع القوانين واللوائح الصادرة من الاتحاد السوداني للرياضات الإلكترونية.',
@@ -604,32 +719,37 @@ class _TournamentRegistrationScreenState extends State<TournamentRegistrationScr
 
   // Step 5: Digital Pass
   Widget _buildStep5() {
+    bool isPending = _registrationStatus == 'pending_payment';
+    
     return Column(
       children: [
         Container(
           width: 80,
           height: 80,
           decoration: BoxDecoration(
-            color: AppTheme.primaryBlue,
+            color: isPending ? Colors.orange : AppTheme.primaryBlue,
             shape: BoxShape.circle,
           ),
-          child: Icon(Icons.check, size: 48, color: Colors.black),
+          child: Icon(isPending ? Icons.access_time : Icons.check, size: 48, color: Colors.black),
         ),
         SizedBox(height: 16),
         Text(
-          'تم تأكيد التسجيل بنجاح! 🎉',
+          isPending ? 'طلبك قيد المعالجة ⏳' : 'تم تأكيد التسجيل بنجاح! 🎉',
           style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
         ),
         SizedBox(height: 8),
         Text(
-          'تم إصدار بطاقة الدخول والمشاركة الرسمية للفريق في البطولة.',
+          isPending 
+            ? 'بعد أن يوافق عليه الإدمن المالي يكتمل ويتم التسجيل في البطولة.'
+            : 'تم إصدار بطاقة الدخول والمشاركة الرسمية للفريق في البطولة.',
           textAlign: TextAlign.center,
           style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 13),
         ),
         SizedBox(height: 24),
 
-        // Digital Ticket Pass
-        Container(
+        if (!isPending)
+          // Digital Ticket Pass
+          Container(
           padding: EdgeInsets.all(20),
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.surface,

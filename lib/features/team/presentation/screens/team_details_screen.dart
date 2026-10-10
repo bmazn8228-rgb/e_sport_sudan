@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:e_sport_sudan/core/theme/app_theme.dart';
 import 'package:e_sport_sudan/core/services/firestore_service.dart';
@@ -18,18 +19,42 @@ class TeamDetailsScreen extends StatelessWidget {
     final roster = (team['roster'] as List?)?.cast<Map<String, dynamic>>() ?? [];
     final currentUid = FirebaseAuth.instance.currentUser?.uid ?? '';
     final isLeader = currentUid == leaderId;
+    final isMember = isLeader || roster.any((m) => m['uid'] == currentUid);
+    final joinType = team['joinType'] ?? 'public';
+    final pendingRequests = (team['pendingRequests'] as List?) ?? [];
+    final hasRequested = pendingRequests.any((req) => req is Map && req['uid'] == currentUid);
 
     Future<void> joinTeam() async {
       try {
-        await FirestoreService().joinTeam(
-          teamId,
-          currentUid,
-          {'uid': currentUid, 'name': FirebaseAuth.instance.currentUser?.displayName ?? 'لاعب', 'ign': ''},
-        );
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('انضممت للفريق بنجاح!'), backgroundColor: AppTheme.primaryBlue),
-          );
+        final currentUser = FirebaseAuth.instance.currentUser;
+        if (currentUser == null) return;
+
+        final rosterData = {
+          'uid': currentUid,
+          'name': currentUser.displayName ?? 'لاعب',
+          'displayName': currentUser.displayName ?? 'لاعب',
+          'email': currentUser.email ?? '',
+          'ign': '',
+          'role': 'عضو',
+          'joinedAt': DateTime.now().toIso8601String(),
+        };
+
+        if (joinType == 'approval') {
+          rosterData['status'] = 'pending';
+          await FirestoreService().requestToJoinTeam(teamId, rosterData);
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('تم إرسال طلب الانضمام لقائد الفريق بنجاح! ⏳'), backgroundColor: Colors.orange.shade700),
+            );
+          }
+        } else {
+          await FirestoreService().joinTeam(teamId, currentUid, rosterData);
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('انضممت للفريق بنجاح! 🏆'), backgroundColor: AppTheme.primaryBlue),
+            );
+            Navigator.pop(context, true);
+          }
         }
       } catch (e) {
         if (context.mounted) {
@@ -81,7 +106,38 @@ class TeamDetailsScreen extends StatelessWidget {
                   ),
                   SizedBox(height: 12),
                   Text(teamName, style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-                  SizedBox(height: 4),
+                  if (teamId.isNotEmpty) ...[
+                    SizedBox(height: 6),
+                    InkWell(
+                      onTap: () {
+                        HapticFeedback.lightImpact();
+                        Clipboard.setData(ClipboardData(text: teamId));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('تم نسخ معرف الفريق: $teamId'), duration: Duration(seconds: 2), behavior: SnackBarBehavior.floating),
+                        );
+                      },
+                      borderRadius: BorderRadius.circular(8),
+                      child: Container(
+                        padding: EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: AppTheme.primaryBlue.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: AppTheme.primaryBlue.withValues(alpha: 0.3)),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.tag_rounded, size: 13, color: AppTheme.primaryBlue),
+                            SizedBox(width: 4),
+                            Text('ID: $teamId', style: TextStyle(color: AppTheme.primaryBlue, fontWeight: FontWeight.bold, fontSize: 12, letterSpacing: 0.5)),
+                            SizedBox(width: 6),
+                            Icon(Icons.copy_rounded, size: 12, color: AppTheme.primaryBlue),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                  SizedBox(height: 6),
                   Text(game, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 14)),
                   SizedBox(height: 16),
                   Row(
@@ -151,21 +207,35 @@ class TeamDetailsScreen extends StatelessWidget {
           ],
         ),
       ),
-      bottomNavigationBar: !isLeader
+      bottomNavigationBar: !isMember
           ? SafeArea(
               child: Padding(
-                padding: EdgeInsets.all(16),
-                child: ElevatedButton.icon(
-                  onPressed: joinTeam,
-                  icon: Icon(Icons.person_add),
-                  label: Text('انضم لهذا الفريق', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.primaryBlue,
-                    foregroundColor: Colors.black,
-                    minimumSize: Size(double.infinity, 54),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                  ),
-                ),
+                padding: const EdgeInsets.all(16),
+                child: hasRequested
+                    ? OutlinedButton.icon(
+                        onPressed: null,
+                        icon: const Icon(Icons.hourglass_top_rounded, color: Colors.orangeAccent),
+                        label: const Text('طلبك قيد الانتظار ⏳', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.orangeAccent, fontSize: 16)),
+                        style: OutlinedButton.styleFrom(
+                          minimumSize: const Size(double.infinity, 52),
+                          side: const BorderSide(color: Colors.orangeAccent),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        ),
+                      )
+                    : ElevatedButton.icon(
+                        onPressed: joinTeam,
+                        icon: Icon(joinType == 'approval' ? Icons.send_rounded : Icons.person_add),
+                        label: Text(
+                          joinType == 'approval' ? 'طلب انضمام للفريق 🔒' : 'انضم لهذا الفريق ⚡',
+                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: joinType == 'approval' ? Colors.orangeAccent : AppTheme.primaryBlue,
+                          foregroundColor: joinType == 'approval' ? Colors.black : Colors.white,
+                          minimumSize: const Size(double.infinity, 52),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        ),
+                      ),
               ),
             )
           : null,
