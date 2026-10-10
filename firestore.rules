@@ -67,6 +67,10 @@ service cloud.firestore {
         (
           (isOwner(userId) || isTournamentAdmin() || isFinanceAdmin()) &&
           (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['role']))
+        ) ||
+        (
+          // Allow team captains to assign or clear teamId for members upon accepting join requests or removing members
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['teamId'])
         )
       );
       

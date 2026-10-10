@@ -184,6 +184,23 @@ exports.onUserNotificationAdded = functions.firestore
           title: notifData.title || "إشعار جديد",
           body: notifData.body || "لديك تنبيه جديد في التطبيق.",
         },
+        android: {
+          priority: "high",
+          notification: {
+            channelId: "high_importance_channel",
+            sound: "default",
+            defaultSound: true,
+            defaultVibrateTimings: true,
+          },
+        },
+        apns: {
+          payload: {
+            aps: {
+              sound: "default",
+              badge: 1,
+            },
+          },
+        },
         data: {
           type: notifData.type || "general",
         },

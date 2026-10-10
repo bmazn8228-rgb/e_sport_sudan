@@ -13,6 +13,7 @@ import 'package:e_sport_sudan/features/profile/presentation/screens/player_searc
 import 'package:image_picker/image_picker.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'dart:io';
+import 'dart:async';
 
 class TeamManagementScreen extends StatefulWidget {
   const TeamManagementScreen({super.key});
@@ -29,11 +30,26 @@ class _TeamManagementScreenState extends State<TeamManagementScreen> {
   bool _isUploadingLogo = false;
   File? _localLogoPreviewFile;
   Map<String, dynamic>? _teamData;
+  StreamSubscription<UserModel?>? _userStreamSub;
 
   @override
   void initState() {
     super.initState();
     _loadData();
+    final authUser = FirebaseAuth.instance.currentUser;
+    if (authUser != null) {
+      _userStreamSub = _firestoreService.getUserStream(authUser.uid).listen((user) {
+        if (mounted && user != null && user.teamId != _currentUser?.teamId) {
+          _loadData();
+        }
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _userStreamSub?.cancel();
+    super.dispose();
   }
 
   Future<void> _loadData() async {
@@ -47,10 +63,10 @@ class _TeamManagementScreenState extends State<TeamManagementScreen> {
       UserModel? user;
       try {
         user = await _firestoreService
-            .getUser(authUser.uid, forceRefresh: false)
+            .getUser(authUser.uid, forceRefresh: true)
             .timeout(const Duration(seconds: 6));
       } catch (_) {
-        user = await _firestoreService.getUser(authUser.uid);
+        user = await _firestoreService.getUser(authUser.uid, forceRefresh: true);
       }
 
       if (user == null) {
@@ -685,17 +701,22 @@ class _TeamManagementScreenState extends State<TeamManagementScreen> {
       ),
       body: _isLoading
           ? Center(child: CircularProgressIndicator(color: AppTheme.primaryBlue))
-          : SingleChildScrollView(
-              padding: EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Team Profile Banner
-                  if (_teamData == null)
-                    _buildNoTeamBanner()
-                  else
-                    _buildTeamDetails(),
-                ],
+          : RefreshIndicator(
+              onRefresh: _loadData,
+              color: AppTheme.primaryBlue,
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Team Profile Banner
+                    if (_teamData == null)
+                      _buildNoTeamBanner()
+                    else
+                      _buildTeamDetails(),
+                  ],
+                ),
               ),
             ),
     );
@@ -970,8 +991,9 @@ class _TeamManagementScreenState extends State<TeamManagementScreen> {
 
     // Check if current user is leader
     final roster = _teamData?['roster'] as List<dynamic>? ?? [];
-    final currentUserData = roster.firstWhere((p) => p['uid'] == _userId, orElse: () => null);
-    final isLeader = currentUserData != null && currentUserData['isLeader'] == true;
+    final currentUserData = roster.firstWhere((p) => p is Map && p['uid'] == _userId, orElse: () => null);
+    final isLeader = (_teamData?['leaderId'] == _userId) ||
+        (currentUserData != null && (currentUserData['isLeader'] == true || currentUserData['role'] == 'كابتن' || currentUserData['role'] == 'Leader'));
     
     if (!isLeader) return SizedBox.shrink();
 
@@ -1009,11 +1031,16 @@ class _TeamManagementScreenState extends State<TeamManagementScreen> {
                     icon: Icon(Icons.check_circle, color: Colors.green),
                     onPressed: () async {
                       try {
-                        await _firestoreService.acceptJoinRequest(_teamData!['id'], requestMap['uid'], requestMap);
+                        await _firestoreService.acceptJoinRequest(
+                          _teamData!['id'],
+                          requestMap['uid'],
+                          requestMap,
+                          teamName: _teamData!['name'],
+                        );
                         _loadData();
                         if (mounted) NotificationService.showCustomToast(context, title: 'نجاح', message: 'تم قبول اللاعب بنجاح ✅', type: ToastType.success);
                       } catch (e) {
-                        if (mounted) NotificationService.showCustomToast(context, title: 'خطأ', message: 'فشل قبول اللاعب', type: ToastType.urgent);
+                        if (mounted) NotificationService.showCustomToast(context, title: 'خطأ', message: 'فشل قبول اللاعب: $e', type: ToastType.urgent);
                       }
                     },
                   ),
@@ -1021,11 +1048,16 @@ class _TeamManagementScreenState extends State<TeamManagementScreen> {
                     icon: Icon(Icons.cancel, color: Colors.red),
                     onPressed: () async {
                       try {
-                        await _firestoreService.rejectJoinRequest(_teamData!['id'], requestMap);
+                        await _firestoreService.rejectJoinRequest(
+                          _teamData!['id'],
+                          requestMap['uid'],
+                          requestMap,
+                          _teamData!['name'],
+                        );
                         _loadData();
                         if (mounted) NotificationService.showCustomToast(context, title: 'مرفوض', message: 'تم رفض طلب الانضمام', type: ToastType.success);
                       } catch (e) {
-                        if (mounted) NotificationService.showCustomToast(context, title: 'خطأ', message: 'فشل الرفض', type: ToastType.urgent);
+                        if (mounted) NotificationService.showCustomToast(context, title: 'خطأ', message: 'فشل الرفض: $e', type: ToastType.urgent);
                       }
                     },
                   ),

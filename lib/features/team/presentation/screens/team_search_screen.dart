@@ -100,15 +100,25 @@ class _TeamSearchScreenState extends State<TeamSearchScreen> {
     setState(() => _loadingTeamIds.add(teamId));
 
     try {
+      final userDoc = await _firestoreService.getUser(user.uid);
+      if (userDoc?.teamId != null && userDoc!.teamId!.isNotEmpty && userDoc.teamId != teamId) {
+        if (mounted) {
+          NotificationService.showCustomToast(
+            context,
+            title: 'تنبيه',
+            message: 'أنت منضم بالفعل إلى فريق آخر! يجب مغادرة فريقك الحالي أولاً.',
+            type: ToastType.urgent,
+          );
+        }
+        return;
+      }
+
       String displayName = user.displayName ?? 'لاعب مجهول';
       String ign = '';
-      try {
-        final userDoc = await _firestoreService.getUser(user.uid);
-        if (userDoc != null) {
-          if (userDoc.displayName.isNotEmpty) displayName = userDoc.displayName;
-          if (userDoc.ign != null && userDoc.ign!.isNotEmpty) ign = userDoc.ign!;
-        }
-      } catch (_) {}
+      if (userDoc != null) {
+        if (userDoc.displayName.isNotEmpty) displayName = userDoc.displayName;
+        if (userDoc.ign != null && userDoc.ign!.isNotEmpty) ign = userDoc.ign!;
+      }
 
       final playerRosterData = {
         'uid': user.uid,
@@ -162,15 +172,25 @@ class _TeamSearchScreenState extends State<TeamSearchScreen> {
     setState(() => _loadingTeamIds.add(teamId));
 
     try {
+      final userDoc = await _firestoreService.getUser(user.uid);
+      if (userDoc?.teamId != null && userDoc!.teamId!.isNotEmpty && userDoc.teamId != teamId) {
+        if (mounted) {
+          NotificationService.showCustomToast(
+            context,
+            title: 'تنبيه',
+            message: 'أنت منضم بالفعل إلى فريق آخر! يجب مغادرة فريقك الحالي أولاً.',
+            type: ToastType.urgent,
+          );
+        }
+        return;
+      }
+
       String displayName = user.displayName ?? 'لاعب مجهول';
       String ign = '';
-      try {
-        final userDoc = await _firestoreService.getUser(user.uid);
-        if (userDoc != null) {
-          if (userDoc.displayName.isNotEmpty) displayName = userDoc.displayName;
-          if (userDoc.ign != null && userDoc.ign!.isNotEmpty) ign = userDoc.ign!;
-        }
-      } catch (_) {}
+      if (userDoc != null) {
+        if (userDoc.displayName.isNotEmpty) displayName = userDoc.displayName;
+        if (userDoc.ign != null && userDoc.ign!.isNotEmpty) ign = userDoc.ign!;
+      }
 
       final playerRosterData = {
         'uid': user.uid,
@@ -183,7 +203,7 @@ class _TeamSearchScreenState extends State<TeamSearchScreen> {
         'requestedAt': DateTime.now().toIso8601String(),
       };
 
-      await _firestoreService.requestToJoinTeam(teamId, playerRosterData);
+      await _firestoreService.requestToJoinTeam(teamId, playerRosterData, teamName: teamName);
 
       if (mounted) {
         NotificationService.showCustomToast(

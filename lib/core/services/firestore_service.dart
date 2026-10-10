@@ -232,58 +232,216 @@ class FirestoreService {
   }
 
   Future<void> joinTeam(String teamId, String uid, Map<String, dynamic> playerRosterData) async {
-    // Add user to team roster array
-    await _db.collection('teams').doc(teamId).update({
-      'roster': FieldValue.arrayUnion([playerRosterData])
-    });
+    final teamRef = _db.collection('teams').doc(teamId);
+    final teamSnap = await teamRef.get();
+    final teamName = teamSnap.data()?['name']?.toString() ?? 'الفريق';
+
+    // Add user to team roster array and remove from pending if present
+    if (teamSnap.exists) {
+      List<dynamic> roster = List.from(teamSnap.data()?['roster'] ?? []);
+      List<dynamic> pending = List.from(teamSnap.data()?['pendingRequests'] ?? []);
+      roster.removeWhere((item) => item is Map && item['uid'] == uid);
+      pending.removeWhere((item) => item is Map && item['uid'] == uid);
+      roster.add(playerRosterData);
+
+      await teamRef.update({
+        'roster': roster,
+        'pendingRequests': pending,
+      });
+    } else {
+      await teamRef.update({
+        'roster': FieldValue.arrayUnion([playerRosterData])
+      });
+    }
+
     // Update user doc safely
     await _db.collection('users').doc(uid).set({
       'teamId': teamId,
     }, SetOptions(merge: true));
+
+    // Clear local cache
+    if (_cachedUser != null && _cachedUser!.uid == uid) {
+      _cachedUser = null;
+    }
+
+    // Send confirmation notification
+    try {
+      await addNotification(
+        uid,
+        'انضممت إلى الفريق! 🏆',
+        'تهانينا! لقد انضممت بنجاح إلى فريق "$teamName".',
+        type: 'social',
+      );
+    } catch (_) {}
   }
 
-  
-  Future<void> requestToJoinTeam(String teamId, Map<String, dynamic> requestData) async {
-    await _db.collection('teams').doc(teamId).update({
-      'pendingRequests': FieldValue.arrayUnion([requestData])
-    });
-  }
-
-  Future<void> acceptJoinRequest(String teamId, String uid, Map<String, dynamic> requestData) async {
+  Future<void> requestToJoinTeam(String teamId, Map<String, dynamic> requestData, {String? teamName}) async {
     final teamRef = _db.collection('teams').doc(teamId);
-    
+    final teamSnap = await teamRef.get();
+    if (!teamSnap.exists) {
+      throw Exception('الفريق غير موجود');
+    }
+
+    final teamData = teamSnap.data() ?? {};
+    final resolvedTeamName = teamName ?? (teamData['name']?.toString() ?? 'الفريق');
+    final leaderId = teamData['leaderId']?.toString() ?? teamData['creatorUid']?.toString();
+    final uid = requestData['uid']?.toString() ?? '';
+
+    // Check if user is already in roster
+    List<dynamic> roster = List.from(teamData['roster'] ?? []);
+    if (roster.any((item) => item is Map && item['uid'] == uid)) {
+      throw Exception('أنت عضو بالفعل في هذا الفريق');
+    }
+
+    // Check if user is already in pendingRequests
+    List<dynamic> pendingRequests = List.from(teamData['pendingRequests'] ?? []);
+    final alreadyRequested = pendingRequests.any((item) => item is Map && item['uid'] == uid);
+    if (alreadyRequested) {
+      throw Exception('لقد قمت بإرسال طلب انضمام بالفعل وهو قيد المراجعة ⏳');
+    }
+
+    // Clean add to pendingRequests
+    pendingRequests.add(requestData);
+    await teamRef.update({
+      'pendingRequests': pendingRequests,
+    });
+
+    // Notify team leader/captain
+    if (leaderId != null && leaderId.isNotEmpty && leaderId != uid) {
+      try {
+        final applicantName = requestData['displayName'] ?? requestData['name'] ?? 'لاعب';
+        await addNotification(
+          leaderId,
+          'طلب انضمام جديد 📩',
+          'أرسل اللاعب "$applicantName" طلباً للانضمام إلى فريقك "$resolvedTeamName". يمكنك مراجعته والموافقة عليه الآن.',
+          type: 'social',
+        );
+      } catch (e) {
+        debugPrint('Error notifying leader about join request: $e');
+      }
+    }
+  }
+
+  Future<void> acceptJoinRequest(
+    String teamId,
+    String uid,
+    Map<String, dynamic> requestData, {
+    String? teamName,
+  }) async {
+    final teamRef = _db.collection('teams').doc(teamId);
+    final userRef = _db.collection('users').doc(uid);
+    String resolvedTeamName = teamName ?? 'الفريق';
+
     await _db.runTransaction((transaction) async {
-      // 1. Remove from pending
+      final teamSnap = await transaction.get(teamRef);
+      if (!teamSnap.exists) {
+        throw Exception('الفريق غير موجود');
+      }
+
+      final teamData = teamSnap.data() ?? {};
+      resolvedTeamName = teamName ?? (teamData['name']?.toString() ?? 'الفريق');
+
+      // 1. Remove cleanly from pendingRequests by uid
+      List<dynamic> pendingRequests = List.from(teamData['pendingRequests'] ?? []);
+      pendingRequests.removeWhere((item) => item is Map && item['uid'] == uid);
+
+      // 2. Add cleanly to roster
+      List<dynamic> roster = List.from(teamData['roster'] ?? []);
+      roster.removeWhere((item) => item is Map && item['uid'] == uid);
+
+      final newMember = Map<String, dynamic>.from(requestData);
+      newMember['role'] = 'عضو';
+      newMember['status'] = 'active';
+      newMember['joinedAt'] = DateTime.now().toIso8601String();
+      roster.add(newMember);
+
+      // Update team doc
       transaction.update(teamRef, {
+        'pendingRequests': pendingRequests,
+        'roster': roster,
+      });
+
+      // 3. Update user doc with teamId
+      transaction.set(userRef, {
+        'teamId': teamId,
+      }, SetOptions(merge: true));
+    });
+
+    // Invalidate local cache
+    if (_cachedUser != null && _cachedUser!.uid == uid) {
+      _cachedUser = null;
+    }
+
+    // 4. Send official acceptance notification to player's account
+    try {
+      await addNotification(
+        uid,
+        'تم قبول انضمامك للفريق! 🎉',
+        'تهانينا! تمت الموافقة على طلب انضمامك إلى فريق "$resolvedTeamName". أصبحت الآن عضواً رسمياً في الفريق!',
+        type: 'team_accepted',
+      );
+    } catch (e) {
+      debugPrint('Error sending acceptance notification: $e');
+    }
+  }
+
+  Future<void> rejectJoinRequest(
+    String teamId,
+    String uid, [
+    Map<String, dynamic>? requestData,
+    String? teamName,
+  ]) async {
+    final teamRef = _db.collection('teams').doc(teamId);
+    String resolvedTeamName = teamName ?? 'الفريق';
+
+    final teamSnap = await teamRef.get();
+    if (teamSnap.exists) {
+      final teamData = teamSnap.data() ?? {};
+      resolvedTeamName = teamName ?? (teamData['name']?.toString() ?? 'الفريق');
+      List<dynamic> pendingRequests = List.from(teamData['pendingRequests'] ?? []);
+      pendingRequests.removeWhere((item) => item is Map && item['uid'] == uid);
+      await teamRef.update({'pendingRequests': pendingRequests});
+    } else if (requestData != null) {
+      await teamRef.update({
         'pendingRequests': FieldValue.arrayRemove([requestData])
       });
-      // 2. Add to roster
-      requestData['role'] = 'Member';
-      requestData['joinedAt'] = DateTime.now().toIso8601String();
-      transaction.update(teamRef, {
-        'roster': FieldValue.arrayUnion([requestData])
-      });
-      // 3. Update user doc
-      final userRef = _db.collection('users').doc(uid);
-      transaction.set(userRef, {'teamId': teamId}, SetOptions(merge: true));
-    });
-  }
+    }
 
-  Future<void> rejectJoinRequest(String teamId, Map<String, dynamic> requestData) async {
-    await _db.collection('teams').doc(teamId).update({
-      'pendingRequests': FieldValue.arrayRemove([requestData])
-    });
+    // Send official rejection notification to player's account
+    try {
+      await addNotification(
+        uid,
+        'تم رفض طلب الانضمام ❌',
+        'نعتذر، تم رفض طلب انضمامك إلى فريق "$resolvedTeamName" من قبل إدارة الفريق.',
+        type: 'team_rejected',
+      );
+    } catch (e) {
+      debugPrint('Error sending rejection notification: $e');
+    }
   }
 
   Future<void> leaveTeam(String teamId, String uid, Map<String, dynamic> playerRosterData) async {
-    // Remove user from team roster array
-    await _db.collection('teams').doc(teamId).update({
-      'roster': FieldValue.arrayRemove([playerRosterData])
-    });
+    final teamRef = _db.collection('teams').doc(teamId);
+    final teamSnap = await teamRef.get();
+    if (teamSnap.exists) {
+      List<dynamic> roster = List.from(teamSnap.data()?['roster'] ?? []);
+      roster.removeWhere((item) => item is Map && item['uid'] == uid);
+      await teamRef.update({'roster': roster});
+    } else {
+      await teamRef.update({
+        'roster': FieldValue.arrayRemove([playerRosterData])
+      });
+    }
+
     // Update user doc safely
     await _db.collection('users').doc(uid).set({
       'teamId': FieldValue.delete(),
     }, SetOptions(merge: true));
+
+    // Clear local cache
+    if (_cachedUser != null && _cachedUser!.uid == uid) {
+      _cachedUser = null;
+    }
   }
 
   Future<void> registerTeam(Map<String, dynamic> teamData) async {
@@ -476,6 +634,7 @@ class FirestoreService {
       'scoreB': scoreB ?? 0,
       'time': isLive ? 'مباشر الآن' : 'متوقف',
       'sessionId': sessionId,
+      'createdAt': FieldValue.serverTimestamp(),
       'updatedAt': FieldValue.serverTimestamp(),
     };
     await _db.collection('matches').doc('sample_live_match').set(data, SetOptions(merge: true));
@@ -505,13 +664,60 @@ class FirestoreService {
     return _db.collection('matches').doc(matchId).snapshots();
   }
 
-  Stream<List<Map<String, dynamic>>> getAllMatchesStream() {
-    return _db.collection('matches').orderBy('createdAt', descending: true).snapshots().map(
-      (snapshot) => snapshot.docs.map((doc) {
+  Stream<Map<String, dynamic>?> getActiveLiveMatchStream() {
+    return _db.collection('matches').snapshots().map((snapshot) {
+      for (final doc in snapshot.docs) {
+        if (doc.id == 'sample_live_match') {
+          final data = doc.data();
+          final isLive = (data['isLive'] == true || data['status'] == 'live') &&
+              (data['youtubeVideoId'] ?? '').toString().trim().isNotEmpty;
+          if (isLive) {
+            final res = Map<String, dynamic>.from(data);
+            res['id'] = doc.id;
+            return res;
+          }
+        }
+      }
+
+      for (final doc in snapshot.docs) {
+        if (doc.id == 'sample_live_match') continue;
         final data = doc.data();
-        data['id'] = doc.id;
-        return data;
-      }).toList(),
+        final isLive = (data['isLive'] == true || data['status'] == 'live') &&
+            (data['youtubeVideoId'] ?? '').toString().trim().isNotEmpty;
+        if (isLive) {
+          final res = Map<String, dynamic>.from(data);
+          res['id'] = doc.id;
+          return res;
+        }
+      }
+      return null;
+    });
+  }
+
+  Stream<List<Map<String, dynamic>>> getAllMatchesStream() {
+    return _db.collection('matches').snapshots().map(
+      (snapshot) {
+        final list = snapshot.docs.map((doc) {
+          final data = doc.data();
+          data['id'] = doc.id;
+          return data;
+        }).toList();
+
+        list.sort((a, b) {
+          final aLive = (a['isLive'] == true || a['status'] == 'live') ? 1 : 0;
+          final bLive = (b['isLive'] == true || b['status'] == 'live') ? 1 : 0;
+          if (aLive != bLive) return bLive.compareTo(aLive);
+
+          final aTime = a['updatedAt'] ?? a['createdAt'];
+          final bTime = b['updatedAt'] ?? b['createdAt'];
+          if (aTime is Timestamp && bTime is Timestamp) {
+            return bTime.compareTo(aTime);
+          }
+          return 0;
+        });
+
+        return list;
+      },
     );
   }
 

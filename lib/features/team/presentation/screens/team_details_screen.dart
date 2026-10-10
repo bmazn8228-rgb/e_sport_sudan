@@ -29,23 +29,42 @@ class TeamDetailsScreen extends StatelessWidget {
         final currentUser = FirebaseAuth.instance.currentUser;
         if (currentUser == null) return;
 
+        final userDoc = await FirestoreService().getUser(currentUid);
+        if (userDoc?.teamId != null && userDoc!.teamId!.isNotEmpty && userDoc.teamId != teamId) {
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('أنت منضم بالفعل إلى فريق آخر! يجب مغادرة فريقك الحالي أولاً.'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+          return;
+        }
+
+        final displayName = (userDoc?.displayName != null && userDoc!.displayName.isNotEmpty)
+            ? userDoc.displayName
+            : (currentUser.displayName ?? 'لاعب');
+
         final rosterData = {
           'uid': currentUid,
-          'name': currentUser.displayName ?? 'لاعب',
-          'displayName': currentUser.displayName ?? 'لاعب',
+          'name': displayName,
+          'displayName': displayName,
           'email': currentUser.email ?? '',
-          'ign': '',
+          'ign': userDoc?.ign ?? '',
           'role': 'عضو',
           'joinedAt': DateTime.now().toIso8601String(),
         };
 
         if (joinType == 'approval') {
           rosterData['status'] = 'pending';
-          await FirestoreService().requestToJoinTeam(teamId, rosterData);
+          rosterData['requestedAt'] = DateTime.now().toIso8601String();
+          await FirestoreService().requestToJoinTeam(teamId, rosterData, teamName: teamName);
           if (context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text('تم إرسال طلب الانضمام لقائد الفريق بنجاح! ⏳'), backgroundColor: Colors.orange.shade700),
             );
+            Navigator.pop(context, true);
           }
         } else {
           await FirestoreService().joinTeam(teamId, currentUid, rosterData);

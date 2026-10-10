@@ -6,11 +6,9 @@ import 'dart:ui';
 import 'package:flutter/services.dart';
 import 'package:e_sport_sudan/core/theme/app_theme.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:e_sport_sudan/core/services/firestore_service.dart';
 import 'package:e_sport_sudan/features/match/presentation/screens/live_match_screen.dart';
 import 'package:e_sport_sudan/features/tournament/presentation/screens/tournaments_screen.dart';
-import 'package:e_sport_sudan/features/tournament/presentation/screens/bracket_screen.dart';
 import 'package:e_sport_sudan/features/tournament/presentation/screens/tournament_registration_screen.dart';
 import 'package:e_sport_sudan/features/rankings/presentation/screens/rankings_screen.dart';
 import 'package:e_sport_sudan/features/profile/presentation/screens/profile_screen.dart';
@@ -138,31 +136,88 @@ class _MainScreenState extends State<MainScreen> {
                             )
                           : null,
                     ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          item['icon'] as IconData,
-                          color: isSelected
-                              ? AppTheme.primaryBlue
-                              : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54),
-                          size: 22,
-                        ),
-                        SizedBox(height: 3),
-                        Text(
-                          item['label'] as String,
-                          style: TextStyle(
-                            color: isSelected
-                                ? AppTheme.primaryBlue
-                                : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54),
-                            fontSize: 10,
-                            fontWeight: isSelected
-                                ? FontWeight.bold
-                                : FontWeight.normal,
+                    child: index == 2
+                        ? StreamBuilder<Map<String, dynamic>?>(
+                            stream: FirestoreService().getActiveLiveMatchStream(),
+                            builder: (context, snapshot) {
+                              final isLive = snapshot.hasData && snapshot.data != null;
+                              return Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Stack(
+                                    clipBehavior: Clip.none,
+                                    children: [
+                                      Icon(
+                                        item['icon'] as IconData,
+                                        color: isSelected
+                                            ? (isLive ? Colors.redAccent : AppTheme.primaryBlue)
+                                            : (isLive ? Colors.redAccent : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54)),
+                                        size: 22,
+                                      ),
+                                      if (isLive)
+                                        Positioned(
+                                          top: -2,
+                                          right: -4,
+                                          child: Container(
+                                            width: 8,
+                                            height: 8,
+                                            decoration: BoxDecoration(
+                                              color: Colors.red,
+                                              shape: BoxShape.circle,
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: Colors.red.withValues(alpha: 0.8),
+                                                  blurRadius: 4,
+                                                  spreadRadius: 1,
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 3),
+                                  Text(
+                                    isLive ? 'مباشر 🔴' : (item['label'] as String),
+                                    style: TextStyle(
+                                      color: isSelected
+                                          ? (isLive ? Colors.redAccent : AppTheme.primaryBlue)
+                                          : (isLive ? Colors.redAccent : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54)),
+                                      fontSize: 10,
+                                      fontWeight: (isSelected || isLive)
+                                          ? FontWeight.bold
+                                          : FontWeight.normal,
+                                    ),
+                                  ),
+                                ],
+                              );
+                            },
+                          )
+                        : Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                item['icon'] as IconData,
+                                color: isSelected
+                                    ? AppTheme.primaryBlue
+                                    : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54),
+                                size: 22,
+                              ),
+                              const SizedBox(height: 3),
+                              Text(
+                                item['label'] as String,
+                                style: TextStyle(
+                                  color: isSelected
+                                      ? AppTheme.primaryBlue
+                                      : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54),
+                                  fontSize: 10,
+                                  fontWeight: isSelected
+                                      ? FontWeight.bold
+                                      : FontWeight.normal,
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                      ],
-                    ),
                   ),
                 );
               }),
@@ -225,6 +280,66 @@ class HomeScreen extends StatelessWidget {
                 ],
               ),
             ),
+            // Live Stream Indicator Pill (Shows ONLY when stream is live)
+            StreamBuilder<Map<String, dynamic>?>(
+              stream: FirestoreService().getActiveLiveMatchStream(),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData || snapshot.data == null) {
+                  return const SizedBox.shrink();
+                }
+                return Padding(
+                  padding: const EdgeInsets.only(left: 8),
+                  child: GestureDetector(
+                    onTap: () {
+                      HapticFeedback.lightImpact();
+                      if (onNavigateTab != null) {
+                        onNavigateTab!(2);
+                      } else {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const LiveMatchScreen(matchId: 'sample_live_match'),
+                          ),
+                        );
+                      }
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Colors.red.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: Colors.redAccent.withValues(alpha: 0.8),
+                          width: 1.2,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.red.withValues(alpha: 0.25),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.circle, color: Colors.redAccent, size: 7),
+                          SizedBox(width: 5),
+                          Text(
+                            'بث مباشر',
+                            style: TextStyle(
+                              color: Colors.redAccent,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 11,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
             // Notification Bell (iOS Style)
             GestureDetector(
               onTap: () {
@@ -266,7 +381,10 @@ class HomeScreen extends StatelessWidget {
           children: [
             // iOS Style Search Bar
             HomeSearchBar(),
-            SizedBox(height: 20),
+            SizedBox(height: 16),
+
+            // Top Live Stream Alert Banner (Shows ONLY when stream is live)
+            _buildTopLiveStreamAlert(context),
 
             // Featured Tournament Banner
             StreamBuilder<List<Map<String, dynamic>>>(
@@ -530,6 +648,199 @@ class HomeScreen extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildTopLiveStreamAlert(BuildContext context) {
+    return StreamBuilder<Map<String, dynamic>?>(
+      stream: FirestoreService().getActiveLiveMatchStream(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData || snapshot.data == null) {
+          return const SizedBox.shrink();
+        }
+
+        final liveData = snapshot.data!;
+        final title = liveData['title'] ?? 'بث مباشر الآن';
+        final matchId = liveData['id'] ?? 'sample_live_match';
+        final teamA = liveData['teamA'] as String?;
+        final teamB = liveData['teamB'] as String?;
+
+        return Container(
+          margin: const EdgeInsets.only(bottom: 20),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [
+                Color(0xFFE50914),
+                Color(0xFF8B0000),
+                Color(0xFF1B1828),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: Colors.redAccent.withValues(alpha: 0.6),
+              width: 1.2,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.redAccent.withValues(alpha: 0.3),
+                blurRadius: 18,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(20),
+              onTap: () {
+                HapticFeedback.lightImpact();
+                if (onNavigateTab != null) {
+                  onNavigateTab!(2);
+                } else {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => LiveMatchScreen(matchId: matchId),
+                    ),
+                  );
+                }
+              },
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.15),
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.3),
+                        ),
+                      ),
+                      child: const Center(
+                        child: Icon(
+                          Icons.play_arrow_rounded,
+                          color: Colors.white,
+                          size: 28,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 3,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withValues(alpha: 0.4),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: Colors.white.withValues(alpha: 0.2),
+                                  ),
+                                ),
+                                child: const Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      Icons.circle,
+                                      color: Colors.redAccent,
+                                      size: 7,
+                                    ),
+                                    SizedBox(width: 4),
+                                    Text(
+                                      'بث مباشر الآن',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              if (teamA != null && teamB != null) ...[
+                                const SizedBox(width: 6),
+                                Expanded(
+                                  child: Text(
+                                    '$teamA vs $teamB',
+                                    style: TextStyle(
+                                      color: Colors.white.withValues(alpha: 0.85),
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            title,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(14),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.2),
+                            blurRadius: 6,
+                          ),
+                        ],
+                      ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'شاهد',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(width: 2),
+                          Icon(
+                            Icons.arrow_forward_ios_rounded,
+                            color: Colors.black,
+                            size: 10,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:e_sport_sudan/core/services/firestore_service.dart';
 import 'package:e_sport_sudan/core/theme/app_theme.dart';
 import 'package:e_sport_sudan/features/tournament/presentation/screens/bracket_screen.dart';
@@ -13,25 +12,20 @@ class LiveMatchesSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<List<Map<String, dynamic>>>(
-      stream: FirestoreService().getAllMatchesStream(),
+    return StreamBuilder<Map<String, dynamic>?>(
+      stream: FirestoreService().getActiveLiveMatchStream(),
       builder: (context, snapshot) {
-        if (!snapshot.hasData || snapshot.data!.isEmpty) {
+        if (!snapshot.hasData || snapshot.data == null) {
           return _buildEmptyOfflineState(context);
         }
 
-        final liveMatches = snapshot.data!.where((data) {
-          final videoId = (data['youtubeVideoId'] ?? '').toString().trim();
-          return (data['isLive'] == true || data['status'] == 'live') && videoId.isNotEmpty;
-        }).toList();
-
-        if (liveMatches.isEmpty) {
-          return _buildEmptyOfflineState(context);
-        }
-
-        final data = liveMatches.first;
+        final data = snapshot.data!;
         final title = data['title'] ?? 'مباراة مباشرة';
         final matchId = data['id'] ?? 'sample_live_match';
+        final teamA = data['teamA'] as String?;
+        final teamB = data['teamB'] as String?;
+        final scoreA = data['scoreA'];
+        final scoreB = data['scoreB'];
 
         return Column(
           children: [
@@ -198,6 +192,55 @@ class LiveMatchesSection extends StatelessWidget {
                     'البث المباشر الرسمي المعتمد من الاتحاد السوداني للرياضات الإلكترونية',
                     style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.60), fontSize: 12),
                   ),
+                  if (teamA != null && teamB != null) ...[
+                    const SizedBox(height: 12),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.6),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              teamA,
+                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                            decoration: BoxDecoration(
+                              color: Colors.black,
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: Colors.orange.withValues(alpha: 0.5)),
+                            ),
+                            child: Text(
+                              '${scoreA ?? 0} : ${scoreB ?? 0}',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.orange,
+                                fontSize: 13,
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: Text(
+                              teamB,
+                              textAlign: TextAlign.end,
+                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                   const SizedBox(height: 16),
                   SizedBox(
                     width: double.infinity,
