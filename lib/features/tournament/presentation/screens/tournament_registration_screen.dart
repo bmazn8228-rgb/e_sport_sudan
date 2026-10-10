@@ -87,14 +87,17 @@ class _TournamentRegistrationScreenState extends State<TournamentRegistrationScr
       if (image == null) return null;
 
       final file = File(image.path);
-      final fileName = '${DateTime.now().millisecondsSinceEpoch}_${image.name}';
+      final fileName = '${DateTime.now().millisecondsSinceEpoch}_file.jpg';
       final storageRef = FirebaseStorage.instance.ref().child('$pathPrefix/$fileName');
       
       if (mounted) {
          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('جاري رفع الصورة... ⏳')));
       }
 
-      await storageRef.putFile(file);
+      // Ensure the upload task completes before getting the URL
+      final uploadTask = storageRef.putFile(file);
+      await uploadTask.whenComplete(() {});
+      
       final downloadUrl = await storageRef.getDownloadURL();
       
       if (mounted) {
