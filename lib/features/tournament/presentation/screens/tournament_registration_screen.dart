@@ -73,7 +73,7 @@ class _TournamentRegistrationScreenState extends State<TournamentRegistrationScr
       });
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('فشل تحميل بيانات الفريق: '), backgroundColor: Colors.red));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('فشل تحميل بيانات الفريق: $e'), backgroundColor: Colors.red));
         Navigator.pop(context); // Exit if data fails to load
       }
     }
@@ -87,8 +87,8 @@ class _TournamentRegistrationScreenState extends State<TournamentRegistrationScr
       if (image == null) return null;
 
       final file = File(image.path);
-      final fileName = '_';
-      final storageRef = FirebaseStorage.instance.ref().child('/');
+      final fileName = '${DateTime.now().millisecondsSinceEpoch}_${image.name}';
+      final storageRef = FirebaseStorage.instance.ref().child('$pathPrefix/$fileName');
       
       if (mounted) {
          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('جاري رفع الصورة... ⏳')));
@@ -103,7 +103,7 @@ class _TournamentRegistrationScreenState extends State<TournamentRegistrationScr
       return downloadUrl;
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('فشل رفع الصورة: '), backgroundColor: Colors.red));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('فشل رفع الصورة: $e'), backgroundColor: Colors.red));
       }
       return null;
     }
@@ -394,13 +394,13 @@ class _TournamentRegistrationScreenState extends State<TournamentRegistrationScr
         SizedBox(height: 6),
         InkWell(
           onTap: () async {
-            // Simulate picking an image
-            setState(() {
-              _teamLogoFileName = 'team_logo_${DateTime.now().millisecondsSinceEpoch.toString().substring(8)}.png';
-            });
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('تم إرفاق شعار الفريق بنجاح ✔️')),
-            );
+            final url = await _pickAndUploadImage('tournaments/logos');
+            if (url != null) {
+              setState(() {
+                _teamLogoUrl = url;
+                _teamLogoFileName = 'تم رفع الشعار بنجاح';
+              });
+            }
           },
           child: Container(
             padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
@@ -671,13 +671,13 @@ class _TournamentRegistrationScreenState extends State<TournamentRegistrationScr
           SizedBox(height: 6),
           InkWell(
             onTap: () async {
-              // Simulate picking an image
-              setState(() {
-                _receiptFileName = 'receipt_bankak_${DateTime.now().millisecondsSinceEpoch.toString().substring(8)}.jpg';
-              });
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('تم إرفاق الإشعار بنجاح ✔️')),
-              );
+              final url = await _pickAndUploadImage('tournaments/receipts');
+              if (url != null) {
+                setState(() {
+                  _receiptFileUrl = url;
+                  _receiptFileName = 'تم رفع الإشعار بنجاح';
+                });
+              }
             },
             child: Container(
               padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
