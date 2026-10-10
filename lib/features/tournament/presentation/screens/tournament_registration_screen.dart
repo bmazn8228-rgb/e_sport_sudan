@@ -7,7 +7,7 @@ import 'package:e_sport_sudan/core/utils/connectivity_helper.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:e_sport_sudan/core/services/firestore_service.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:firebase_storage/firebase_storage.dart';
+import 'package:e_sport_sudan/core/services/storage_service.dart';
 
 class TournamentRegistrationScreen extends StatefulWidget {
   final Map<String, dynamic> tournamentData;
@@ -87,21 +87,21 @@ class _TournamentRegistrationScreenState extends State<TournamentRegistrationScr
       if (image == null) return null;
 
       final file = File(image.path);
-      final fileName = '${DateTime.now().millisecondsSinceEpoch}_file.jpg';
-      final storageRef = FirebaseStorage.instance.ref().child('$pathPrefix/$fileName');
       
       if (mounted) {
          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('جاري رفع الصورة... ⏳')));
       }
 
-      // Ensure the upload task completes before getting the URL
-      final uploadTask = storageRef.putFile(file);
-      await uploadTask.whenComplete(() {});
+      final downloadUrl = await StorageService().uploadImage(file, pathPrefix);
       
-      final downloadUrl = await storageRef.getDownloadURL();
-      
-      if (mounted) {
-         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('تم رفع الصورة بنجاح ✔️'), backgroundColor: AppTheme.primaryBlue));
+      if (downloadUrl != null) {
+        if (mounted) {
+           ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('تم رفع الصورة بنجاح ✔️'), backgroundColor: AppTheme.primaryBlue));
+        }
+      } else {
+        if (mounted) {
+           ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('فشل رفع الصورة، يرجى المحاولة مرة أخرى.'), backgroundColor: Colors.red));
+        }
       }
       return downloadUrl;
     } catch (e) {
