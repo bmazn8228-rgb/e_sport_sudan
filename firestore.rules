@@ -21,29 +21,29 @@ service cloud.firestore {
     
     function isSuperAdmin() {
       return isAuthenticated() && (
-        (request.auth.token.keys().hasAny(['email']) && request.auth.token.email.matches('(?i)^(superadmin|admin)@esportsudan\\.sd$'))
-        || getUserRole() == 'super_admin'
+        (request.auth.token.email != null && request.auth.token.email.matches('(?i)^(superadmin|admin)@esportsudan\\.sd$'))
+        || getUserRole() in ['super_admin', 'superAdmin']
       );
     }
     
     function isTournamentAdmin() {
       return isSuperAdmin() || (isAuthenticated() && (
-        (request.auth.token.keys().hasAny(['email']) && request.auth.token.email.matches('(?i)^(tournament|organizer)@esportsudan\\.sd$'))
-        || getUserRole() in ['super_admin', 'tournament_admin']
+        (request.auth.token.email != null && request.auth.token.email.matches('(?i)^(tournament|organizer)@esportsudan\\.sd$'))
+        || getUserRole() in ['super_admin', 'superAdmin', 'tournament_admin', 'tournamentAdmin', 'admin', 'organizer']
       ));
     }
     
     function isReferee() {
       return isTournamentAdmin() || (isAuthenticated() && (
-        (request.auth.token.keys().hasAny(['email']) && request.auth.token.email.matches('(?i)^referee@esportsudan\\.sd$'))
-        || getUserRole() in ['super_admin', 'tournament_admin', 'referee']
+        (request.auth.token.email != null && request.auth.token.email.matches('(?i)^referee@esportsudan\\.sd$'))
+        || getUserRole() in ['referee']
       ));
     }
     
     function isFinanceAdmin() {
       return isSuperAdmin() || (isAuthenticated() && (
-        (request.auth.token.keys().hasAny(['email']) && request.auth.token.email.matches('(?i)^finance@esportsudan\\.sd$'))
-        || getUserRole() in ['super_admin', 'finance_admin']
+        (request.auth.token.email != null && request.auth.token.email.matches('(?i)^finance@esportsudan\\.sd$'))
+        || getUserRole() in ['finance_admin', 'financeAdmin']
       ));
     }
     
@@ -57,28 +57,24 @@ service cloud.firestore {
     match /users/{userId} {
       allow read: if isAuthenticated();
       
+      // Allow user creation on signup (role cannot be self-assigned to admin)
       allow create: if isAuthenticated() && (
-        isOwner(userId)
+        (isOwner(userId) && (!('role' in request.resource.data) || request.resource.data.role in ['player', 'guest']))
         || isSuperAdmin()
       );
       
+      // Allow user to update their own profile, but NOT change their own role unless SuperAdmin
       allow update: if isAuthenticated() && (
-        isSuperAdmin() ||
-        (
-          (isOwner(userId) || isTournamentAdmin() || isFinanceAdmin()) &&
-          (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['role']))
-        ) ||
-        (
-          // Allow team captains to assign or clear teamId for members upon accepting join requests or removing members
-          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['teamId'])
-        )
+        (isOwner(userId) && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['role'])))
+        || isSuperAdmin()
+        || isFinanceAdmin()
       );
       
       allow delete: if isSuperAdmin();
 
       // User Notifications Subcollection
       match /notifications/{notificationId} {
-        allow read, update, delete: if isOwner(userId);
+        allow read, update, delete: if isOwner(userId) || isSuperAdmin();
         allow create: if isAuthenticated();
       }
 
@@ -86,7 +82,6 @@ service cloud.firestore {
       match /bank_accounts/{accountId} {
         allow read, write: if isOwner(userId) || isSuperAdmin() || isFinanceAdmin();
       }
-
     }
 
     // =========================================================================
@@ -94,7 +89,8 @@ service cloud.firestore {
     // =========================================================================
     match /tournaments/{tournamentId} {
       allow read: if true;
-      allow create, update, delete: if isTournamentAdmin();
+      allow create: if isTournamentAdmin();
+      allow update, delete: if isTournamentAdmin();
       
       match /registrations/{registrationId} {
         allow read: if isAuthenticated();
@@ -197,6 +193,14 @@ service cloud.firestore {
       allow read: if true;
       allow write: if isTournamentAdmin();
     }
+
+    // =========================================================================
+    // 10. Global Notifications (if created at root)
+    // =========================================================================
+    match /notifications/{notificationId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update, delete: if isSuperAdmin() || isTournamentAdmin();
+    }
   }
 }
-
