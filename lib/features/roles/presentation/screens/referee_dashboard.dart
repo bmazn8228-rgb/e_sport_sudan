@@ -8,7 +8,9 @@ import 'package:e_sport_sudan/core/services/firestore_service.dart';
 import 'package:e_sport_sudan/features/admin/presentation/screens/referee_dashboard_screen.dart';
 import 'package:e_sport_sudan/core/services/auth_service.dart';
 import 'package:e_sport_sudan/features/auth/presentation/screens/login_screen.dart';
-import 'package:e_sport_sudan/core/widgets/live_matches_section.dart';
+import 'package:e_sport_sudan/features/match/presentation/screens/live_match_screen.dart';
+import 'package:e_sport_sudan/core/services/notification_service.dart';
+import 'package:e_sport_sudan/core/widgets/esport_toast.dart';
 
 class RefereeDashboard extends StatefulWidget {
   RefereeDashboard({super.key});
@@ -95,6 +97,65 @@ class _RefereeDashboardState extends State<RefereeDashboard> with SingleTickerPr
     }
   }
 
+  Future<void> _claimStream(Map<String, dynamic> stream) async {
+    final matchId = stream['id'] ?? '';
+    final streamTitle = stream['title'] ?? 'البث المباشر';
+    final currentUserName = FirebaseAuth.instance.currentUser?.displayName ?? 'حكم معتمد';
+
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.gavel_rounded, color: AppTheme.primaryBlue),
+            SizedBox(width: 8),
+            Text('استلام تحكيم البث ⚖️', style: TextStyle(fontSize: 16)),
+          ],
+        ),
+        content: Text('هل ترغب في استلام تحكيم "$streamTitle" الآن؟\n\nسيتم تسجيلك كحكم رسمي لهذا البث وإبلاغ المنظمين واللاعبين.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('إلغاء'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryBlue),
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text('تأكيد واستلام التحكيم 🚀', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      try {
+        await _firestoreService.claimMatchReferee(
+          matchId: matchId,
+          refereeId: _refereeUid,
+          refereeName: currentUserName,
+        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('تم استلام تحكيم البث بنجاح! تم تعيينك كحكم معتمد ⚖️', style: TextStyle(color: Colors.black)),
+              backgroundColor: AppTheme.primaryBlue,
+            ),
+          );
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => MatchControlRoom(matchId: matchId, initialData: stream),
+            ),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          NotificationService.showCustomToast(context, title: 'خطأ', message: 'فشل استلام التحكيم: $e', type: ToastType.urgent);
+        }
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -169,7 +230,7 @@ class _RefereeDashboardState extends State<RefereeDashboard> with SingleTickerPr
                         SizedBox(height: 12),
                         Text('لا توجد مباراة موكلة لك حالياً', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontWeight: FontWeight.bold)),
                         SizedBox(height: 4),
-                        Text('سيقوم منظم البطولة بتخصيص مباريات لك أو يمكنك التبديل إلى تبويب "غرفة التحكم المباشر" لإدارة أي مباراة مباشرة.', textAlign: TextAlign.center, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 12)),
+                        Text('سيقوم منظم البطولة بتخصيص مباريات لك أو يمكنك التبديل إلى تبويب "غرفة التحكم المباشر" لاستلام تحكيم أي بث مباشر.', textAlign: TextAlign.center, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 12)),
                       ],
                     ),
                   ),
@@ -178,42 +239,133 @@ class _RefereeDashboardState extends State<RefereeDashboard> with SingleTickerPr
               return Column(
                 children: matches.map((match) {
                   final isSelected = _selectedMatch?['id'] == match['id'];
-                  return GestureDetector(
-                    onTap: () => setState(() {
-                      _selectedMatch = isSelected ? null : match;
-                      _scoreA = (match['scoreA'] as num?)?.toInt() ?? 0;
-                      _scoreB = (match['scoreB'] as num?)?.toInt() ?? 0;
-                      _screenshotFile = null;
-                    }),
-                    child: Container(
-                      margin: EdgeInsets.only(bottom: 10),
-                      padding: EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.surface,
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(color: isSelected ? AppTheme.primaryBlue : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12), width: isSelected ? 1.5 : 1),
+                  final isLive = match['isLive'] == true || match['status'] == 'live';
+
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: 12),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.surface,
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(
+                        color: isLive
+                            ? Colors.redAccent
+                            : (isSelected ? AppTheme.primaryBlue : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12)),
+                        width: isLive || isSelected ? 1.5 : 1,
                       ),
-                      child: Row(
-                        children: [
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (isLive)
                           Container(
-                            padding: EdgeInsets.all(8),
-                            decoration: BoxDecoration(color: Colors.blue.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(8)),
-                            child: Icon(Icons.sports_score, color: Colors.blue, size: 20),
-                          ),
-                          SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: Colors.redAccent.withValues(alpha: 0.15),
+                              borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                            ),
+                            child: const Row(
                               children: [
-                                Text('${match["teamA"] ?? "فريق أ"} vs ${match["teamB"] ?? "فريق ب"}', style: TextStyle(fontWeight: FontWeight.bold)),
-                                SizedBox(height: 4),
-                                Text('${match['tournamentName'] ?? 'بطولة'} • ${match['round'] ?? 'مباراة'}', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 12)),
+                                Icon(Icons.circle, color: Colors.redAccent, size: 8),
+                                SizedBox(width: 6),
+                                Text(
+                                  'بث مباشر نشط الآن 🔴 (أنت الحكم المعين)',
+                                  style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold, fontSize: 11),
+                                ),
                               ],
                             ),
                           ),
-                          if (isSelected) Icon(Icons.check_circle, color: AppTheme.primaryBlue, size: 20),
-                        ],
-                      ),
+                        GestureDetector(
+                          onTap: () => setState(() {
+                            _selectedMatch = isSelected ? null : match;
+                            _scoreA = (match['scoreA'] as num?)?.toInt() ?? 0;
+                            _scoreB = (match['scoreB'] as num?)?.toInt() ?? 0;
+                            _screenshotFile = null;
+                          }),
+                          child: Padding(
+                            padding: const EdgeInsets.all(14),
+                            child: Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: (isLive ? Colors.red : Colors.blue).withValues(alpha: 0.15),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Icon(
+                                    isLive ? Icons.live_tv_rounded : Icons.sports_score,
+                                    color: isLive ? Colors.redAccent : Colors.blue,
+                                    size: 20,
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        '${match["teamA"] ?? "فريق أ"} vs ${match["teamB"] ?? "فريق ب"}',
+                                        style: const TextStyle(fontWeight: FontWeight.bold),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        '${match['tournamentName'] ?? 'بطولة'} • ${match['round'] ?? 'مباراة'}${isLive ? ' • النتيجة: ${match['scoreA'] ?? 0} - ${match['scoreB'] ?? 0}' : ''}',
+                                        style: TextStyle(
+                                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54),
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                if (isSelected)
+                                  const Icon(Icons.check_circle, color: AppTheme.primaryBlue, size: 20),
+                              ],
+                            ),
+                          ),
+                        ),
+                        if (isLive)
+                          Padding(
+                            padding: const EdgeInsets.only(left: 14, right: 14, bottom: 12),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: ElevatedButton.icon(
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => MatchControlRoom(matchId: match['id'], initialData: match),
+                                        ),
+                                      );
+                                    },
+                                    icon: const Icon(Icons.tune_rounded, size: 16, color: Colors.black),
+                                    label: const Text('دخول وتحكيم البث ⚖️', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 12)),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: AppTheme.primaryBlue,
+                                      padding: const EdgeInsets.symmetric(vertical: 8),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                OutlinedButton.icon(
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => LiveMatchScreen(matchId: match['id']),
+                                      ),
+                                    );
+                                  },
+                                  icon: const Icon(Icons.live_tv, size: 16, color: Colors.white),
+                                  label: const Text('مشاهدة ودردشة 💬', style: TextStyle(color: Colors.white, fontSize: 12)),
+                                  style: OutlinedButton.styleFrom(
+                                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                      ],
                     ),
                   );
                 }).toList(),
@@ -286,63 +438,345 @@ class _RefereeDashboardState extends State<RefereeDashboard> with SingleTickerPr
   }
 
   Widget _buildLiveControlRoomView() {
-    return Column(
-      children: [
-        const Padding(
-          padding: EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
-          child: LiveMatchesSection(),
-        ),
-        Expanded(
-          child: StreamBuilder<List<Map<String, dynamic>>>(
-            stream: _firestoreService.getAllMatchesStream(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator(color: AppTheme.primaryBlue));
-        }
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: const [
+              Row(
+                children: [
+                  Icon(Icons.live_tv_rounded, color: Colors.redAccent, size: 20),
+                  SizedBox(width: 8),
+                  Text(
+                    'البثوث المباشرة النشطة (غرفة الحكام) 📡',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'اختر البث الذي تود تحكيمه. عند انشغال حكم بزميل، يمكنك تحكيم بث آخر شاغر.',
+            style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), fontSize: 11),
+          ),
+          const SizedBox(height: 12),
 
-        final matches = snapshot.data ?? [];
-        if (matches.isEmpty) {
-          return Center(child: Text('لا توجد مباريات حالياً في النظام', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54))));
-        }
+          StreamBuilder<List<Map<String, dynamic>>>(
+            stream: _firestoreService.getActiveLiveStreams(),
+            builder: (context, activeSnap) {
+              if (activeSnap.connectionState == ConnectionState.waiting) {
+                return const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(24),
+                    child: CircularProgressIndicator(color: AppTheme.primaryBlue),
+                  ),
+                );
+              }
 
-        return ListView.builder(
-          padding: EdgeInsets.all(16),
-          itemCount: matches.length,
-          itemBuilder: (context, index) {
-            final match = matches[index];
-            final status = match['status'] ?? 'scheduled';
-            final isLive = status == 'live';
+              final activeStreams = activeSnap.data ?? [];
 
-            return Card(
-              color: Theme.of(context).colorScheme.surface,
-              margin: EdgeInsets.only(bottom: 12),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              child: ListTile(
-                leading: CircleAvatar(
-                  backgroundColor: isLive ? Colors.red : Colors.blue.withValues(alpha: 0.2),
-                  child: Icon(isLive ? Icons.live_tv : Icons.sports_score, color: isLive ? Theme.of(context).colorScheme.onSurface : Colors.blue),
-                ),
-                title: Text('${match['teamA'] ?? 'فريق أ'} VS ${match['teamB'] ?? 'فريق ب'}', style: TextStyle(fontWeight: FontWeight.bold)),
-                subtitle: Text('النتيجة: ${match['scoreA'] ?? 0} - ${match['scoreB'] ?? 0} | ${match['time'] ?? 'مجدولة'}'),
-                trailing: Icon(Icons.tune, color: AppTheme.primaryBlue),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => MatchControlRoom(matchId: match['id'], initialData: match),
+              if (activeStreams.isEmpty) {
+                return Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(20),
+                  margin: const EdgeInsets.only(bottom: 16),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surface,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1)),
+                  ),
+                  child: Center(
+                    child: Column(
+                      children: [
+                        Icon(Icons.tv_off_rounded, size: 36, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3)),
+                        const SizedBox(height: 8),
+                        const Text(
+                          'لا توجد بثوث مباشرة جارية حالياً',
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'فور بدء أي بث مباشر من الإدارة سيظهر هنا لجميع الحكام فوراً.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 11, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }
+
+              return Column(
+                children: activeStreams.map((st) {
+                  final stId = (st['id'] ?? '').toString();
+                  final stTitle = (st['title'] ?? 'بث مباشر').toString();
+                  final refId = st['refereeId'] as String?;
+                  final refName = st['refereeName'] as String?;
+                  final isMe = refId != null && refId == _refereeUid;
+                  final isOccupiedByOther = refId != null && refId.isNotEmpty && !isMe;
+                  final isUnassigned = refId == null || refId.isEmpty;
+                  final scoreA = st['scoreA'] ?? 0;
+                  final scoreB = st['scoreB'] ?? 0;
+                  final teamA = st['teamA'] ?? 'الفريق أ';
+                  final teamB = st['teamB'] ?? 'الفريق ب';
+
+                  Color cardBorderColor;
+                  if (isMe) {
+                    cardBorderColor = Colors.greenAccent;
+                  } else if (isOccupiedByOther) {
+                    cardBorderColor = Colors.orangeAccent.withValues(alpha: 0.6);
+                  } else {
+                    cardBorderColor = AppTheme.primaryBlue;
+                  }
+
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: 12),
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.surface,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: cardBorderColor, width: 1.5),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: Colors.redAccent,
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: const Text('مباشر الآن 🔴', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+                            ),
+                            if (isMe)
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: Colors.greenAccent.withValues(alpha: 0.15),
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(color: Colors.greenAccent.withValues(alpha: 0.4)),
+                                ),
+                                child: const Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(Icons.verified_rounded, size: 14, color: Colors.greenAccent),
+                                    SizedBox(width: 4),
+                                    Text('أنت الحكم المعين ⚖️', style: TextStyle(color: Colors.greenAccent, fontSize: 11, fontWeight: FontWeight.bold)),
+                                  ],
+                                ),
+                              )
+                            else if (isOccupiedByOther)
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: Colors.orangeAccent.withValues(alpha: 0.15),
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(color: Colors.orangeAccent.withValues(alpha: 0.4)),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(Icons.lock_rounded, size: 14, color: Colors.orangeAccent),
+                                    const SizedBox(width: 4),
+                                    Text('الحكم: $refName (مشغول)', style: const TextStyle(color: Colors.orangeAccent, fontSize: 11, fontWeight: FontWeight.bold)),
+                                  ],
+                                ),
+                              )
+                            else
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: AppTheme.primaryBlue.withValues(alpha: 0.15),
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(color: AppTheme.primaryBlue.withValues(alpha: 0.4)),
+                                ),
+                                child: const Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(Icons.radio_button_checked, size: 14, color: AppTheme.primaryBlue),
+                                    SizedBox(width: 4),
+                                    Text('شاغر (متاح للتحكيم) 🟢', style: TextStyle(color: AppTheme.primaryBlue, fontSize: 11, fontWeight: FontWeight.bold)),
+                                  ],
+                                ),
+                              ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          stTitle,
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          '$teamA ($scoreA) vs ($scoreB) $teamB',
+                          style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 12),
+                        ),
+                        const SizedBox(height: 10),
+
+                        if (isMe) ...[
+                          Row(
+                            children: [
+                              Expanded(
+                                child: ElevatedButton.icon(
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => MatchControlRoom(matchId: stId, initialData: st),
+                                      ),
+                                    );
+                                  },
+                                  icon: const Icon(Icons.tune_rounded, size: 16, color: Colors.black),
+                                  label: const Text('إدارة وتحكيم البث ⚖️', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 12)),
+                                  style: ElevatedButton.styleFrom(backgroundColor: Colors.greenAccent),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              OutlinedButton.icon(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => LiveMatchScreen(matchId: stId),
+                                    ),
+                                  );
+                                },
+                                icon: const Icon(Icons.live_tv, size: 16, color: Colors.white),
+                                label: const Text('عرض البث 💬', style: TextStyle(color: Colors.white, fontSize: 12)),
+                              ),
+                            ],
+                          ),
+                        ] else if (isUnassigned) ...[
+                          Row(
+                            children: [
+                              Expanded(
+                                child: ElevatedButton.icon(
+                                  onPressed: () => _claimStream(st),
+                                  icon: const Icon(Icons.gavel_rounded, size: 16, color: Colors.black),
+                                  label: const Text('استلام تحكيم هذا البث ⚖️', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 12)),
+                                  style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryBlue),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              OutlinedButton.icon(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => LiveMatchScreen(matchId: stId),
+                                    ),
+                                  );
+                                },
+                                icon: const Icon(Icons.visibility_outlined, size: 16, color: Colors.white),
+                                label: const Text('مشاهدة', style: TextStyle(color: Colors.white, fontSize: 12)),
+                              ),
+                            ],
+                          ),
+                        ] else ...[
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                                  decoration: BoxDecoration(
+                                    color: Colors.orangeAccent.withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Text(
+                                    'يقوم الحكم "$refName" بتحكيم هذا البث حالياً. يمكنك تحكيم بث آخر شاغر.',
+                                    style: const TextStyle(fontSize: 11, color: Colors.orangeAccent),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              OutlinedButton.icon(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => LiveMatchScreen(matchId: stId),
+                                    ),
+                                  );
+                                },
+                                icon: const Icon(Icons.visibility_outlined, size: 16, color: Colors.white),
+                                label: const Text('مشاهدة 👁️', style: TextStyle(color: Colors.white, fontSize: 12)),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ],
                     ),
                   );
-                },
-              ),
-            );
-          },
-        );
-      },
-    ),
-    ), // This closes Expanded
-    ],
+                }).toList(),
+              );
+            },
+          ),
+
+          const SizedBox(height: 16),
+          const Divider(),
+          const SizedBox(height: 10),
+          const Text(
+            'جميع مباريات البطولات والجدول 🏆',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+          ),
+          const SizedBox(height: 10),
+
+          StreamBuilder<List<Map<String, dynamic>>>(
+            stream: _firestoreService.getAllMatchesStream(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator(color: AppTheme.primaryBlue));
+              }
+              final matches = snapshot.data ?? [];
+              if (matches.isEmpty) {
+                return Center(
+                  child: Text('لا توجد مباريات مسجلة حالياً', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54))),
+                );
+              }
+              return Column(
+                children: matches.map((match) {
+                  final status = match['status'] ?? 'scheduled';
+                  final isLive = status == 'live' || match['isLive'] == true;
+                  final refName = match['refereeName'] as String?;
+
+                  return Card(
+                    color: Theme.of(context).colorScheme.surface,
+                    margin: const EdgeInsets.only(bottom: 10),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    child: ListTile(
+                      leading: CircleAvatar(
+                        backgroundColor: isLive ? Colors.red : Colors.blue.withValues(alpha: 0.2),
+                        child: Icon(isLive ? Icons.live_tv : Icons.sports_score, color: isLive ? Colors.white : Colors.blue),
+                      ),
+                      title: Text('${match['teamA'] ?? 'فريق أ'} VS ${match['teamB'] ?? 'فريق ب'}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                      subtitle: Text('النتيجة: ${match['scoreA'] ?? 0} - ${match['scoreB'] ?? 0} | ${refName != null ? 'الحكم: $refName' : (match['time'] ?? 'مجدولة')}'),
+                      trailing: const Icon(Icons.tune, color: AppTheme.primaryBlue),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => MatchControlRoom(matchId: match['id'], initialData: match),
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                }).toList(),
+              );
+            },
+          ),
+        ],
+      ),
     );
   }
+
 
   Widget _buildTeamScore(String teamName, int score, ValueChanged<int> onChanged) {
     return Column(

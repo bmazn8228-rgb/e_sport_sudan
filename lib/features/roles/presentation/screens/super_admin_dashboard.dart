@@ -164,11 +164,48 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard> {
                 }),
               ],
             ),
-            SizedBox(height: 24),
+            const SizedBox(height: 16),
+            StreamBuilder<List<Map<String, dynamic>>>(
+              stream: FirestoreService().getActiveLiveStreams(),
+              builder: (context, snap) {
+                final activeStreams = snap.data ?? [];
+                if (activeStreams.isEmpty) return const SizedBox.shrink();
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 16),
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: Colors.redAccent.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: Colors.redAccent.withValues(alpha: 0.35)),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.circle, color: Colors.redAccent, size: 10),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'يوجد حالياً ${activeStreams.length} بث مباشر نشط للمستخدمين 🔴',
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.redAccent),
+                        ),
+                      ),
+                      TextButton.icon(
+                        onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => AdminDashboardScreen())),
+                        icon: const Icon(Icons.settings_remote_rounded, size: 16, color: Colors.redAccent),
+                        label: const Text('إدارة البثوث ⚙️', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.redAccent)),
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          minimumSize: const Size(0, 28),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
 
             // Portals & Hub Actions
-            Text('بوابات الإدارة المباشرة', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-            SizedBox(height: 12),
+            const Text('بوابات الإدارة المباشرة', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 12),
             Container(
               decoration: BoxDecoration(
                 color: Theme.of(context).colorScheme.surface,

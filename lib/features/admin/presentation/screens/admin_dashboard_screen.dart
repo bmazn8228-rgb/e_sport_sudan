@@ -438,41 +438,163 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                         currentUrl: currentVideoId.isNotEmpty ? 'https://www.youtube.com/watch?v=$currentVideoId' : '',
                         currentTitle: currentTitle.isNotEmpty ? currentTitle : 'البث المباشر لمنافسات اليوم',
                         currentIsLive: isLive,
+                        matchId: 'sample_live_match',
+                        currentRefereeId: data?['refereeId'],
+                        currentRefereeName: data?['refereeName'],
                       ),
-                      icon: Icon(Icons.settings, color: Colors.black, size: 18),
+                      icon: const Icon(Icons.settings, color: Colors.black, size: 18),
                       label: Text(
-                        isLive ? 'تعديل رابط البث 🎥' : 'بدء بث مباشر جديد 🎥',
-                        style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 12),
+                        isLive ? 'تعديل البث الرئيسي 🎥' : 'بدء بث رئيسي 🎥',
+                        style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 12),
                       ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppTheme.primaryBlue,
-                        padding: EdgeInsets.symmetric(vertical: 12),
+                        minimumSize: const Size(0, 40),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
                       ),
                     ),
                   ),
+                  const SizedBox(width: 8),
+                  ElevatedButton.icon(
+                    onPressed: () => _showLiveStreamDialog(
+                      context,
+                      currentUrl: '',
+                      currentTitle: 'بث مباشر إضافي',
+                      currentIsLive: true,
+                      isNewAdditionalStream: true,
+                    ),
+                    icon: const Icon(Icons.add_to_queue_rounded, color: Colors.white, size: 16),
+                    label: const Text('بث إضافي ➕', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.purpleAccent.shade700,
+                      minimumSize: const Size(0, 40),
+                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
+                    ),
+                  ),
                   if (isLive) ...[
-                    SizedBox(width: 8),
+                    const SizedBox(width: 6),
                     IconButton(
                       tooltip: 'مسح دردشة البث',
                       onPressed: () => _confirmClearChat(context),
-                      icon: Icon(Icons.delete_sweep_rounded, color: Colors.orangeAccent),
+                      icon: const Icon(Icons.delete_sweep_rounded, color: Colors.orangeAccent),
                       style: IconButton.styleFrom(
                         backgroundColor: Colors.orangeAccent.withValues(alpha: 0.12),
-                        padding: EdgeInsets.all(12),
+                        padding: const EdgeInsets.all(10),
                       ),
                     ),
-                    SizedBox(width: 8),
+                    const SizedBox(width: 6),
                     OutlinedButton.icon(
-                      onPressed: () => _confirmStopLiveStream(context),
-                      icon: Icon(Icons.stop_circle_outlined, color: Colors.redAccent, size: 18),
-                      label: Text('إيقاف', style: TextStyle(color: Colors.redAccent, fontSize: 12)),
+                      onPressed: () => _confirmStopLiveStream(context, matchId: 'sample_live_match', streamTitle: currentTitle),
+                      icon: const Icon(Icons.stop_circle_outlined, color: Colors.redAccent, size: 18),
+                      label: const Text('إيقاف', style: TextStyle(color: Colors.redAccent, fontSize: 12)),
                       style: OutlinedButton.styleFrom(
-                        side: BorderSide(color: Colors.redAccent),
-                        padding: EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+                        side: const BorderSide(color: Colors.redAccent),
+                        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
+                        minimumSize: const Size(0, 40),
                       ),
                     ),
                   ],
                 ],
+              ),
+              // Multi-Stream Monitor
+              StreamBuilder<List<Map<String, dynamic>>>(
+                stream: FirestoreService().getActiveLiveStreams(),
+                builder: (context, activeSnap) {
+                  final activeList = activeSnap.data ?? [];
+                  if (activeList.isEmpty) return const SizedBox.shrink();
+
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 14),
+                      Divider(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1)),
+                      const SizedBox(height: 6),
+                      Text(
+                        'البثوث المباشرة النشطة حالياً (${activeList.length}):',
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.redAccent),
+                      ),
+                      const SizedBox(height: 8),
+                      ...activeList.map((st) {
+                        final stId = st['id'] ?? '';
+                        final stTitle = st['title'] ?? 'بث مباشر';
+                        final refName = st['refereeName'] as String?;
+                        return Container(
+                          margin: const EdgeInsets.only(bottom: 6),
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.surface,
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: Colors.redAccent.withValues(alpha: 0.25)),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.circle, color: Colors.redAccent, size: 8),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      stTitle,
+                                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Row(
+                                      children: [
+                                        Icon(
+                                          refName != null ? Icons.gavel_rounded : Icons.person_off_outlined,
+                                          size: 12,
+                                          color: refName != null ? Colors.greenAccent : Colors.orangeAccent,
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          refName != null ? 'الحكم: $refName' : 'شاغر (لم يتم تعيين حكم)',
+                                          style: TextStyle(
+                                            fontSize: 10,
+                                            color: refName != null ? Colors.greenAccent : Colors.orangeAccent,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              IconButton(
+                                tooltip: 'تعديل أو تعيين حكم',
+                                onPressed: () => _showLiveStreamDialog(
+                                  context,
+                                  currentUrl: (st['youtubeVideoId'] ?? '').toString().isNotEmpty
+                                      ? 'https://www.youtube.com/watch?v=${st['youtubeVideoId']}'
+                                      : '',
+                                  currentTitle: stTitle,
+                                  currentIsLive: true,
+                                  matchId: stId,
+                                  currentRefereeId: st['refereeId'],
+                                  currentRefereeName: st['refereeName'],
+                                ),
+                                icon: const Icon(Icons.tune_rounded, color: Colors.blueAccent, size: 18),
+                                padding: const EdgeInsets.all(4),
+                                constraints: const BoxConstraints(),
+                              ),
+                              const SizedBox(width: 4),
+                              TextButton.icon(
+                                onPressed: () => _confirmStopLiveStream(context, matchId: stId, streamTitle: stTitle),
+                                icon: const Icon(Icons.stop_circle_rounded, color: Colors.redAccent, size: 16),
+                                label: const Text('إنهاء', style: TextStyle(color: Colors.redAccent, fontSize: 11)),
+                                style: TextButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  minimumSize: const Size(0, 28),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }),
+                    ],
+                  );
+                },
               ),
             ],
           ),
@@ -481,18 +603,32 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     );
   }
 
-  void _showLiveStreamDialog(BuildContext context, {String? currentUrl, String? currentTitle, bool currentIsLive = true}) {
+  void _showLiveStreamDialog(
+    BuildContext context, {
+    String? currentUrl,
+    String? currentTitle,
+    bool currentIsLive = true,
+    String matchId = 'sample_live_match',
+    bool isNewAdditionalStream = false,
+    String? currentRefereeId,
+    String? currentRefereeName,
+  }) {
+    final effectiveMatchId = isNewAdditionalStream
+        ? 'stream_${DateTime.now().millisecondsSinceEpoch}'
+        : matchId;
     final urlController = TextEditingController(text: currentUrl ?? '');
-    final titleController = TextEditingController(text: currentTitle ?? 'البث المباشر لمنافسات اليوم');
+    final titleController = TextEditingController(text: currentTitle ?? (isNewAdditionalStream ? 'بث إضافي لمباراة اليوم' : 'البث المباشر لمنافسات اليوم'));
     bool isLive = currentIsLive;
     bool resetChat = true;
     bool isSaving = false;
+    String? selectedRefereeId = currentRefereeId;
+    String? selectedRefereeName = currentRefereeName;
 
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Theme.of(context).colorScheme.surface,
-      shape: RoundedRectangleBorder(
+      shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (ctx) => StatefulBuilder(
@@ -513,9 +649,12 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                   children: [
                     Row(
                       children: [
-                        Icon(Icons.live_tv, color: Colors.redAccent),
-                        SizedBox(width: 8),
-                        Text('ضبط وتحديث البث المباشر', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                        const Icon(Icons.live_tv, color: Colors.redAccent),
+                        const SizedBox(width: 8),
+                        Text(
+                          isNewAdditionalStream ? 'إضافة بث مباشر إضافي ➕' : 'ضبط وتحديث البث المباشر',
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                        ),
                       ],
                     ),
                     IconButton(
@@ -524,19 +663,19 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                     ),
                   ],
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 Text('رابط البث من YouTube أو معرف الفيديو:', style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7))),
-                SizedBox(height: 6),
+                const SizedBox(height: 6),
                 TextField(
                   controller: urlController,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     hintText: 'مثال: https://www.youtube.com/watch?v=xxxx أو xxxx',
                     prefixIcon: Icon(Icons.link, color: Colors.redAccent),
                   ),
                 ),
-                SizedBox(height: 14),
+                const SizedBox(height: 14),
                 Text('عنوان البث المباشر:', style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7))),
-                SizedBox(height: 6),
+                const SizedBox(height: 6),
                 TextField(
                   controller: titleController,
                   decoration: InputDecoration(
@@ -544,11 +683,114 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                     prefixIcon: Icon(Icons.title, color: AppTheme.primaryBlue),
                   ),
                 ),
-                SizedBox(height: 14),
+                const SizedBox(height: 14),
+                Text('تعيين الحكم المسؤول عن إدارة وتحكيم هذا البث ⚖️:', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.85))),
+                const SizedBox(height: 6),
+                StreamBuilder<List<Map<String, dynamic>>>(
+                  stream: FirestoreService().getUsersByRoleStream('referee'),
+                  builder: (context, refSnap) {
+                    final referees = refSnap.data ?? [];
+                    return StreamBuilder<List<Map<String, dynamic>>>(
+                      stream: FirestoreService().getActiveLiveStreams(),
+                      builder: (context, activeSnap) {
+                        final activeStreams = activeSnap.data ?? [];
+                        final occupiedRefereeMap = <String, String>{};
+                        for (var s in activeStreams) {
+                          if (s['id'] != effectiveMatchId && s['refereeId'] != null && s['refereeId'].toString().isNotEmpty) {
+                            occupiedRefereeMap[s['refereeId'].toString()] = (s['title'] ?? 'بث آخر').toString();
+                          }
+                        }
+
+                        return Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.surface,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: AppTheme.primaryBlue.withValues(alpha: 0.35)),
+                          ),
+                          child: DropdownButtonHideUnderline(
+                            child: DropdownButton<String?>(
+                              isExpanded: true,
+                              dropdownColor: Theme.of(context).colorScheme.surface,
+                              value: selectedRefereeId,
+                              hint: const Text('اختر الحكم المكلف بالبث (أو اتركه شاغراً)', style: TextStyle(fontSize: 12)),
+                              items: [
+                                const DropdownMenuItem<String?>(
+                                  value: null,
+                                  child: Row(
+                                    children: [
+                                      Icon(Icons.person_outline, size: 18, color: Colors.grey),
+                                      SizedBox(width: 8),
+                                      Text('بدون تعيين مسبق (شاغر ومتاح لأي حكم)', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                                    ],
+                                  ),
+                                ),
+                                ...referees.map((ref) {
+                                  final rId = (ref['id'] ?? ref['uid'] ?? '').toString();
+                                  final rName = (ref['displayName'] ?? ref['name'] ?? ref['email'] ?? 'حكم معتمد').toString();
+                                  final isOccupied = occupiedRefereeMap.containsKey(rId);
+
+                                  return DropdownMenuItem<String?>(
+                                    value: rId,
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          isOccupied ? Icons.lock_clock_rounded : Icons.gavel_rounded,
+                                          size: 18,
+                                          color: isOccupied ? Colors.orangeAccent : Colors.greenAccent,
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Expanded(
+                                          child: Text(
+                                            rName,
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.bold,
+                                              color: isOccupied ? Colors.orangeAccent : Colors.white,
+                                            ),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                        if (isOccupied)
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                            decoration: BoxDecoration(
+                                              color: Colors.orangeAccent.withValues(alpha: 0.15),
+                                              borderRadius: BorderRadius.circular(6),
+                                            ),
+                                            child: const Text('مشغول ببث آخر ⚠️', style: TextStyle(fontSize: 10, color: Colors.orangeAccent)),
+                                          ),
+                                      ],
+                                    ),
+                                  );
+                                }),
+                              ],
+                              onChanged: (val) {
+                                setModalState(() {
+                                  selectedRefereeId = val;
+                                  if (val == null) {
+                                    selectedRefereeName = null;
+                                  } else {
+                                    final matchRef = referees.firstWhere(
+                                      (r) => (r['id'] ?? r['uid']) == val,
+                                      orElse: () => {'displayName': 'حكم معتمد'},
+                                    );
+                                    selectedRefereeName = (matchRef['displayName'] ?? matchRef['name'] ?? matchRef['email'] ?? 'حكم معتمد').toString();
+                                  }
+                                });
+                              },
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  },
+                ),
+                const SizedBox(height: 14),
                 SwitchListTile(
                   contentPadding: EdgeInsets.zero,
                   activeThumbColor: AppTheme.primaryBlue,
-                  title: Text('تفعيل البث وإظهاره للمستخدمين الآن', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+                  title: const Text('تفعيل البث وإظهاره للمستخدمين الآن', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
                   subtitle: Text('عند التفعيل سيظهر البث فوراً في الواجهة الرئيسية وتبويب المباريات', style: TextStyle(fontSize: 11, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54))),
                   value: isLive,
                   onChanged: (val) => setModalState(() => isLive = val),
@@ -556,12 +798,12 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 SwitchListTile(
                   contentPadding: EdgeInsets.zero,
                   activeThumbColor: Colors.orangeAccent,
-                  title: Text('تصفير الدردشة وبدء محادثة نظيفة جديدة لهذا البث', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+                  title: const Text('تصفير الدردشة وبدء محادثة نظيفة جديدة لهذا البث', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
                   subtitle: Text('يحذف أي رسائل سابقة حتى تبدأ الدردشة فارغة للبث الحالي', style: TextStyle(fontSize: 11, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54))),
                   value: resetChat,
                   onChanged: (val) => setModalState(() => resetChat = val),
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton.icon(
@@ -586,16 +828,19 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                             setModalState(() => isSaving = true);
                             try {
                               await FirestoreService().updateLiveStream(
+                                matchId: effectiveMatchId,
                                 youtubeVideoId: videoId,
                                 title: titleController.text.trim().isEmpty ? 'البث المباشر' : titleController.text.trim(),
                                 isLive: isLive,
+                                refereeId: selectedRefereeId,
+                                refereeName: selectedRefereeName,
                                 resetChat: resetChat,
                               );
                               if (ctx.mounted) Navigator.pop(ctx);
                               if (context.mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
-                                    content: Text('تم نشر وتحديث البث المباشر بنجاح 🚀', style: TextStyle(color: Colors.black)),
+                                    content: const Text('تم نشر وتحديث البث المباشر بنجاح 🚀', style: TextStyle(color: Colors.black)),
                                     backgroundColor: AppTheme.primaryBlue,
                                   ),
                                 );
@@ -603,17 +848,17 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                             } catch (e) {
                               setModalState(() => isSaving = false);
                               if (context.mounted) {
-                                NotificationService.showCustomToast(context, title: 'تنبيه النظام', message: 'فشل تحديث رابط البث ❌', type: ToastType.urgent);
+                                NotificationService.showCustomToast(context, title: 'تنبيه النظام', message: 'فشل تحديث رابط البث: $e ❌', type: ToastType.urgent);
                               }
                             }
                           },
                     icon: isSaving
-                        ? SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black))
-                        : Icon(Icons.cloud_upload, color: Colors.black),
-                    label: Text(isSaving ? 'جاري الحفظ...' : 'نشر وتحديث البث المباشر للمستخدمين 🚀', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+                        ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black))
+                        : const Icon(Icons.cloud_upload, color: Colors.black),
+                    label: Text(isSaving ? 'جاري الحفظ...' : 'نشر وتحديث البث المباشر للمستخدمين 🚀', style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppTheme.primaryBlue,
-                      padding: EdgeInsets.symmetric(vertical: 14),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
                     ),
                   ),
                 ),
@@ -625,15 +870,15 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
     );
   }
 
-  void _confirmClearChat(BuildContext context) {
+  void _confirmClearChat(BuildContext context, {String matchId = 'sample_live_match'}) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: Theme.of(context).colorScheme.surface,
         title: Row(
           children: [
-            Icon(Icons.delete_sweep_rounded, color: Colors.orangeAccent),
-            SizedBox(width: 8),
+            const Icon(Icons.delete_sweep_rounded, color: Colors.orangeAccent),
+            const SizedBox(width: 8),
             Text('مسح محادثة البث', style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16)),
           ],
         ),
@@ -648,10 +893,10 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             onPressed: () async {
               Navigator.pop(ctx);
               try {
-                await FirestoreService().clearMatchChat('sample_live_match');
+                await FirestoreService().clearMatchChat(matchId);
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
+                    const SnackBar(
                       content: Text('تم مسح محادثة البث المباشر بنجاح 🗑️', style: TextStyle(color: Colors.black)),
                       backgroundColor: Colors.orangeAccent,
                     ),
@@ -659,50 +904,63 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
                 }
               } catch (e) {
                 if (context.mounted) {
-                  NotificationService.showCustomToast(context, title: 'تنبيه النظام', message: 'فشل مسح المحادثة ❌', type: ToastType.urgent);
+                  NotificationService.showCustomToast(context, title: 'تنبيه النظام', message: 'فشل مسح المحادثة: $e ❌', type: ToastType.urgent);
                 }
               }
             },
-            child: Text('مسح الدردشة', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+            child: const Text('مسح الدردشة', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
           ),
         ],
       ),
     );
   }
 
-  void _confirmStopLiveStream(BuildContext context) {
+  void _confirmStopLiveStream(BuildContext context, {String matchId = 'sample_live_match', String? streamTitle}) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: Theme.of(context).colorScheme.surface,
-        title: Text('إيقاف البث المباشر', style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
-        content: Text('هل أنت متأكد من رغبتك في إيقاف البث المباشر الحالي؟ سيختفي البث من الواجهة الرئيسية وسيظهر للمستخدمين أن البث متوقف مع تنظيف المحادثة.', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7))),
+        title: Row(
+          children: [
+            const Icon(Icons.stop_circle_rounded, color: Colors.redAccent),
+            const SizedBox(width: 8),
+            Text('إيقاف البث المباشر', style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16)),
+          ],
+        ),
+        content: Text(
+          'هل أنت متأكد من رغبتك في إيقاف ${streamTitle != null ? '"$streamTitle"' : 'البث المباشر الحالي'}؟ سيختفي البث فوراً من شاشات المستخدمين والواجهة الرئيسية وسيتم مسح دردشة هذا البث وتصفيرها.',
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 13),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
             child: Text('إلغاء', style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54))),
           ),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+              minimumSize: const Size(0, 38),
+            ),
             onPressed: () async {
               Navigator.pop(ctx);
               try {
-                await FirestoreService().stopLiveStream(resetChat: true);
+                await FirestoreService().stopLiveStream(matchId: matchId, resetChat: true);
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('تم إيقاف البث المباشر وتصفير الجلسة بنجاح 🛑', style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+                    const SnackBar(
+                      content: Text('تم إيقاف البث المباشر وتصفير الجلسة بنجاح 🛑', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                       backgroundColor: Colors.red,
                     ),
                   );
                 }
               } catch (e) {
                 if (context.mounted) {
-                  NotificationService.showCustomToast(context, title: 'تنبيه النظام', message: 'فشل في إيقاف البث ❌', type: ToastType.urgent);
+                  NotificationService.showCustomToast(context, title: 'تنبيه النظام', message: 'فشل في إيقاف البث: $e ❌', type: ToastType.urgent);
                 }
               }
             },
-            child: Text('إيقاف البث'),
+            child: const Text('إيقاف البث نهائياً'),
           ),
         ],
       ),

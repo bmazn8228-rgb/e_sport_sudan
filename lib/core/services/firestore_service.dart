@@ -609,6 +609,7 @@ class FirestoreService {
   }
 
   Future<void> updateLiveStream({
+    String matchId = 'sample_live_match',
     required String youtubeVideoId,
     required String title,
     required bool isLive,
@@ -616,14 +617,16 @@ class FirestoreService {
     String? teamB,
     int? scoreA,
     int? scoreB,
+    String? refereeId,
+    String? refereeName,
     bool resetChat = true,
   }) async {
     final sessionId = 'live_${DateTime.now().millisecondsSinceEpoch}';
     if (resetChat && isLive) {
-      await clearMatchChat('sample_live_match');
+      await clearMatchChat(matchId);
     }
-    final data = {
-      'id': 'sample_live_match',
+    final data = <String, dynamic>{
+      'id': matchId,
       'youtubeVideoId': isLive ? youtubeVideoId : '',
       'title': title,
       'isLive': isLive,
@@ -637,13 +640,43 @@ class FirestoreService {
       'createdAt': FieldValue.serverTimestamp(),
       'updatedAt': FieldValue.serverTimestamp(),
     };
-    await _db.collection('matches').doc('sample_live_match').set(data, SetOptions(merge: true));
-    await _db.collection('settings').doc('live_stream').set(data, SetOptions(merge: true));
+    if (refereeId != null && refereeId.isNotEmpty) {
+      data['refereeId'] = refereeId;
+      data['refereeName'] = refereeName ?? 'الحكم المعين';
+    }
+    await _db.collection('matches').doc(matchId).set(data, SetOptions(merge: true));
+    if (matchId == 'sample_live_match') {
+      await _db.collection('settings').doc('live_stream').set(data, SetOptions(merge: true));
+    }
+
+    if (isLive && refereeId != null && refereeId.isNotEmpty) {
+      try {
+        await addNotification(
+          refereeId,
+          '⚖️ تكليف بتحكيم بث مباشر!',
+          'تم تعيينك من قبل الإدارة لتحكيم البث المباشر: "$title". يرجى الدخول لغرفة التحكم المباشر.',
+          type: 'referee',
+        );
+      } catch (_) {}
+    }
   }
 
-  Future<void> stopLiveStream({bool resetChat = true}) async {
+  Future<void> claimMatchReferee({
+    required String matchId,
+    required String refereeId,
+    required String refereeName,
+  }) async {
+    await _db.collection('matches').doc(matchId).update({
+      'refereeId': refereeId,
+      'refereeName': refereeName,
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
+  }
+
+
+  Future<void> stopLiveStream({String matchId = 'sample_live_match', bool resetChat = true}) async {
     if (resetChat) {
-      await clearMatchChat('sample_live_match');
+      await clearMatchChat(matchId);
     }
     final data = {
       'isLive': false,
@@ -652,8 +685,10 @@ class FirestoreService {
       'time': 'متوقف',
       'updatedAt': FieldValue.serverTimestamp(),
     };
-    await _db.collection('matches').doc('sample_live_match').set(data, SetOptions(merge: true));
-    await _db.collection('settings').doc('live_stream').set(data, SetOptions(merge: true));
+    await _db.collection('matches').doc(matchId).set(data, SetOptions(merge: true));
+    if (matchId == 'sample_live_match') {
+      await _db.collection('settings').doc('live_stream').set(data, SetOptions(merge: true));
+    }
   }
 
   Stream<DocumentSnapshot<Map<String, dynamic>>> getGlobalLiveStream() {
@@ -664,34 +699,40 @@ class FirestoreService {
     return _db.collection('matches').doc(matchId).snapshots();
   }
 
-  Stream<Map<String, dynamic>?> getActiveLiveMatchStream() {
+  /// Returns all currently active live streams across all matches
+  Stream<List<Map<String, dynamic>>> getActiveLiveStreams() {
     return _db.collection('matches').snapshots().map((snapshot) {
+      final List<Map<String, dynamic>> activeList = [];
       for (final doc in snapshot.docs) {
-        if (doc.id == 'sample_live_match') {
-          final data = doc.data();
-          final isLive = (data['isLive'] == true || data['status'] == 'live') &&
-              (data['youtubeVideoId'] ?? '').toString().trim().isNotEmpty;
-          if (isLive) {
-            final res = Map<String, dynamic>.from(data);
-            res['id'] = doc.id;
-            return res;
-          }
-        }
-      }
-
-      for (final doc in snapshot.docs) {
-        if (doc.id == 'sample_live_match') continue;
         final data = doc.data();
         final isLive = (data['isLive'] == true || data['status'] == 'live') &&
             (data['youtubeVideoId'] ?? '').toString().trim().isNotEmpty;
         if (isLive) {
           final res = Map<String, dynamic>.from(data);
           res['id'] = doc.id;
-          return res;
+          activeList.add(res);
         }
       }
-      return null;
+
+      activeList.sort((a, b) {
+        // sample_live_match is always prioritized first if live
+        if (a['id'] == 'sample_live_match') return -1;
+        if (b['id'] == 'sample_live_match') return 1;
+
+        final aTime = a['updatedAt'] ?? a['createdAt'];
+        final bTime = b['updatedAt'] ?? b['createdAt'];
+        if (aTime is Timestamp && bTime is Timestamp) {
+          return bTime.compareTo(aTime);
+        }
+        return 0;
+      });
+
+      return activeList;
     });
+  }
+
+  Stream<Map<String, dynamic>?> getActiveLiveMatchStream() {
+    return getActiveLiveStreams().map((list) => list.isNotEmpty ? list.first : null);
   }
 
   Stream<List<Map<String, dynamic>>> getAllMatchesStream() {
@@ -739,21 +780,24 @@ class FirestoreService {
         .doc(matchId)
         .collection('chat_messages')
         .orderBy('timestamp', descending: false)
-        .limitToLast(60)
+        .limitToLast(100)
         .snapshots()
         .map((snapshot) {
-          final list = snapshot.docs.map((doc) => doc.data()).toList();
+          final list = snapshot.docs.map((doc) {
+            final data = doc.data();
+            data['id'] = doc.id;
+            return data;
+          }).toList();
+
           if (sessionId != null && sessionId.isNotEmpty) {
-            return list.where((m) => m['sessionId'] == null || m['sessionId'] == sessionId).toList();
+            // Strictly match the current active session: never leak older stream comments!
+            return list.where((m) => m['sessionId'] == sessionId).toList();
           }
           return list;
         });
   }
 
   Stream<List<Map<String, dynamic>>> getTeamMatchesStream(String teamId) {
-    // Note: Since Firestore doesn't support logical OR in simple where clauses natively across fields without composite indexes,
-    // we fetch matches where the team is either teamAId or teamBId on the client for this demo, or we can just fetch all matches and filter,
-    // or use a more robust backend logic. Here we just fetch all and filter for simplicity since it's a small dataset.
     return _db
         .collection('matches')
         .snapshots()
@@ -770,11 +814,13 @@ class FirestoreService {
     required String senderName,
     required String message,
     String? sessionId,
+    String? senderRole,
     bool isModerator = false,
   }) async {
     await _db.collection('matches').doc(matchId).collection('chat_messages').add({
       'senderId': senderId,
       'senderName': senderName,
+      'senderRole': senderRole ?? 'player',
       'message': message,
       if (sessionId != null && sessionId.isNotEmpty) 'sessionId': sessionId,
       'timestamp': FieldValue.serverTimestamp(),
@@ -1141,11 +1187,28 @@ class FirestoreService {
     return _db.collection('matches')
         .where('refereeId', isEqualTo: refereeUid)
         .snapshots()
-        .map((snapshot) => snapshot.docs.map((doc) {
-              final data = doc.data();
-              data['id'] = doc.id;
-              return data;
-            }).where((match) => match['status'] == 'scheduled').toList());
+        .map((snapshot) {
+          final list = snapshot.docs.map((doc) {
+            final data = doc.data();
+            data['id'] = doc.id;
+            return data;
+          }).where((match) => match['status'] != 'completed').toList();
+
+          list.sort((a, b) {
+            final aLive = (a['isLive'] == true || a['status'] == 'live') ? 1 : 0;
+            final bLive = (b['isLive'] == true || b['status'] == 'live') ? 1 : 0;
+            if (aLive != bLive) return bLive.compareTo(aLive);
+
+            final aTime = a['updatedAt'] ?? a['createdAt'];
+            final bTime = b['updatedAt'] ?? b['createdAt'];
+            if (aTime is Timestamp && bTime is Timestamp) {
+              return bTime.compareTo(aTime);
+            }
+            return 0;
+          });
+
+          return list;
+        });
   }
 
   Future<void> submitMatchResult({
