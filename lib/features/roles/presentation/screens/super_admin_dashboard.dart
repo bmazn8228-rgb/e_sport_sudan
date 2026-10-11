@@ -445,13 +445,14 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard> {
             ElevatedButton(
               onPressed: () => _showRoleChangeBottomSheet(context, user),
               style: ElevatedButton.styleFrom(
+                minimumSize: const Size(0, 32),
                 backgroundColor: roleColor.withValues(alpha: 0.15),
                 foregroundColor: roleColor,
                 elevation: 0,
-                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
               ),
-              child: Text(role, style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+              child: Text(role, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
             ),
           ],
         ),

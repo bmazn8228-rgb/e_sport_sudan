@@ -237,25 +237,29 @@ class _RegisteredPlayersScreenState extends State<RegisteredPlayersScreen> {
   }) {
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _buildMiniStat('إجمالي المسجلين', '$totalCount', AppTheme.primaryBlue, Icons.people_alt_rounded),
-          _buildDivider(),
-          _buildMiniStat('اللاعبين', '$playersCount', Colors.cyanAccent, Icons.sports_esports_rounded),
-          _buildDivider(),
-          _buildMiniStat('الحكام', '$refereesCount', Colors.blueAccent, Icons.sports_rounded),
-          _buildDivider(),
-          _buildMiniStat('المنظمين', '$organizersCount', Colors.orangeAccent, Icons.emoji_events_rounded),
-          _buildDivider(),
-          _buildMiniStat('المشرفين', '${financeCount + superAdminsCount}', Colors.purpleAccent, Icons.shield_rounded),
-        ],
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: [
+            _buildMiniStat('إجمالي المسجلين', '$totalCount', AppTheme.primaryBlue, Icons.people_alt_rounded),
+            _buildDivider(),
+            _buildMiniStat('اللاعبين', '$playersCount', Colors.cyanAccent, Icons.sports_esports_rounded),
+            _buildDivider(),
+            _buildMiniStat('الحكام', '$refereesCount', Colors.blueAccent, Icons.sports_rounded),
+            _buildDivider(),
+            _buildMiniStat('المنظمين', '$organizersCount', Colors.orangeAccent, Icons.emoji_events_rounded),
+            _buildDivider(),
+            _buildMiniStat('المالية', '$financeCount', Colors.tealAccent, Icons.account_balance_wallet_rounded),
+            _buildDivider(),
+            _buildMiniStat('الإدارة العليا', '$superAdminsCount', Colors.purpleAccent, Icons.shield_rounded),
+          ],
+        ),
       ),
     );
   }
@@ -421,246 +425,271 @@ class _RegisteredPlayersScreenState extends State<RegisteredPlayersScreen> {
               : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.06),
         ),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(14),
-        child: Column(
-          children: [
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(14),
+          onTap: canPromoteThisUser ? () => _showPromotionSheet(context, user, userId, name, userRole) : null,
+          child: Padding(
+            padding: const EdgeInsets.all(14),
+            child: Column(
               children: [
-                // Avatar with Role Indicator Badge
-                Stack(
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    CircleAvatar(
-                      radius: 26,
-                      backgroundColor: roleColor.withValues(alpha: 0.15),
-                      backgroundImage: (photoUrl != null && photoUrl.isNotEmpty)
-                          ? NetworkImage(photoUrl)
-                          : null,
-                      child: (photoUrl == null || photoUrl.isEmpty)
-                          ? Text(
-                              name.isNotEmpty ? name[0].toUpperCase() : 'U',
-                              style: TextStyle(
-                                color: roleColor,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20,
-                              ),
-                            )
-                          : null,
-                    ),
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: Container(
-                        padding: const EdgeInsets.all(3),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.surface,
-                          shape: BoxShape.circle,
-                          border: Border.all(color: roleColor, width: 1.5),
-                        ),
-                        child: Icon(roleIcon, size: 10, color: roleColor),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(width: 12),
-
-                // User details
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              name,
-                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                          // Role Badge
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                            decoration: BoxDecoration(
-                              color: roleColor.withValues(alpha: 0.15),
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: roleColor.withValues(alpha: 0.4)),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(roleIcon, size: 11, color: roleColor),
-                                const SizedBox(width: 4),
-                                Text(
-                                  userRole.displayNameArabic,
+                    // Avatar with Role Indicator Badge
+                    Stack(
+                      children: [
+                        CircleAvatar(
+                          radius: 26,
+                          backgroundColor: roleColor.withValues(alpha: 0.15),
+                          backgroundImage: (photoUrl != null && photoUrl.isNotEmpty)
+                              ? NetworkImage(photoUrl)
+                              : null,
+                          child: (photoUrl == null || photoUrl.isEmpty)
+                              ? Text(
+                                  name.isNotEmpty ? name[0].toUpperCase() : 'U',
                                   style: TextStyle(
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.bold,
                                     color: roleColor,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 20,
                                   ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 4),
-
-                      // IGN and Player ID Row
-                      Row(
-                        children: [
-                          if (ign.isNotEmpty) ...[
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: AppTheme.primaryBlue.withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: Text(
-                                'IGN: $ign',
-                                style: TextStyle(
-                                  color: AppTheme.primaryBlue,
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 6),
-                          ],
-                          if (playerId.isNotEmpty) ...[
-                            InkWell(
-                              onTap: () {
-                                Clipboard.setData(ClipboardData(text: playerId));
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text('تم نسخ الآيدي: $playerId ✅'),
-                                    duration: const Duration(seconds: 1),
-                                  ),
-                                );
-                              },
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(
-                                    'ID: #$playerId',
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 2),
-                                  Icon(
-                                    Icons.copy_rounded,
-                                    size: 11,
-                                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
-                      const SizedBox(height: 6),
-
-                      // Email / Phone Info
-                      if (email.isNotEmpty)
-                        Row(
-                          children: [
-                            Icon(Icons.email_outlined, size: 12, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4)),
-                            const SizedBox(width: 4),
-                            Expanded(
-                              child: Text(
-                                email,
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
+                                )
+                              : null,
                         ),
-                      if (phone.isNotEmpty)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 2),
-                          child: Row(
+                        Positioned(
+                          bottom: 0,
+                          right: 0,
+                          child: Container(
+                            padding: const EdgeInsets.all(3),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).colorScheme.surface,
+                              shape: BoxShape.circle,
+                              border: Border.all(color: roleColor, width: 1.5),
+                            ),
+                            child: Icon(roleIcon, size: 10, color: roleColor),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(width: 12),
+
+                    // User details
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
                             children: [
-                              Icon(Icons.phone_outlined, size: 12, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4)),
-                              const SizedBox(width: 4),
-                              Text(
-                                phone,
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                              Expanded(
+                                child: Text(
+                                  name,
+                                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              // Role Badge
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                decoration: BoxDecoration(
+                                  color: roleColor.withValues(alpha: 0.15),
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(color: roleColor.withValues(alpha: 0.4)),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(roleIcon, size: 11, color: roleColor),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      userRole.displayNameArabic,
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.bold,
+                                        color: roleColor,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ],
                           ),
-                        ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+                          const SizedBox(height: 4),
 
-            const SizedBox(height: 12),
-            const Divider(height: 1),
-            const SizedBox(height: 10),
+                          // IGN and Player ID Row
+                          Row(
+                            children: [
+                              if (ign.isNotEmpty) ...[
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: AppTheme.primaryBlue.withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                  child: Text(
+                                    'IGN: $ign',
+                                    style: TextStyle(
+                                      color: AppTheme.primaryBlue,
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 6),
+                              ],
+                              if (playerId.isNotEmpty) ...[
+                                InkWell(
+                                  onTap: () {
+                                    Clipboard.setData(ClipboardData(text: playerId));
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text('تم نسخ الآيدي: $playerId ✅'),
+                                        duration: const Duration(seconds: 1),
+                                      ),
+                                    );
+                                  },
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        'ID: #$playerId',
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 2),
+                                      Icon(
+                                        Icons.copy_rounded,
+                                        size: 11,
+                                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                          const SizedBox(height: 6),
 
-            // Action Row: Promotion or Locked Info
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // Rank Level info
-                Text(
-                  'مستوى الرتبة: ${userRole.rank}',
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.45),
-                  ),
-                ),
-
-                // Promote / Change Role Button
-                if (canPromoteThisUser)
-                  ElevatedButton.icon(
-                    onPressed: () => _showPromotionSheet(context, user, userId, name, userRole),
-                    icon: const Icon(Icons.shield_outlined, size: 14),
-                    label: const Text('ترقية الصلاحيات', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: roleColor.withValues(alpha: 0.15),
-                      foregroundColor: roleColor,
-                      elevation: 0,
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        side: BorderSide(color: roleColor.withValues(alpha: 0.4)),
+                          // Email / Phone Info
+                          if (email.isNotEmpty)
+                            Row(
+                              children: [
+                                Icon(Icons.email_outlined, size: 12, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4)),
+                                const SizedBox(width: 4),
+                                Expanded(
+                                  child: Text(
+                                    email,
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          if (phone.isNotEmpty)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 2),
+                              child: Row(
+                                children: [
+                                  Icon(Icons.phone_outlined, size: 12, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4)),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    phone,
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                        ],
                       ),
                     ),
-                  )
-                else
-                  OutlinedButton.icon(
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('ترقية وتعديل الرتب مخصصة لمدير النظام (Super Admin) فقط 🔒'),
-                          backgroundColor: Colors.deepOrangeAccent,
-                        ),
-                      );
-                    },
-                    icon: const Icon(Icons.lock_rounded, size: 13, color: Colors.grey),
-                    label: const Text('غير مصرح بالترقية 🔒', style: TextStyle(fontSize: 11, color: Colors.grey)),
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                      side: BorderSide(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12)),
+                  ],
+                ),
+
+                const SizedBox(height: 12),
+                const Divider(height: 1),
+                const SizedBox(height: 10),
+
+                // Action Row: Promotion or Locked Info
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    // Rank Level info badge
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: roleColor.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: roleColor.withValues(alpha: 0.25)),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.military_tech_rounded, size: 14, color: roleColor),
+                          const SizedBox(width: 4),
+                          Text(
+                            'مستوى الرتبة: ${userRole.rank}',
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                              color: roleColor,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
+
+                    // Promote / Demote / Change Role Button
+                    if (canPromoteThisUser)
+                      ElevatedButton.icon(
+                        onPressed: () => _showPromotionSheet(context, user, userId, name, userRole),
+                        icon: const Icon(Icons.swap_vert_rounded, size: 16),
+                        label: const Text('ترقية / تخفيض الرتبة ⚡', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                        style: ElevatedButton.styleFrom(
+                          minimumSize: const Size(0, 36),
+                          backgroundColor: roleColor.withValues(alpha: 0.20),
+                          foregroundColor: roleColor,
+                          elevation: 0,
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            side: BorderSide(color: roleColor.withValues(alpha: 0.5)),
+                          ),
+                        ),
+                      )
+                    else
+                      OutlinedButton.icon(
+                        onPressed: () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('ترقية وتعديل الرتب مخصصة لمدير النظام (Super Admin) فقط 🔒'),
+                              backgroundColor: Colors.deepOrangeAccent,
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.lock_rounded, size: 13, color: Colors.grey),
+                        label: const Text('غير مصرح بالترقية 🔒', style: TextStyle(fontSize: 11, color: Colors.grey)),
+                        style: OutlinedButton.styleFrom(
+                          minimumSize: const Size(0, 36),
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          side: BorderSide(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12)),
+                        ),
+                      ),
+                  ],
+                ),
               ],
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -818,41 +847,72 @@ class _RegisteredPlayersScreenState extends State<RegisteredPlayersScreen> {
                               ),
                             ),
                             const Spacer(),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: (isEligible ? color : Colors.grey).withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: Text(
-                                'مستوى ${candidateRole.rank}',
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  color: isEligible ? color : Colors.grey,
-                                  fontWeight: FontWeight.bold,
+                            if (isCurrentRole)
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: color.withValues(alpha: 0.15),
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: Text(
+                                  'الرتبة الحالية',
+                                  style: TextStyle(fontSize: 10, color: color, fontWeight: FontWeight.bold),
+                                ),
+                              )
+                            else if (candidateRole.rank > currentUserRole.rank)
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: Colors.greenAccent.withValues(alpha: 0.15),
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: const Text(
+                                  'ترقية ⬆️',
+                                  style: TextStyle(fontSize: 10, color: Colors.greenAccent, fontWeight: FontWeight.bold),
+                                ),
+                              )
+                            else
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: Colors.orangeAccent.withValues(alpha: 0.15),
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: const Text(
+                                  'تخفيض ⬇️',
+                                  style: TextStyle(fontSize: 10, color: Colors.orangeAccent, fontWeight: FontWeight.bold),
                                 ),
                               ),
-                            ),
                           ],
                         ),
                         subtitle: Text(
                           isCurrentRole
-                              ? 'الرتبة الحالية للمستخدم'
+                              ? 'الرتبة الحالية للمستخدم (مستوى ${candidateRole.rank})'
                               : (!isEligible
                                   ? 'غير متاح (يتطلب رتبة أعلى من رتبتك)'
-                                  : 'ترقية وتحديث الصلاحيات فوراً في Firebase'),
+                                  : (candidateRole.rank > currentUserRole.rank
+                                      ? 'ترقية إلى رتبة وصلاحيات أعلى (مستوى ${candidateRole.rank})'
+                                      : 'تخفيض الرتبة والصلاحيات إلى مستوى (${candidateRole.rank})')),
                           style: TextStyle(
                             fontSize: 10,
                             color: isCurrentRole
                                 ? color
-                                : (!isEligible ? Colors.redAccent.withValues(alpha: 0.7) : Colors.grey),
+                                : (!isEligible
+                                    ? Colors.redAccent.withValues(alpha: 0.7)
+                                    : (candidateRole.rank > currentUserRole.rank ? Colors.greenAccent : Colors.orangeAccent)),
                           ),
                         ),
                         trailing: isCurrentRole
                             ? Icon(Icons.check_circle_rounded, color: color, size: 20)
                             : (!isEligible
                                 ? const Icon(Icons.lock_rounded, color: Colors.grey, size: 16)
-                                : const Icon(Icons.arrow_forward_ios_rounded, size: 14)),
+                                : Icon(
+                                    candidateRole.rank > currentUserRole.rank
+                                        ? Icons.arrow_upward_rounded
+                                        : Icons.arrow_downward_rounded,
+                                    size: 16,
+                                    color: candidateRole.rank > currentUserRole.rank ? Colors.greenAccent : Colors.orangeAccent,
+                                  )),
                         onTap: (!isEligible || isCurrentRole)
                             ? null
                             : () => _confirmAndPromoteUser(
@@ -860,6 +920,7 @@ class _RegisteredPlayersScreenState extends State<RegisteredPlayersScreen> {
                                   bottomSheetContext,
                                   userId,
                                   userName,
+                                  currentUserRole,
                                   candidateRole,
                                 ),
                       ),
@@ -879,8 +940,13 @@ class _RegisteredPlayersScreenState extends State<RegisteredPlayersScreen> {
     BuildContext bottomSheetContext,
     String userId,
     String userName,
+    UserRole currentRole,
     UserRole newRole,
   ) {
+    final isUpgrade = newRole.rank > currentRole.rank;
+    final actionLabel = isUpgrade ? 'ترقية المستخدم ⬆️' : 'تخفيض رتبة المستخدم ⬇️';
+    final actionColor = isUpgrade ? Colors.greenAccent : Colors.orangeAccent;
+
     showDialog(
       context: bottomSheetContext,
       builder: (dialogCtx) {
@@ -892,9 +958,16 @@ class _RegisteredPlayersScreenState extends State<RegisteredPlayersScreen> {
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               title: Row(
                 children: [
-                  Icon(_getRoleIcon(newRole), color: _getRoleColor(newRole)),
+                  Icon(
+                    isUpgrade ? Icons.arrow_circle_up_rounded : Icons.arrow_circle_down_rounded,
+                    color: actionColor,
+                    size: 22,
+                  ),
                   const SizedBox(width: 8),
-                  const Text('تأكيد ترقية المستخدم', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                  Text(
+                    'تأكيد $actionLabel',
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
                 ],
               ),
               content: Column(
@@ -902,7 +975,23 @@ class _RegisteredPlayersScreenState extends State<RegisteredPlayersScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text('هل أنت متأكد من تغيير رتبة المستخدم: "$userName"؟'),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 10),
+                  // Old Role
+                  Row(
+                    children: [
+                      const Text('الرتبة السابقة: ', style: TextStyle(fontSize: 12)),
+                      Text(
+                        currentRole.roleTitleArabic,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: _getRoleColor(currentRole),
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  // New Role Container
                   Container(
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
@@ -912,21 +1001,26 @@ class _RegisteredPlayersScreenState extends State<RegisteredPlayersScreen> {
                     ),
                     child: Row(
                       children: [
-                        const Text('الرتبة الجديدة: ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                         Text(
-                          newRole.roleTitleArabic,
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: _getRoleColor(newRole),
+                          isUpgrade ? 'الرتبة الجديدة بعد الترقية: ' : 'الرتبة الجديدة بعد التخفيض: ',
+                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                        ),
+                        Expanded(
+                          child: Text(
+                            newRole.roleTitleArabic,
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: _getRoleColor(newRole),
+                            ),
                           ),
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 10),
                   Text(
-                    'سيتم حفظ التغيير فوراً في Firebase Cloud وإرسال إشعار فوري بحسابه.',
+                    'سيتم حفظ التغيير فوراً في قاعدة بيانات Firebase السحابية وتحديث صلاحيات المستخدم فورياً.',
                     style: TextStyle(
                       fontSize: 11,
                       color: Theme.of(parentContext).colorScheme.onSurface.withValues(alpha: 0.6),
@@ -941,6 +1035,7 @@ class _RegisteredPlayersScreenState extends State<RegisteredPlayersScreen> {
                 ),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
+                    minimumSize: const Size(0, 38),
                     backgroundColor: _getRoleColor(newRole),
                     foregroundColor: Colors.black,
                   ),
@@ -956,7 +1051,12 @@ class _RegisteredPlayersScreenState extends State<RegisteredPlayersScreen> {
                             if (parentContext.mounted) {
                               ScaffoldMessenger.of(parentContext).showSnackBar(
                                 SnackBar(
-                                  content: Text('تمت ترقية $userName إلى ${newRole.roleTitleArabic} بنجاح ✅', style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+                                  content: Text(
+                                    isUpgrade
+                                        ? 'تمت ترقية $userName إلى ${newRole.roleTitleArabic} بنجاح ✅'
+                                        : 'تم تخفيض رتبة $userName إلى ${newRole.roleTitleArabic} بنجاح ✅',
+                                    style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+                                  ),
                                   backgroundColor: AppTheme.primaryBlue,
                                   duration: const Duration(seconds: 3),
                                 ),
@@ -966,14 +1066,17 @@ class _RegisteredPlayersScreenState extends State<RegisteredPlayersScreen> {
                             setDialogState(() => isProcessing = false);
                             if (parentContext.mounted) {
                               ScaffoldMessenger.of(parentContext).showSnackBar(
-                                SnackBar(content: Text('فشل تنفيذ الترقية: $e ❌'), backgroundColor: Colors.redAccent),
+                                SnackBar(content: Text('فشل تنفيذ العملية: $e ❌'), backgroundColor: Colors.redAccent),
                               );
                             }
                           }
                         },
                   child: isProcessing
                       ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black))
-                      : const Text('تأكيد الترقية ✅', style: TextStyle(fontWeight: FontWeight.bold)),
+                      : Text(
+                          isUpgrade ? 'تأكيد الترقية ⬆️' : 'تأكيد تخفيض الرتبة ⬇️',
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
                 ),
               ],
             );
