@@ -714,9 +714,14 @@ class _TournamentAdminDashboardScreenState extends State<TournamentAdminDashboar
     }
   }
 
-  bool get _isSuperAdmin {
-    final email = FirebaseAuth.instance.currentUser?.email;
-    return _userRole == 'super_admin' || email == 'superadmin@esportsudan.sd' || email == 'admin@esportsudan.sd';
+  bool get _canManageTournaments {
+    final email = FirebaseAuth.instance.currentUser?.email?.trim().toLowerCase();
+    return _userRole == 'super_admin' ||
+           _userRole == 'tournament_admin' ||
+           email == 'superadmin@esportsudan.sd' ||
+           email == 'admin@esportsudan.sd' ||
+           email == 'tournament@esportsudan.sd' ||
+           email == 'organizer@esportsudan.sd';
   }
 
   @override
@@ -733,7 +738,7 @@ class _TournamentAdminDashboardScreenState extends State<TournamentAdminDashboar
           ),
         ],
       ),
-      floatingActionButton: _isSuperAdmin
+      floatingActionButton: _canManageTournaments
           ? FloatingActionButton(
               onPressed: () => _showAddTournamentDialog(context),
               backgroundColor: AppTheme.primaryBlue,

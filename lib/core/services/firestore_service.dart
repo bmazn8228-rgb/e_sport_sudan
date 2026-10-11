@@ -1395,12 +1395,23 @@ class FirestoreService {
   }
 
   Future<void> updateUserRole(String userId, String roleValue) async {
+    final cleanUserId = userId.trim();
+    if (cleanUserId.isEmpty) {
+      throw ArgumentError('معرف المستخدم غير متوفر أو غير صالح');
+    }
+    
     _cachedUser = null;
-    await _db.collection('users').doc(userId).set({'role': roleValue}, SetOptions(merge: true));
+    _lastCacheTime = null;
+
+    await _db.collection('users').doc(cleanUserId).set({
+      'role': roleValue,
+      'updatedAt': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
+
     try {
       final roleModel = UserRole.fromValue(roleValue);
       await addNotification(
-        userId,
+        cleanUserId,
         'ترقية الصلاحيات والرتبة 🎖️',
         'تم تحديث رتبتك وصلاحياتك في المنظومة إلى: ${roleModel.roleTitleArabic}',
         type: 'role_upgrade',

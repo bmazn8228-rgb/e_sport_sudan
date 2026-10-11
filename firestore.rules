@@ -15,34 +15,34 @@ service cloud.firestore {
     
     function getUserRole() {
       return (isAuthenticated() && exists(/databases/$(database)/documents/users/$(request.auth.uid))) 
-        ? getUserData().role 
+        ? (('role' in getUserData()) ? getUserData().role : 'player') 
         : 'guest';
     }
     
     function isSuperAdmin() {
       return isAuthenticated() && (
-        request.auth.token.email in ['superadmin@esportsudan.sd', 'admin@esportsudan.sd']
+        (request.auth.token.keys().hasAny(['email']) && request.auth.token.email.matches('(?i)^(superadmin|admin)@esportsudan\\.sd$'))
         || getUserRole() == 'super_admin'
       );
     }
     
     function isTournamentAdmin() {
       return isSuperAdmin() || (isAuthenticated() && (
-        request.auth.token.email in ['tournament@esportsudan.sd', 'organizer@esportsudan.sd']
+        (request.auth.token.keys().hasAny(['email']) && request.auth.token.email.matches('(?i)^(tournament|organizer)@esportsudan\\.sd$'))
         || getUserRole() in ['super_admin', 'tournament_admin']
       ));
     }
     
     function isReferee() {
       return isTournamentAdmin() || (isAuthenticated() && (
-        request.auth.token.email == 'referee@esportsudan.sd'
+        (request.auth.token.keys().hasAny(['email']) && request.auth.token.email.matches('(?i)^referee@esportsudan\\.sd$'))
         || getUserRole() in ['super_admin', 'tournament_admin', 'referee']
       ));
     }
     
     function isFinanceAdmin() {
       return isSuperAdmin() || (isAuthenticated() && (
-        request.auth.token.email == 'finance@esportsudan.sd'
+        (request.auth.token.keys().hasAny(['email']) && request.auth.token.email.matches('(?i)^finance@esportsudan\\.sd$'))
         || getUserRole() in ['super_admin', 'finance_admin']
       ));
     }

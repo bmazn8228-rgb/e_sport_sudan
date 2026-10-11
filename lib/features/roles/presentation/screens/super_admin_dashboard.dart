@@ -14,6 +14,7 @@ import 'package:e_sport_sudan/features/roles/presentation/screens/admin_news_man
 import 'package:e_sport_sudan/features/roles/presentation/screens/registered_players_screen.dart';
 import 'referee_dashboard.dart';
 import 'package:e_sport_sudan/features/team/presentation/screens/team_management_screen.dart';
+import 'package:e_sport_sudan/features/main/presentation/screens/main_screen.dart';
 
 class SuperAdminDashboard extends StatefulWidget {
   const SuperAdminDashboard({super.key});
@@ -353,6 +354,14 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard> {
                   Navigator.push(context, MaterialPageRoute(builder: (context) => TeamManagementScreen()));
                 },
               ),
+              ListTile(
+                leading: Icon(Icons.sports_esports, color: Colors.purpleAccent),
+                title: Text('معاينة واجهة اللاعب العادي (Player App)'),
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => const MainScreen()));
+                },
+              ),
             ],
           ),
         );
@@ -457,7 +466,7 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard> {
     const adminRole = UserRole.superAdmin;
 
     if (userId.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('خطأ: لا يوجد معرّف للمستخدم')));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('خطأ: لا يوجد معرّف للمستخدم')));
       return;
     }
 
@@ -474,25 +483,26 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard> {
     showModalBottomSheet(
       context: context,
       backgroundColor: Theme.of(context).colorScheme.surface,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-      builder: (ctx) {
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (bottomSheetContext) {
         return Padding(
-          padding: EdgeInsets.all(20),
+          padding: const EdgeInsets.all(20),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('ترقية صلاحيات: ${user['displayName'] ?? 'المستخدم'}', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-              SizedBox(height: 6),
+              Text('ترقية صلاحيات: ${user['displayName'] ?? 'المستخدم'}', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 6),
               Text(
                 'الرتبة الحالية: ${targetUserRole.displayNameArabic} (مستوى ${targetUserRole.rank}). اختر الرتبة الجديدة وفق الصلاحيات المتاحة:',
                 style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54)),
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               ...UserRole.values.map((role) {
                 final isEligible = adminRole.canAssignRole(role);
                 return _buildRoleOption(
-                  ctx,
+                  context,
+                  bottomSheetContext,
                   userId,
                   role.toValue(),
                   role.roleTitleArabic,
@@ -540,7 +550,8 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard> {
   }
 
   Widget _buildRoleOption(
-    BuildContext context,
+    BuildContext parentContext,
+    BuildContext bottomSheetContext,
     String userId,
     String roleValue,
     String roleName,
@@ -556,29 +567,34 @@ class _SuperAdminDashboardState extends State<SuperAdminDashboard> {
       title: Text(
         roleName,
         style: TextStyle(
-          color: isEligible ? (isSelected ? color : Theme.of(context).colorScheme.onSurface) : Colors.grey,
+          color: isEligible ? (isSelected ? color : Theme.of(parentContext).colorScheme.onSurface) : Colors.grey,
           fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
         ),
       ),
-      subtitle: !isEligible ? Text('غير متاح (يتطلب رتبة أعلى)', style: TextStyle(color: Colors.redAccent, fontSize: 10)) : null,
-      trailing: isSelected ? Icon(Icons.check_circle, color: color) : (!isEligible ? Icon(Icons.lock, size: 16, color: Colors.grey) : null),
+      subtitle: !isEligible ? const Text('غير متاح (يتطلب رتبة أعلى)', style: TextStyle(color: Colors.redAccent, fontSize: 10)) : null,
+      trailing: isSelected ? Icon(Icons.check_circle, color: color) : (!isEligible ? const Icon(Icons.lock, size: 16, color: Colors.grey) : null),
       onTap: (!isEligible || isSelected)
           ? null
           : () async {
-              final messenger = ScaffoldMessenger.of(context);
-              Navigator.pop(context);
+              if (bottomSheetContext.mounted) {
+                Navigator.pop(bottomSheetContext);
+              }
               try {
                 await FirestoreService().updateUserRole(userId, roleValue);
-                messenger.showSnackBar(
-                  SnackBar(
-                    content: Text('تم تغيير الصلاحية إلى $roleName بنجاح ✅', style: TextStyle(color: Colors.black)),
-                    backgroundColor: AppTheme.primaryBlue,
-                  ),
-                );
+                if (parentContext.mounted) {
+                  ScaffoldMessenger.of(parentContext).showSnackBar(
+                    SnackBar(
+                      content: Text('تم تغيير الصلاحية إلى $roleName بنجاح ✅', style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+                      backgroundColor: AppTheme.primaryBlue,
+                    ),
+                  );
+                }
               } catch (e) {
-                messenger.showSnackBar(
-                  SnackBar(content: Text('فشل تغيير الصلاحية: $e ❌'), backgroundColor: Colors.red),
-                );
+                if (parentContext.mounted) {
+                  ScaffoldMessenger.of(parentContext).showSnackBar(
+                    SnackBar(content: Text('فشل تغيير الصلاحية: $e ❌'), backgroundColor: Colors.red),
+                  );
+                }
               }
             },
     );
