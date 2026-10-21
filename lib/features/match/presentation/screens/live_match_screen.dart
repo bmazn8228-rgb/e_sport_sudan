@@ -1,7 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:e_sport_sudan/core/theme/app_theme.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'package:e_sport_sudan/core/services/firestore_service.dart';
@@ -591,13 +591,35 @@ class _LiveMatchScreenState extends State<LiveMatchScreen> with TickerProviderSt
                           Expanded(
                             child: TextField(
                               controller: _chatController,
-                              style: const TextStyle(fontSize: 13, color: Colors.white),
-                              onSubmitted: (_) => _sendMessage(sessionId, activeMatchId),
+                              obscureText: false,
+                              keyboardType: TextInputType.text,
                               textInputAction: TextInputAction.send,
+                              enableSuggestions: true,
+                              autocorrect: false,
+                              textCapitalization: TextCapitalization.sentences,
+                              cursorColor: Colors.white,
+                              cursorWidth: 2.0,
+                              style: GoogleFonts.cairo(
+                                fontSize: 13,
+                                color: Colors.white,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              onSubmitted: (_) => _sendMessage(sessionId, activeMatchId),
                               decoration: InputDecoration(
                                 hintText: 'أضف تعليقاً... 💬',
-                                hintStyle: TextStyle(fontSize: 12, color: Colors.white.withValues(alpha: 0.55)),
+                                hintStyle: GoogleFonts.cairo(
+                                  fontSize: 12,
+                                  color: Colors.white.withValues(alpha: 0.6),
+                                ),
+                                hintTextDirection: TextDirection.rtl,
+                                filled: true,
+                                fillColor: Colors.transparent,
+                                isDense: true,
                                 border: InputBorder.none,
+                                enabledBorder: InputBorder.none,
+                                focusedBorder: InputBorder.none,
+                                errorBorder: InputBorder.none,
+                                disabledBorder: InputBorder.none,
                                 contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                               ),
                             ),
@@ -731,7 +753,7 @@ class _LiveMatchScreenState extends State<LiveMatchScreen> with TickerProviderSt
                         Flexible(
                           child: Text(
                             senderName,
-                            style: TextStyle(
+                            style: GoogleFonts.cairo(
                               fontWeight: FontWeight.bold,
                               fontSize: 11,
                               color: roleColor,
@@ -749,7 +771,7 @@ class _LiveMatchScreenState extends State<LiveMatchScreen> with TickerProviderSt
                             ),
                             child: Text(
                               roleBadge,
-                              style: TextStyle(color: roleColor, fontSize: 8, fontWeight: FontWeight.bold),
+                              style: GoogleFonts.cairo(color: roleColor, fontSize: 8, fontWeight: FontWeight.bold),
                             ),
                           ),
                         ],
@@ -758,9 +780,10 @@ class _LiveMatchScreenState extends State<LiveMatchScreen> with TickerProviderSt
                     const SizedBox(height: 2),
                     Text(
                       messageText,
-                      style: const TextStyle(
+                      style: GoogleFonts.cairo(
                         fontSize: 12,
                         color: Colors.white,
+                        fontWeight: FontWeight.w500,
                         height: 1.3,
                       ),
                     ),

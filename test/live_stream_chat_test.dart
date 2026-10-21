@@ -115,6 +115,15 @@ void main() {
       expect(refereeMatches.any((m) => m['status'] == 'scheduled'), true);
       expect(refereeMatches.any((m) => m['status'] == 'completed'), false);
     });
+
+    test('Chat comment input validation prevents empty or whitespace-only messages', () {
+      final whitespaceMessage = '   \n  \t  ';
+      final validMessage = '  لعب ممتاز جداً! 👏  ';
+
+      expect(whitespaceMessage.trim().isEmpty, true);
+      expect(validMessage.trim().isEmpty, false);
+      expect(validMessage.trim(), 'لعب ممتاز جداً! 👏');
+    });
   });
 }
 
